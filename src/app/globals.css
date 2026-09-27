@@ -1,0 +1,144 @@
+/* MJ design tokens — taken from design/*.dc.html. Every component reads from these. */
+:root {
+  /* Ink & paper */
+  --mj-ink: #26221d;
+  --mj-ink-2: #2b2620; /* dark sections on the website */
+  --mj-ink-hover: #332d25; /* sidebar hover / active */
+  --mj-ink-line: #3a342b; /* rules on dark */
+  --mj-ink-bar: #4a4234; /* chart bars on dark */
+  --mj-cream: #f2ede3; /* page ground */
+  --mj-paper: #f7f2e7; /* cards, inputs */
+  --mj-sand: #ede6d6; /* header, hover rows */
+  --mj-sand-2: #e4dcc9; /* tracks, done tags */
+  --mj-white: #ffffff;
+
+  /* Gold */
+  --mj-gold: #b8a06a;
+  --mj-gold-hover: #a68d55;
+  --mj-gold-deep: #8f7a4b; /* small text in gold */
+
+  /* Text & lines */
+  --mj-text: #26221d;
+  --mj-text-2: #5c5344;
+  --mj-text-muted: #b9b2a4;
+  --mj-text-on-ink: #d9cfbb;
+  --mj-line: #ddd3bf;
+
+  /* Type */
+  --mj-serif: var(--font-mincho), "Zen Old Mincho", serif;
+  --mj-sans: var(--font-jost), "Jost", sans-serif;
+
+  /* Motion */
+  --mj-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Shadows */
+  --mj-shadow-sm: 0 4px 14px rgba(38, 34, 29, 0.12);
+  --mj-shadow-md: 0 8px 24px rgba(38, 34, 29, 0.12);
+  --mj-shadow-lg: 0 10px 30px rgba(38, 34, 29, 0.22);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--mj-cream);
+  color: var(--mj-text);
+  font-family: var(--mj-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--mj-gold-deep);
+}
+a:hover {
+  color: var(--mj-gold);
+}
+
+::selection {
+  background: var(--mj-gold);
+  color: var(--mj-ink);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--mj-gold-deep);
+}
+
+:focus-visible {
+  outline: 2px solid var(--mj-gold);
+  outline-offset: 2px;
+}
+
+button {
+  font-family: var(--mj-sans);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+/* Shared motion (dashboard cards, bars) */
+@keyframes mj-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mj-bar-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes mj-bar-up {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes mj-shimmer {
+  from {
+    background-position: -400px 0;
+  }
+  to {
+    background-position: 400px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

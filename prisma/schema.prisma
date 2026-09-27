@@ -1,0 +1,307 @@
+// MJ platform — database schema (R1 scope).
+// Money is stored as whole somoni (Int). Times are stored in UTC; the salon runs on Asia/Dushanbe (UTC+5).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Access ──────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  RECEPTION
+  CONTENT
+  MASTER
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  login        String    @unique
+  passwordHash String
+  role         Role
+  staff        Staff?    @relation(fields: [staffId], references: [id])
+  staffId      String?   @unique
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// ─── Team & services ─────────────────────────────────────
+
+model Staff {
+  id          String   @id @default(cuid())
+  name        String
+  title       String
+  /// Working weekdays, 0 = Monday … 6 = Sunday
+  workDays    Int[]
+  commission  Int      @default(40) /// percent of service revenue
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  user        User?
+  appointments AppointmentStaff[]
+  sales       Sale[]
+}
+
+model ServiceCategory {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  /// Lucide icon key: scissors | hand | eye | droplet | sparkles | brush | crown
+  icon      String
+  sortOrder Int       @default(0)
+  services  Service[]
+}
+
+model Service {
+  id          String          @id @default(cuid())
+  category    ServiceCategory @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  name        String
+  durationMin Int
+  price       Int
+  showOnSite  Boolean         @default(true)
+  showInPos   Boolean         @default(false)
+  sortOrder   Int             @default(0)
+  active      Boolean         @default(true)
+  appointments Appointment[]
+  saleItems   SaleItem[]
+}
+
+// ─── Guests & bookings ───────────────────────────────────
+
+enum GuestTag {
+  NEW
+  REGULAR
+  VIP
+  BRIDE
+}
+
+model Guest {
+  id           String        @id @default(cuid())
+  name         String
+  phone        String        @unique
+  birthday     DateTime?     @db.Date
+  tag          GuestTag      @default(NEW)
+  notes        String?
+  createdAt    DateTime      @default(now())
+  appointments Appointment[]
+  sales        Sale[]
+  dressBookings DressBooking[]
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  IN_CHAIR
+  DONE
+  CANCELLED
+  NO_SHOW
+}
+
+enum BookingSource {
+  CMS
+  WEBSITE
+  TELEGRAM
+  WHATSAPP
+  WALK_IN
+}
+
+model Appointment {
+  id          String             @id @default(cuid())
+  guest       Guest?             @relation(fields: [guestId], references: [id])
+  guestId     String?
+  /// Display name, also used for group or unregistered guests ("Подружки ×3")
+  guestName   String
+  service     Service?           @relation(fields: [serviceId], references: [id])
+  serviceId   String?
+  /// Display label; may differ from the service name ("СВАДЬБА: образ под ключ")
+  serviceLabel String
+  startsAt    DateTime
+  durationMin Int
+  price       Int
+  status      AppointmentStatus  @default(PENDING)
+  source      BookingSource      @default(CMS)
+  note        String?
+  createdAt   DateTime           @default(now())
+  staff       AppointmentStaff[]
+
+  @@index([startsAt])
+}
+
+model AppointmentStaff {
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointmentId String
+  staff         Staff       @relation(fields: [staffId], references: [id])
+  staffId       String
+
+  @@id([appointmentId, staffId])
+}
+
+// ─── Till ────────────────────────────────────────────────
+
+enum PaymentMethod {
+  CASH
+  CARD
+  QR
+}
+
+model Sale {
+  id        String        @id @default(cuid())
+  guest     Guest?        @relation(fields: [guestId], references: [id])
+  guestId   String?
+  staff     Staff?        @relation(fields: [staffId], references: [id])
+  staffId   String?
+  total     Int
+  method    PaymentMethod
+  createdAt DateTime      @default(now())
+  items     SaleItem[]
+
+  @@index([createdAt])
+}
+
+model SaleItem {
+  id        String   @id @default(cuid())
+  sale      Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleId    String
+  service   Service? @relation(fields: [serviceId], references: [id])
+  serviceId String?
+  name      String
+  price     Int
+}
+
+// ─── Dress rental ────────────────────────────────────────
+
+enum DressType {
+  WEDDING
+  EVENING
+}
+
+enum DressStatus {
+  AVAILABLE
+  CLEANING
+  RETIRED
+}
+
+model Dress {
+  id          String         @id @default(cuid())
+  name        String
+  type        DressType
+  size        String
+  pricePerDay Int
+  status      DressStatus    @default(AVAILABLE)
+  photoUrl    String?
+  sortOrder   Int            @default(0)
+  bookings    DressBooking[]
+}
+
+model DressBooking {
+  id        String   @id @default(cuid())
+  dress     Dress    @relation(fields: [dressId], references: [id])
+  dressId   String
+  guest     Guest?   @relation(fields: [guestId], references: [id])
+  guestId   String?
+  startsOn  DateTime @db.Date
+  endsOn    DateTime @db.Date
+  createdAt DateTime @default(now())
+}
+
+// ─── Salon settings & reminders ──────────────────────────
+
+model Setting {
+  key   String @id
+  value Json
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  text      String
+  done      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ─── Website content (edited in /admin) ──────────────────
+
+model SiteText {
+  key       String   /// hero | philosophy | bridal | about | booking
+  locale    String   @default("ru")
+  label     String
+  title     String
+  body      String
+  updatedAt DateTime @updatedAt
+
+  @@id([key, locale])
+}
+
+model SitePhoto {
+  slot      String   @id /// hero | bridal | interior | review-<n>
+  label     String
+  placement String
+  url       String
+  credit    String?
+  creditUrl String?
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  author    String
+  text      String
+  source    String
+  rating    Int      @default(5)
+  visible   Boolean  @default(true)
+  photoSlot String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ─── Integrations (mock first) ───────────────────────────
+
+enum IntegrationMode {
+  MOCK
+  LIVE
+}
+
+model Integration {
+  key       String          @id /// telegram | whatsapp | sms | payments
+  mode      IntegrationMode @default(MOCK)
+  enabled   Boolean         @default(true)
+  /// Non-secret settings only. Secrets live in server env.
+  config    Json            @default("{}")
+  updatedAt DateTime        @updatedAt
+}
+
+enum OutboxStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+model OutboxMessage {
+  id        String       @id @default(cuid())
+  channel   String       /// telegram | whatsapp | sms
+  to        String
+  body      String
+  status    OutboxStatus @default(QUEUED)
+  mock      Boolean      @default(true)
+  error     String?
+  meta      Json?
+  createdAt DateTime     @default(now())
+  sentAt    DateTime?
+
+  @@index([createdAt])
+}

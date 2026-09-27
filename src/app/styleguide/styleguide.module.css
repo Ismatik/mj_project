@@ -1,0 +1,138 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+}
+.header {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+.title {
+  font-family: var(--mj-serif);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin-top: 10px;
+}
+.lead {
+  font-size: 13.5px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+  margin: 8px 0 0;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.inkBox {
+  background: var(--mj-ink);
+  padding: 10px 14px;
+}
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11.5px;
+  color: var(--mj-text-2);
+}
+.chip {
+  height: 56px;
+  border: 1px solid var(--mj-line);
+}
+.type {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.display {
+  font-family: var(--mj-serif);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.display em {
+  color: var(--mj-gold-deep);
+}
+.body {
+  font-size: 13.5px;
+  font-weight: 300;
+  margin: 0;
+}
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 32px;
+}
+.appt {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 0 15px 8px;
+  border-bottom: 1px solid var(--mj-line);
+  transition: background 0.3s;
+}
+.appt:hover {
+  background: var(--mj-sand);
+}
+.apptMain {
+  flex: 1;
+  min-width: 0;
+}
+.apptName {
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+}
+.apptSub {
+  font-size: 12.5px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+}
+.apptRight {
+  text-align: right;
+}
+.apptTime {
+  font-family: var(--mj-serif);
+  font-weight: 600;
+  font-size: 14px;
+}
+.apptPrice {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--mj-gold-deep);
+}
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 24px 16px 60px;
+  }
+  .split {
+    grid-template-columns: 1fr;
+  }
+  .display,
+  .title {
+    font-size: 26px;
+  }
+}

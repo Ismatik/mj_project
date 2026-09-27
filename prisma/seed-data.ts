@@ -1,0 +1,271 @@
+// Demo data taken from the design prototypes (design/*.dc.html).
+// Prices are in somoni. Staff and several guest names are placeholders until the salon provides real data.
+
+export const staff = [
+  // name, title, working weekdays (0 = Mon), commission %
+  { key: "mavzuna", name: "Мавзуна", title: "Владелица · стилист", workDays: [1, 2, 3, 4, 5], commission: 100 },
+  { key: "ines", name: "Инес", title: "Колорист", workDays: [1, 2, 3, 4, 5, 6], commission: 40 },
+  { key: "mira", name: "Мира", title: "Брови · ресницы · макияж", workDays: [1, 2, 4, 5, 6], commission: 40 },
+  { key: "petra", name: "Петра", title: "Ногтевой сервис", workDays: [1, 2, 3, 4, 5], commission: 40 },
+  { key: "dario", name: "Дарио", title: "Парикмахер", workDays: [2, 3, 4, 5, 6], commission: 40 },
+] as const;
+
+export type StaffKey = (typeof staff)[number]["key"];
+
+export const categories = [
+  { slug: "hair", name: "Волосы", icon: "scissors" },
+  { slug: "nails", name: "Ногти", icon: "hand" },
+  { slug: "brows", name: "Брови и ресницы", icon: "eye" },
+  { slug: "skin", name: "Уход за кожей", icon: "droplet" },
+  { slug: "spa", name: "Спа", icon: "sparkles" },
+  { slug: "makeup", name: "Макияж и образы", icon: "brush" },
+] as const;
+
+type Cat = (typeof categories)[number]["slug"];
+
+export const services: {
+  key: string;
+  cat: Cat;
+  name: string;
+  min: number;
+  price: number;
+  site: boolean;
+  pos: boolean;
+  staff: StaffKey[];
+}[] = [
+  { key: "cut", cat: "hair", name: "Стрижка + укладка", min: 60, price: 180, site: true, pos: true, staff: ["dario", "mavzuna"] },
+  { key: "color", cat: "hair", name: "Окрашивание в один тон", min: 120, price: 450, site: true, pos: true, staff: ["ines"] },
+  { key: "balayage", cat: "hair", name: "Балаяж / шатуш", min: 180, price: 700, site: true, pos: true, staff: ["ines"] },
+  { key: "bridalHair", cat: "hair", name: "Свадебная причёска", min: 90, price: 550, site: true, pos: false, staff: ["mavzuna", "dario"] },
+  { key: "gel", cat: "nails", name: "Маникюр, гель-лак", min: 90, price: 280, site: true, pos: true, staff: ["petra"] },
+  { key: "pedi", cat: "nails", name: "Педикюр", min: 75, price: 320, site: true, pos: true, staff: ["petra"] },
+  { key: "nailArt", cat: "nails", name: "Дизайн (за ноготь)", min: 10, price: 15, site: false, pos: false, staff: ["petra"] },
+  { key: "brows", cat: "brows", name: "Архитектура бровей", min: 45, price: 150, site: true, pos: true, staff: ["mira"] },
+  { key: "lashes", cat: "brows", name: "Ламинирование ресниц", min: 60, price: 340, site: true, pos: true, staff: ["mira"] },
+  { key: "skin", cat: "skin", name: "Уход за кожей", min: 60, price: 520, site: true, pos: true, staff: ["ines"] },
+  { key: "spaHands", cat: "spa", name: "Спа-уход для рук", min: 45, price: 220, site: false, pos: false, staff: ["petra"] },
+  { key: "dayMakeup", cat: "makeup", name: "Макияж дневной", min: 45, price: 250, site: true, pos: false, staff: ["mira"] },
+  { key: "eveMakeup", cat: "makeup", name: "Макияж вечерний", min: 60, price: 400, site: true, pos: true, staff: ["mira"] },
+  { key: "bridal", cat: "makeup", name: "Свадебный образ под ключ", min: 180, price: 1500, site: true, pos: false, staff: ["mira", "ines"] },
+  { key: "trial", cat: "makeup", name: "Пробный образ", min: 90, price: 950, site: false, pos: false, staff: ["mira"] },
+];
+
+export type ServiceKey = string;
+
+export const guests: {
+  key: string;
+  name: string;
+  phone: string;
+  tag: "NEW" | "REGULAR" | "VIP" | "BRIDE";
+  /** Visits in history, days since the last visit (relative to "today"), favourite service. */
+  visits: number;
+  lastDaysAgo: number;
+  fav: ServiceKey;
+  birthdayWeekday?: number;
+}[] = [
+  { key: "marta", name: "Марта Каримова", phone: "+992935012214", tag: "VIP", visits: 24, lastDaysAgo: 0, fav: "balayage", birthdayWeekday: 3 },
+  { key: "farzona", name: "Фарзона Икромова", phone: "+992987004590", tag: "BRIDE", visits: 3, lastDaysAgo: 3, fav: "trial" },
+  { key: "sofia", name: "София Рахимова", phone: "+992901123877", tag: "REGULAR", visits: 17, lastDaysAgo: 0, fav: "gel" },
+  { key: "anna", name: "Анна Литвинова", phone: "+992938800451", tag: "REGULAR", visits: 9, lastDaysAgo: 0, fav: "lashes" },
+  { key: "sevara", name: "Севара Мирзоева", phone: "+992914551908", tag: "REGULAR", visits: 12, lastDaysAgo: 7, fav: "skin" },
+  { key: "leila", name: "Лейла Хамидова", phone: "+992983226733", tag: "NEW", visits: 2, lastDaysAgo: 4, fav: "eveMakeup" },
+  { key: "gulnora", name: "Гульнора Ташева", phone: "+992906402816", tag: "VIP", visits: 21, lastDaysAgo: 9, fav: "color" },
+  { key: "nargis", name: "Наргис Бобоева", phone: "+992932189042", tag: "REGULAR", visits: 6, lastDaysAgo: 14, fav: "cut" },
+  // Guests who appear only in the calendar
+  { key: "chloe", name: "Хлоя Бекова", phone: "+992900000101", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "skin" },
+  { key: "yuki", name: "Юки Таирова", phone: "+992900000102", tag: "NEW", visits: 0, lastDaysAgo: -1, fav: "cut" },
+  { key: "nigora", name: "Нигора Саидова", phone: "+992900000103", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "brows" },
+  { key: "zarina", name: "Зарина Алиева", phone: "+992900000104", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "gel" },
+  { key: "dilnoza", name: "Дильноза Рашидова", phone: "+992900000105", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "cut" },
+  { key: "lola", name: "Лола Хакимова", phone: "+992900000106", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "gel" },
+  { key: "malika", name: "Малика Юсупова", phone: "+992900000107", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "cut" },
+  { key: "shakhlo", name: "Шахло Камолова", phone: "+992900000108", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "pedi" },
+  { key: "aziza", name: "Азиза Назарова", phone: "+992900000109", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "lashes" },
+  { key: "mokhira", name: "Мохира Давлатова", phone: "+992900000110", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "eveMakeup" },
+  { key: "rukhshona", name: "Рухшона Валиева", phone: "+992900000111", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "gel" },
+  { key: "kamila", name: "Камила Саидова", phone: "+992900000112", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "gel" },
+  { key: "dilorom", name: "Дилором Азимова", phone: "+992900000113", tag: "REGULAR", visits: 0, lastDaysAgo: -1, fav: "brows" },
+];
+
+type Status = "PENDING" | "CONFIRMED" | "IN_CHAIR" | "DONE";
+
+export type SeedAppt = {
+  time: string;
+  guest: string | null; // guest key, or null for a named group
+  guestName?: string;
+  label: string;
+  service: ServiceKey;
+  staff: StaffKey[];
+  price: number;
+  status?: Status;
+};
+
+/** "Кто сегодня в кресле" — today's list from the dashboard. */
+export const today: SeedAppt[] = [
+  { time: "09:00", guest: "marta", label: "Балаяж + стрижка", service: "balayage", staff: ["ines"], price: 880, status: "DONE" },
+  { time: "10:30", guest: "sofia", label: "Гель-лак, пыльная роза", service: "gel", staff: ["petra"], price: 280, status: "DONE" },
+  { time: "12:00", guest: "anna", label: "Ламинирование ресниц", service: "lashes", staff: ["mira"], price: 340, status: "IN_CHAIR" },
+  { time: "13:30", guest: "chloe", label: "Уход за кожей", service: "skin", staff: ["ines"], price: 520, status: "CONFIRMED" },
+  { time: "15:30", guest: "yuki", label: "Стрижка и укладка", service: "cut", staff: ["dario"], price: 180, status: "PENDING" },
+  { time: "17:00", guest: "leila", label: "Пробный свадебный образ", service: "trial", staff: ["mira"], price: 950, status: "CONFIRMED" },
+];
+
+/** The calendar week from the prototype, by weekday (0 = Mon, closed). */
+export const week: SeedAppt[][] = [
+  [],
+  [
+    { time: "09:00", guest: "marta", label: "Балаяж + стрижка", service: "balayage", staff: ["ines"], price: 880 },
+    { time: "11:30", guest: "nigora", label: "Брови + ресницы", service: "brows", staff: ["mira"], price: 490 },
+    { time: "14:00", guest: "zarina", label: "Маникюр", service: "gel", staff: ["petra"], price: 280 },
+    { time: "16:30", guest: "dilnoza", label: "Укладка", service: "cut", staff: ["dario"], price: 180 },
+  ],
+  [
+    { time: "09:30", guest: "sevara", label: "Уход за кожей", service: "skin", staff: ["ines"], price: 520 },
+    { time: "12:00", guest: "lola", label: "Гель-лак", service: "gel", staff: ["petra"], price: 280 },
+    { time: "15:00", guest: "malika", label: "Стрижка", service: "cut", staff: ["dario"], price: 180 },
+  ],
+  [
+    { time: "11:00", guest: "farzona", label: "Свадебный образ, проба", service: "trial", staff: ["mira"], price: 950 },
+    { time: "13:30", guest: "gulnora", label: "Окрашивание", service: "color", staff: ["ines"], price: 450 },
+    { time: "17:00", guest: "shakhlo", label: "Педикюр", service: "pedi", staff: ["petra"], price: 320 },
+  ],
+  [
+    { time: "09:00", guest: "aziza", label: "Ламинирование ресниц", service: "lashes", staff: ["mira"], price: 340 },
+    { time: "12:30", guest: "mokhira", label: "Макияж вечерний", service: "eveMakeup", staff: ["mira"], price: 400 },
+    { time: "14:30", guest: "rukhshona", label: "Маникюр + педикюр", service: "gel", staff: ["petra"], price: 600 },
+  ],
+  [
+    { time: "08:30", guest: "farzona", label: "СВАДЬБА: образ под ключ", service: "bridal", staff: ["mira", "ines"], price: 1500 },
+    { time: "09:00", guest: null, guestName: "Мама невесты", label: "Причёска + макияж", service: "bridalHair", staff: ["dario"], price: 800 },
+    { time: "10:00", guest: null, guestName: "Подружки ×3", label: "Укладки", service: "cut", staff: ["petra"], price: 540 },
+    { time: "15:00", guest: "kamila", label: "Гель-лак", service: "gel", staff: ["petra"], price: 280 },
+  ],
+  [
+    { time: "10:00", guest: "nargis", label: "Стрижка", service: "cut", staff: ["dario"], price: 180 },
+    { time: "12:00", guest: "dilorom", label: "Брови", service: "brows", staff: ["mira"], price: 150 },
+  ],
+];
+
+/** Daily revenue of the last 14 days from the dashboard chart ($ → somoni at ×10). Oldest first. */
+export const revenue14 = [420, 510, 380, 640, 720, 560, 480, 690, 750, 610, 530, 820, 700, 486].map((v) => v * 10);
+
+export const dresses = [
+  { name: "Платье «Амира»", type: "WEDDING", size: "42–44", price: 900, status: "AVAILABLE", bookedInDays: null },
+  { name: "Платье «Ситора»", type: "WEDDING", size: "46–48", price: 850, status: "AVAILABLE", bookedInDays: 6 },
+  { name: "Платье «Лола»", type: "EVENING", size: "42", price: 400, status: "AVAILABLE", bookedInDays: null },
+  { name: "Платье «Малика»", type: "WEDDING", size: "40–42", price: 1100, status: "AVAILABLE", bookedInDays: 13 },
+  { name: "Платье «Наргис»", type: "EVENING", size: "44", price: 350, status: "CLEANING", bookedInDays: null },
+  { name: "Платье «Гуландом»", type: "EVENING", size: "46", price: 380, status: "AVAILABLE", bookedInDays: null },
+] as const;
+
+export const reminders = [
+  "День рождения Марты в четверг — маленький подарок?",
+  "Гель-лак «розовое золото» заканчивается (3 шт.)",
+  "Отправить советы по уходу гостьям после чисток",
+];
+
+export const settings: Record<string, string> = {
+  "salon.name": "Mavzunai Jovid — Gallery of Beauty MJ",
+  "salon.branch": "Студия на Бухоро",
+  "salon.address": "ул. Бухоро, 23/25, 1–2 этаж, Шохмансур, Душанбе",
+  "salon.phone": "+992 98 103 11 11",
+  "salon.whatsapp": "wa.me/992981031111",
+  "salon.instagram": "@mavzunai.jovid.official",
+  "salon.instagramGallery": "@mavzunai_jovid_gallery_beauty",
+  "salon.hours": "Вт–Вс 09:00–18:00 · Пн — выходной",
+  "salon.currency": "сомони (TJS)",
+  "site.seoTitle": "Mavzunai Jovid — салон красоты и свадебный зал в Душанбе",
+  "site.seoDescription":
+    "Gallery of Beauty MJ: волосы, ногти, макияж, свадебные образы и прокат платьев. ул. Бухоро 23/25. Запись в WhatsApp +992 98 103 11 11.",
+};
+
+export const siteTexts = [
+  { key: "hero", label: "Hero — главный экран", title: "Красота, которая вдохновляет", body: "Роскошь ухода. Ваша вневременная красота." },
+  {
+    key: "philosophy",
+    label: "Наша философия",
+    title: "Наша философия",
+    body: "Красота — это не только образ, это уверенность и характер. Мавзуна и её команда создают персональный опыт для каждой гостьи: от утреннего маникюра до свадебного образа под ключ — в тишине, заботе и без спешки.",
+  },
+  {
+    key: "bridal",
+    label: "Свадебный зал",
+    title: "Ваш самый красивый день",
+    body: "Причёска, макияж и маникюр в одно утро — без спешки. Прокат свадебных и вечерних платьев с примеркой и подгонкой по фигуре, пробный образ до торжества и образы для мамы и подружек невесты.",
+  },
+  {
+    key: "about",
+    label: "О салоне",
+    title: "О салоне",
+    body: "Два этажа в центре Душанбе: салон красоты и свадебный зал под одной крышей. Идеальная чистота, внимательные мастера и владелица Мавзуна, которая сама подскажет, что пойдёт именно вам.",
+  },
+];
+
+export const sitePhotos = [
+  {
+    slot: "hero",
+    label: "Hero — главный экран",
+    placement: "верх страницы",
+    url: "https://images.unsplash.com/photo-1688395199230-ab7c7170a4b6?q=75&w=1400&auto=format&fit=crop&sat=-100",
+    credit: "Photo by engin akyurt on Unsplash",
+    creditUrl: "https://unsplash.com/@enginakyurt",
+  },
+  {
+    slot: "bridal",
+    label: "Свадебный зал",
+    placement: "секция «Невестам»",
+    url: "https://images.unsplash.com/photo-1708134128589-0dfd38b2203a?q=75&w=1200&auto=format&fit=crop&sat=-100",
+    credit: "Photo by 550Park Luxury Wedding Films on Unsplash",
+    creditUrl: "https://unsplash.com/@550park",
+  },
+  {
+    slot: "interior",
+    label: "Интерьер",
+    placement: "секция «О салоне»",
+    url: "https://api.mino.tj/storage/53935/conversions/16BBF696-509D-4AB2-8205-82B0860153C6-panel.jpg",
+    credit: "Фото: Beauty Studio Mavzunai Jovid (mino.tj)",
+    creditUrl: "https://mino.tj/biz/beauty-studio-mavzunai-jovid-dushanbe",
+  },
+  {
+    slot: "review-zukhra",
+    label: "Отзыв — Zukhra K.",
+    placement: "аватар",
+    url: "https://images.unsplash.com/photo-1650292266612-a634d749626f?q=75&w=400&auto=format&fit=crop&sat=-100",
+    credit: "Photo by Alexander Krivitskiy on Unsplash",
+    creditUrl: "https://unsplash.com/@krivitskiy",
+  },
+  {
+    slot: "review-di",
+    label: "Отзыв — D I",
+    placement: "аватар",
+    url: "https://images.unsplash.com/photo-1731907547491-dd745791d8b5?q=75&w=400&auto=format&fit=crop&sat=-100",
+    credit: "Photo by Anshul on Unsplash",
+    creditUrl: "https://unsplash.com/@tomatopictures1",
+  },
+];
+
+export const reviews = [
+  {
+    author: "Zukhra K.",
+    text: "«Очень приятная атмосфера, идеальная чистота. Владелица Мавзуна сама подсказала, что мне пойдёт — результат идеальный. Советую всем подругам!»",
+    source: "Tripadvisor · сен 2022",
+    visible: true,
+    photoSlot: "review-zukhra",
+  },
+  {
+    author: "D I, Душанбе",
+    text: "«Проходил мимо, зашёл — и был в восторге от салона. Очень уютно, доброжелательный персонал, услуги на высоте. Процветания вам!»",
+    source: "Tripadvisor · июл 2023",
+    visible: true,
+    photoSlot: "review-di",
+  },
+  {
+    author: "Фарзона И.",
+    text: "«Свадебный образ — мечта. Платье, причёска, макияж — всё в одном месте, и всё идеально.»",
+    source: "Instagram · черновик",
+    visible: false,
+    photoSlot: null,
+  },
+];
+
+export const integrations = ["telegram", "whatsapp", "sms", "payments"];

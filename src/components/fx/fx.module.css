@@ -1,0 +1,130 @@
+/* Full-screen loader */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--mj-cream);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  transition: opacity 0.5s ease;
+  color: var(--mj-ink);
+}
+.loaderHiding {
+  opacity: 0;
+  pointer-events: none;
+}
+.loaderLabel {
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+
+/* Toasts */
+.toasts {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 99998;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+.toast {
+  background: var(--mj-ink);
+  color: var(--mj-cream);
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  max-width: 360px;
+  box-shadow: var(--mj-shadow-lg);
+  animation: toastIn 0.35s var(--mj-ease) both;
+}
+.toastLeaving {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s var(--mj-ease);
+}
+.toastKicker {
+  font-size: 9.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--mj-gold);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 600px) {
+  .toasts {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    align-items: stretch;
+  }
+  .toast {
+    max-width: none;
+  }
+}
+
+/* Skeleton */
+.sk {
+  background: var(--mj-sand-2) linear-gradient(90deg, var(--mj-sand-2) 0, #efe8da 50%, var(--mj-sand-2) 100%) no-repeat;
+  background-size: 400px 100%;
+  animation: mj-shimmer 1.2s linear infinite;
+}
+.skeletonOverlay {
+  position: fixed;
+  z-index: 9000;
+  background: var(--mj-cream);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow: hidden;
+  transition: opacity 0.35s ease;
+}
+.skeletonCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.skeletonRow {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--mj-line);
+}
+.skeletonLines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}

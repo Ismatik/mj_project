@@ -48,8 +48,9 @@ The `design/*.dc.html` files are HTML prototypes (rendered by `design/support.js
 
 - `web` — Next.js: website, admin, CMS, API routes, Telegram/WhatsApp webhooks.
 - `worker` — scheduled reminders and outgoing messages (pg-boss queue on Postgres).
-- `postgres` — with daily automated backup.
-- `minio` — S3-compatible storage for photos and portfolio.
+- `postgres` — PostgreSQL 16.
+- `media` volume — uploaded photos and portfolio (behind a storage interface, so S3-compatible storage can be added later).
+- `backup` — daily Postgres dumps to `./backups`.
 - `caddy` — reverse proxy with automatic HTTPS (required for bot webhooks).
 - Two environments: staging and production.
 
