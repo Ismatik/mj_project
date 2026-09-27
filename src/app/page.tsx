@@ -1,19 +1,31 @@
-import Link from "next/link";
-import { Monogram } from "@/components/ui/Monogram";
+import type { Metadata } from "next";
+import { Website } from "@/components/site/Website";
+import { canUseSiteAdmin } from "@/lib/access";
+import { todayYmd } from "@/lib/time";
+import { getCurrentUser } from "@/server/auth";
+import { getSiteContent, getSitePriceList } from "@/server/site";
 
-// Temporary start page until the website lands in R1 Sprint 4.
-export default function Home() {
-  return (
-    <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24 }}>
-      <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
-        <Monogram size={96} color="var(--mj-ink)" />
-        <div style={{ fontSize: 11, letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--mj-gold-deep)" }}>
-          Сайт скоро откроется
-        </div>
-        <Link href="/login" style={{ fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-          Вход для команды →
-        </Link>
-      </div>
-    </main>
-  );
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const c = await getSiteContent("published");
+  return {
+    title: c.seo.title,
+    description: c.seo.description,
+    openGraph: { title: c.seo.title, description: c.seo.description, type: "website", locale: "ru_RU", images: [c.photos.hero.url] },
+  };
+}
+
+// The public website. "?preview=1" shows the admin's unpublished draft to signed-in editors.
+export default async function HomePage({ searchParams }: PageProps<"/">) {
+  const { preview } = await searchParams;
+  let showDraft = false;
+  if (preview === "1") {
+    const user = await getCurrentUser();
+    showDraft = !!user && canUseSiteAdmin(user.role);
+  }
+  const content = await getSiteContent(showDraft ? "draft" : "published");
+  const prices = await getSitePriceList(showDraft ? content.serviceOverrides : {});
+
+  return <Website c={content} prices={prices} today={todayYmd()} preview={showDraft ? {} : undefined} />;
 }

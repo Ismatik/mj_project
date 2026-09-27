@@ -4,6 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, type PaymentMethod } from "../src/generated/prisma/client";
 import { hashPassword } from "../src/lib/password";
 import { addDays, atSalonTime, isClosed, mondayOf, todayYmd, weekdayOf, type Ymd } from "../src/lib/time";
+import { DEFAULT_CONTENT } from "../src/lib/site-content";
 import * as data from "./seed-data";
 
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
@@ -28,9 +29,8 @@ async function wipe() {
   await db.$transaction([
     db.outboxMessage.deleteMany(),
     db.integration.deleteMany(),
-    db.review.deleteMany(),
-    db.sitePhoto.deleteMany(),
-    db.siteText.deleteMany(),
+    db.siteDocument.deleteMany(),
+    db.bookingRequest.deleteMany(),
     db.reminder.deleteMany(),
     db.setting.deleteMany(),
     db.dressBooking.deleteMany(),
@@ -234,9 +234,13 @@ async function main() {
   // Salon settings, reminders, website content, integrations
   await db.setting.createMany({ data: Object.entries(data.settings).map(([key, value]) => ({ key, value })) });
   await db.reminder.createMany({ data: data.reminders.map((text) => ({ text })) });
-  await db.siteText.createMany({ data: data.siteTexts.map((t) => ({ ...t, locale: "ru" })) });
-  await db.sitePhoto.createMany({ data: data.sitePhotos });
-  await db.review.createMany({ data: data.reviews.map((r, i) => ({ ...r, sortOrder: i })) });
+  // Website content: draft and published start identical (texts from the design)
+  await db.siteDocument.createMany({
+    data: [
+      { id: "draft", data: DEFAULT_CONTENT },
+      { id: "published", data: DEFAULT_CONTENT },
+    ],
+  });
   await db.integration.createMany({ data: data.integrations.map((key) => ({ key })) });
 
   // Sign-in accounts (the same demo password for every role; change it after first sign-in)

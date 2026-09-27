@@ -61,6 +61,14 @@ Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
 
 `prisma/seed.ts` rebuilds the database around today's date in Dushanbe: the team, services and prices, guests with visit history, this week's calendar, 60 days of sales (the last 14 days follow the dashboard chart in the design), dresses, reminders, website texts, photos and reviews. Mondays are the day off. Prices are in somoni.
 
+## Website and site admin
+
+- `/` — the public website. It shows the **published** content; `/?preview=1` shows the draft to signed-in editors.
+- `/admin` — texts, prices on the site, photos, reviews, contacts, SEO. Edits autosave to a draft; **Опубликовать** makes them live.
+- Prices and durations come from the CMS menu (`/cms/services`). The admin only chooses which services appear on the site.
+- Uploaded photos (JPG/PNG/WebP up to 8 MB) are stored in `MEDIA_DIR` and served from `/media/…`.
+- The website's "Онлайн-запись" form creates a request that reception sees on the CMS dashboard ("Заявки с сайта").
+
 ## Integrations
 
 Telegram, WhatsApp, SMS and payments each run in `MOCK` or `LIVE` mode (table `Integration`). In mock mode messages are recorded in the outbox and marked as sent without leaving the server. API keys belong in `.env` only.

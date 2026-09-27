@@ -1,0 +1,200 @@
+/* "Онлайн-запись" form — floating labels and inline validation from the prototype */
+.form {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 18px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.floating {
+  position: relative;
+  display: block;
+}
+.input {
+  width: 100%;
+  background: var(--mj-paper);
+  border: 1px solid var(--mj-line);
+  padding: 25px 40px 9px 15px;
+  font-family: var(--mj-sans);
+  font-size: 15px;
+  color: var(--mj-ink);
+  outline: none;
+  transition: border-color 0.25s;
+  border-radius: 0;
+  min-height: 56px;
+}
+.inputFocus {
+  border-color: var(--mj-ink);
+}
+.inputError {
+  border-color: #8c3a2b;
+}
+.label {
+  position: absolute;
+  left: 15px;
+  top: 18px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  pointer-events: none;
+  transition:
+    top 0.22s var(--mj-ease),
+    font-size 0.22s var(--mj-ease),
+    color 0.22s;
+}
+.labelUp {
+  top: 8px;
+  font-size: 9.5px;
+}
+.labelFocus {
+  color: var(--mj-ink);
+}
+.labelError {
+  color: #8c3a2b !important;
+}
+.ok {
+  position: absolute;
+  right: 15px;
+  top: 18px;
+  color: var(--mj-gold-deep);
+  font-size: 15px;
+}
+.error {
+  font-size: 12px;
+  color: #8c3a2b;
+  letter-spacing: 0.02em;
+}
+.services {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.servicesLabel {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  padding: 0;
+  margin-bottom: 10px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  background: transparent;
+  color: var(--mj-ink);
+  border: 1px solid var(--mj-ink);
+  padding: 10px 18px;
+  font-family: var(--mj-sans);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    color 0.25s;
+}
+.chipOn {
+  background: var(--mj-ink);
+  color: var(--mj-cream);
+}
+.submitRow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.submit {
+  background: var(--mj-ink);
+  color: var(--mj-cream);
+  border: none;
+  padding: 16px 34px;
+  font-family: var(--mj-sans);
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.submit:hover:not(:disabled) {
+  background: var(--mj-ink-line);
+}
+.submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+.hours {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+}
+.done {
+  margin-top: 40px;
+  background: var(--mj-ink);
+  color: var(--mj-cream);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  text-align: center;
+  animation: mj-fade-up 0.6s var(--mj-ease) both;
+}
+.doneKicker {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mj-gold);
+}
+.doneTitle {
+  font-family: var(--mj-serif);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.doneText {
+  font-size: 14.5px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--mj-text-on-ink);
+  margin: 0;
+  max-width: 44ch;
+}
+.again {
+  margin-top: 10px;
+  background: transparent;
+  color: var(--mj-cream);
+  border: 1px solid var(--mj-cream);
+  padding: 12px 24px;
+  font-family: var(--mj-sans);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.again:hover {
+  background: var(--mj-ink-line);
+}

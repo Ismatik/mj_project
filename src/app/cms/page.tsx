@@ -11,6 +11,7 @@ import { atSalonTime } from "@/lib/time";
 import { requirePage } from "@/server/auth";
 import { getDashboard } from "@/server/dashboard";
 import { Reminders } from "./Reminders";
+import { Requests } from "./Requests";
 import s from "./dashboard.module.css";
 
 function greeting(hour: number) {
@@ -73,6 +74,12 @@ export default async function DashboardPage() {
 
       <div className={s.columns}>
         <section>
+          {d.requests.length > 0 && (
+            <div className={s.requestsBlock}>
+              <SectionHead title={`Заявки с сайта · ${d.requests.length}`} />
+              <Requests items={d.requests} />
+            </div>
+          )}
           <SectionHead
             title="Кто сегодня в кресле"
             action={

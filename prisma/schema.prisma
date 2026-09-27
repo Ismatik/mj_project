@@ -105,6 +105,7 @@ model Guest {
   appointments Appointment[]
   sales        Sale[]
   dressBookings DressBooking[]
+  requests     BookingRequest[]
 }
 
 enum AppointmentStatus {
@@ -241,37 +242,35 @@ model Reminder {
 
 // ─── Website content (edited in /admin) ──────────────────
 
-model SiteText {
-  key       String   /// hero | philosophy | bridal | about | booking
-  locale    String   @default("ru")
-  label     String
-  title     String
-  body      String
-  updatedAt DateTime @updatedAt
-
-  @@id([key, locale])
+/// Two documents: "draft" (what the admin edits) and "published" (what the website shows).
+/// Shape: SiteContent in src/lib/site-content.ts
+model SiteDocument {
+  id          String   @id /// draft | published
+  data        Json
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
 }
 
-model SitePhoto {
-  slot      String   @id /// hero | bridal | interior | review-<n>
-  label     String
-  placement String
-  url       String
-  credit    String?
-  creditUrl String?
-  updatedAt DateTime @updatedAt
+enum RequestStatus {
+  NEW
+  CALLED
+  BOOKED
+  DECLINED
 }
 
-model Review {
-  id        String   @id @default(cuid())
-  author    String
-  text      String
-  source    String
-  rating    Int      @default(5)
-  visible   Boolean  @default(true)
-  photoSlot String?
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
+/// "Онлайн-запись" form on the website (real-time slots replace it in R1 Sprint 5)
+model BookingRequest {
+  id        String        @id @default(cuid())
+  name      String
+  phone     String
+  date      DateTime      @db.Date
+  service   String
+  status    RequestStatus @default(NEW)
+  guest     Guest?        @relation(fields: [guestId], references: [id])
+  guestId   String?
+  createdAt DateTime      @default(now())
+
+  @@index([status, createdAt])
 }
 
 // ─── Integrations (mock first) ───────────────────────────

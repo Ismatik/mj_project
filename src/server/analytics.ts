@@ -18,12 +18,13 @@ export async function getAnalytics() {
   const since90 = atSalonTime(addDays(today, -89));
   const since30 = atSalonTime(addDays(today, -29));
 
-  const [month, prev, visitsRecent, doneCounts, online, recentAppts, byMethod, topItems, revenue14] = await Promise.all([
+  const [month, prev, visitsRecent, doneCounts, online, requests, recentAppts, byMethod, topItems, revenue14] = await Promise.all([
     db.sale.aggregate({ where: { createdAt: monthToDate(today) }, _sum: { total: true }, _count: true }),
     db.sale.aggregate({ where: { createdAt: previousMonthToDate(today) }, _sum: { total: true }, _count: true }),
     db.appointment.findMany({ where: { status: "DONE", startsAt: { gte: since90 }, guestId: { not: null } }, select: { guestId: true }, distinct: ["guestId"] }),
     db.appointment.groupBy({ by: ["guestId"], where: { status: "DONE", guestId: { not: null } }, _count: true }),
     db.appointment.count({ where: { createdAt: monthToDate(today), source: { in: ["WEBSITE", "TELEGRAM", "WHATSAPP"] } } }),
+    db.bookingRequest.count({ where: { createdAt: monthToDate(today) } }),
     db.appointment.findMany({ where: { startsAt: { gte: since30, lt: atSalonTime(addDays(today, 1)) }, status: { notIn: ["CANCELLED"] } }, select: { startsAt: true } }),
     db.sale.groupBy({ by: ["method"], where: { createdAt: monthToDate(today) }, _sum: { total: true } }),
     db.saleItem.groupBy({ by: ["name"], where: { sale: { createdAt: monthToDate(today) } }, _sum: { price: true }, _count: true, orderBy: { _sum: { price: "desc" } }, take: 5 }),
@@ -58,7 +59,7 @@ export async function getAnalytics() {
       avg,
       avgChange: changeLabel(avg, prevAvg),
       retention,
-      online,
+      online: online + requests,
     },
     revenue14,
     hours: buckets.map((b) => ({ label: b.label, share: apptTotal ? b.count / apptTotal : 0 })),

@@ -30,3 +30,10 @@ export async function deleteDoneReminders() {
   await db.reminder.deleteMany({ where: { done: true } });
   revalidatePath("/cms");
 }
+
+export async function setRequestStatus(id: string, status: "CALLED" | "BOOKED" | "DECLINED") {
+  await requireDashboard();
+  if (!["CALLED", "BOOKED", "DECLINED"].includes(status)) throw new Error("Неизвестный статус");
+  await db.bookingRequest.update({ where: { id }, data: { status } });
+  revalidatePath("/cms", "layout");
+}

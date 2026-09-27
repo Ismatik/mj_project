@@ -42,7 +42,7 @@ export async function categoryShares(today: Ymd, days = 30) {
 
 /** Everything "Мой салон сегодня" shows, computed from real records. */
 export async function getDashboard(today: Ymd = todayYmd()) {
-  const [todaySales, monthSales, prevMonthSales, guestsTotal, guestsNewThisMonth, appointments, revenue14, categories, reminders] =
+  const [todaySales, monthSales, prevMonthSales, guestsTotal, guestsNewThisMonth, appointments, revenue14, categories, reminders, requests] =
     await Promise.all([
       db.sale.aggregate({ where: { createdAt: dayRange(today) }, _sum: { total: true }, _count: true }),
       db.sale.aggregate({ where: { createdAt: monthToDate(today) }, _sum: { total: true } }),
@@ -57,6 +57,7 @@ export async function getDashboard(today: Ymd = todayYmd()) {
       revenueByDay(today, 14),
       categoryShares(today),
       db.reminder.findMany({ orderBy: [{ done: "asc" }, { createdAt: "asc" }] }),
+      db.bookingRequest.findMany({ where: { status: { in: ["NEW", "CALLED"] } }, orderBy: { createdAt: "asc" }, take: 20 }),
     ]);
 
   // Busiest chairs today
@@ -92,5 +93,15 @@ export async function getDashboard(today: Ymd = todayYmd()) {
     revenue14,
     categories,
     reminders: reminders.map((r) => ({ id: r.id, text: r.text, done: r.done })),
+    requests: requests.map((r) => ({
+      id: r.id,
+      name: r.name,
+      phone: r.phone,
+      date: r.date.toISOString().slice(0, 10),
+      service: r.service,
+      status: r.status,
+      createdAt: r.createdAt,
+      guestId: r.guestId,
+    })),
   };
 }
