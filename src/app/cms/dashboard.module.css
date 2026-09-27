@@ -23,11 +23,25 @@
 .stats {
   margin-top: 26px;
 }
-.section {
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 32px;
   margin-top: 38px;
-  max-width: 820px;
 }
-.empty {
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+.empty,
+.muted {
   font-size: 13.5px;
   font-weight: 300;
   color: var(--mj-text-2);
@@ -39,9 +53,12 @@
   padding: 15px 0 15px 8px;
   border-bottom: 1px solid var(--mj-line);
   transition: background 0.3s;
+  text-decoration: none;
+  color: inherit;
 }
 .appt:hover {
   background: var(--mj-sand);
+  color: inherit;
 }
 .apptMain {
   flex: 1;
@@ -71,6 +88,78 @@
   color: var(--mj-gold-deep);
 }
 
+/* Reminders */
+.reminders {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  margin-top: 18px;
+  font-size: 13.5px;
+  font-weight: 300;
+}
+.reminder {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  cursor: pointer;
+}
+.reminder input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.reminder:has(input:focus-visible) {
+  outline: 2px solid var(--mj-gold);
+  outline-offset: 2px;
+}
+.star {
+  color: var(--mj-gold);
+  transition: color 0.2s;
+}
+.reminderDone {
+  color: var(--mj-text-muted);
+  text-decoration: line-through;
+}
+.reminderDone .star {
+  color: var(--mj-line);
+}
+.reminderForm {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+}
+.reminderForm input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--mj-line);
+  padding: 6px 0;
+  font-family: var(--mj-sans);
+  font-size: 13px;
+  color: var(--mj-ink);
+  outline: none;
+}
+.reminderForm input:focus {
+  border-bottom-color: var(--mj-gold);
+}
+.reminderForm button {
+  background: none;
+  border: none;
+  font-family: var(--mj-sans);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
 @media (max-width: 600px) {
   .title {
     font-size: 24px;

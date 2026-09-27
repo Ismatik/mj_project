@@ -1,0 +1,60 @@
+.kpis {
+  margin-top: 24px;
+}
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 32px;
+  align-items: start;
+}
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+.top {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 4px;
+  border-bottom: 1px solid var(--mj-line);
+  font-size: 13.5px;
+}
+.topN {
+  font-family: var(--mj-serif);
+  font-weight: 600;
+  color: var(--mj-gold);
+  width: 18px;
+}
+.topName {
+  flex: 1;
+  font-weight: 500;
+}
+.topName small {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+}
+.topSum {
+  font-family: var(--mj-serif);
+  font-weight: 600;
+}
+.muted {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+  padding: 12px 0;
+}
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

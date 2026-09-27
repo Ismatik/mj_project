@@ -1,0 +1,169 @@
+.group {
+  margin-top: 30px;
+}
+.groupTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mj-serif);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--mj-gold);
+  padding-bottom: 10px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1fr 1.2fr 80px;
+  gap: 12px;
+  padding: 12px 8px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--mj-line);
+  align-items: center;
+  transition: background 0.3s;
+}
+.row:hover {
+  background: var(--mj-sand);
+}
+.name {
+  font-weight: 500;
+}
+.dur {
+  font-weight: 300;
+  color: var(--mj-text-2);
+}
+.price {
+  font-family: var(--mj-serif);
+  font-weight: 600;
+}
+.tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.onSite,
+.inPos {
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border: 1px solid var(--mj-gold);
+  color: var(--mj-gold-deep);
+}
+.inPos {
+  border-color: var(--mj-line);
+}
+.edit,
+.add,
+.archive {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mj-sans);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  cursor: pointer;
+  justify-self: end;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.row:hover .edit,
+.edit:focus-visible {
+  opacity: 1;
+}
+.add {
+  opacity: 1;
+  margin-top: 10px;
+  padding: 6px 8px;
+}
+.add:hover,
+.edit:hover {
+  color: var(--mj-ink);
+}
+.archive {
+  opacity: 1;
+  color: #a3533f;
+  margin-right: auto;
+}
+
+.editor {
+  background: var(--mj-paper);
+  border: 1px solid var(--mj-gold);
+  padding: 14px 16px;
+  margin: 6px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: mj-fade-up 0.3s var(--mj-ease) both;
+}
+.editorGrid {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1fr;
+  gap: 10px;
+}
+.editorGrid label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.editorGrid span,
+.checksLabel {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+.editorGrid input {
+  background: var(--mj-white);
+  border: 1px solid var(--mj-line);
+  padding: 9px 11px;
+  font-family: var(--mj-sans);
+  font-size: 13.5px;
+  outline: none;
+}
+.editorGrid input:focus {
+  border-color: var(--mj-gold);
+}
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 300;
+}
+.checks input {
+  accent-color: var(--mj-ink);
+}
+.editorActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+.error {
+  font-size: 12.5px;
+  color: #a3533f;
+}
+
+@media (max-width: 800px) {
+  .row {
+    grid-template-columns: 1fr auto;
+  }
+  .dur,
+  .tags {
+    grid-column: 1;
+  }
+  .edit {
+    opacity: 1;
+  }
+  .editorGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .editorGrid .wide {
+    grid-column: 1 / -1;
+  }
+}

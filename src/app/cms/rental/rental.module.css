@@ -1,0 +1,135 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+  align-items: start;
+}
+.card {
+  border: 1px solid var(--mj-line);
+  background: var(--mj-paper);
+  transition: box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+.card:hover {
+  box-shadow: var(--mj-shadow-md);
+}
+.cover {
+  height: 120px;
+  background: var(--mj-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.name {
+  font-family: var(--mj-serif);
+  font-size: 16px;
+  font-weight: 600;
+}
+.meta {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+  margin-top: 4px;
+}
+.status {
+  margin-top: 10px;
+}
+.bookings {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 300;
+}
+.bookings li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px dashed var(--mj-line);
+  padding-bottom: 4px;
+}
+.bookings button {
+  background: none;
+  border: none;
+  color: var(--mj-text-muted);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+}
+.bookings button:hover {
+  color: var(--mj-ink);
+}
+.actions {
+  display: flex;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+.actions button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mj-sans);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  cursor: pointer;
+}
+.actions button:hover {
+  color: var(--mj-ink);
+}
+.form {
+  display: grid;
+  grid-template-columns: 1fr 70px;
+  gap: 8px;
+  margin-top: 14px;
+}
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.form .wide {
+  grid-column: 1 / -1;
+}
+.form span {
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+.form input {
+  width: 100%;
+  background: var(--mj-white);
+  border: 1px solid var(--mj-line);
+  padding: 7px 9px;
+  font-family: var(--mj-sans);
+  font-size: 12.5px;
+  outline: none;
+}
+.form input:focus {
+  border-color: var(--mj-gold);
+}
+.formActions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.error {
+  font-size: 12px;
+  color: #a3533f;
+  margin-top: 8px;
+}

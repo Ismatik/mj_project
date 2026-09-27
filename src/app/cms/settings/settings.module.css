@@ -1,0 +1,104 @@
+.page {
+  max-width: 680px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 26px;
+}
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+.saved {
+  font-size: 12.5px;
+  color: var(--mj-gold-deep);
+}
+.error {
+  font-size: 12.5px;
+  color: #a3533f;
+}
+.block {
+  margin-top: 44px;
+}
+.team {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}
+.member {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--mj-line);
+  font-size: 13.5px;
+  font-weight: 300;
+}
+.member b {
+  font-weight: 500;
+}
+.off {
+  opacity: 0.55;
+}
+.memberMain {
+  flex: 1;
+  min-width: 200px;
+}
+.memberMain small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--mj-text-2);
+}
+.memberActions {
+  display: flex;
+  gap: 14px;
+}
+.memberActions button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mj-sans);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  cursor: pointer;
+}
+.memberActions button:hover {
+  color: var(--mj-ink);
+}
+.reset {
+  flex-basis: 100%;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.reset input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--mj-paper);
+  border: 1px solid var(--mj-line);
+  padding: 7px 10px;
+  font-family: var(--mj-sans);
+  font-size: 13px;
+  outline: none;
+}
+.reset input:focus {
+  border-color: var(--mj-gold);
+}
+@media (max-width: 600px) {
+  .two {
+    grid-template-columns: 1fr;
+  }
+}

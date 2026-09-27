@@ -2,7 +2,8 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background: var(--mj-cream);
+  /* the ink column continues below the sticky sidebar on long pages */
+  background: linear-gradient(to right, var(--mj-ink) 256px, var(--mj-cream) 256px);
 }
 
 /* ── Sidebar ─────────────────────────────────────────── */
@@ -153,7 +154,7 @@
   cursor: pointer;
   flex-shrink: 0;
 }
-.newShort {
+.header .newShort {
   display: none;
 }
 .content {
@@ -238,6 +239,9 @@
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 1024px) {
+  .shell {
+    background: var(--mj-cream);
+  }
   .sidebar {
     position: fixed;
     left: 0;
@@ -279,10 +283,10 @@
   }
 }
 @media (max-width: 600px) {
-  .newLong {
+  .header .newLong {
     display: none;
   }
-  .newShort {
+  .header .newShort {
     display: inline-flex;
   }
   .results {
