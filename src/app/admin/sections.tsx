@@ -101,11 +101,7 @@ export function TextsSection({ c, onChange }: Props) {
         <Box label="Онлайн-запись">
           <Text label="Заголовок" title value={c.booking.title} onChange={(v) => edit((d) => void (d.booking.title = v))} />
           <Text label="Текст" rows={2} value={c.booking.intro} onChange={(v) => edit((d) => void (d.booking.intro = v))} />
-          <Text
-            label="Варианты услуг через запятую"
-            value={c.booking.services.join(", ")}
-            onChange={(v) => edit((d) => void (d.booking.services = v.split(",").map((x) => x.trim()).filter(Boolean)))}
-          />
+          <span className={s.small}>Услуги, мастера и свободное время для записи берутся из CMS автоматически.</span>
         </Box>
       </div>
     </>

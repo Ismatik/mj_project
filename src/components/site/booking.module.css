@@ -81,22 +81,6 @@
   color: #8c3a2b;
   letter-spacing: 0.02em;
 }
-.services {
-  border: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.servicesLabel {
-  font-size: 10px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--mj-gold-deep);
-  padding: 0;
-  margin-bottom: 10px;
-}
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -197,4 +181,211 @@
 }
 .again:hover {
   background: var(--mj-ink-line);
+}
+
+/* Step-by-step online booking */
+.step {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: mj-fade-up 0.45s var(--mj-ease) both;
+}
+.stepLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  padding: 0;
+  margin-bottom: 12px;
+}
+.stepLabel span {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--mj-ink);
+  color: var(--mj-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mj-serif);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.service {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  background: var(--mj-paper);
+  border: 1px solid var(--mj-line);
+  padding: 12px 14px;
+  font-family: var(--mj-sans);
+  color: var(--mj-ink);
+  cursor: pointer;
+  transition:
+    border-color 0.25s,
+    background 0.25s;
+}
+.service:hover {
+  border-color: var(--mj-ink);
+}
+.serviceOn,
+.serviceOn:hover {
+  background: var(--mj-ink);
+  border-color: var(--mj-ink);
+  color: var(--mj-cream);
+}
+.serviceName {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.serviceMeta {
+  font-size: 12px;
+  font-weight: 300;
+  opacity: 0.8;
+}
+.serviceMeta b {
+  font-family: var(--mj-serif);
+  font-weight: 600;
+}
+.dates {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+.date {
+  flex: 0 0 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0;
+  background: var(--mj-paper);
+  border: 1px solid var(--mj-line);
+  font-family: var(--mj-sans);
+  color: var(--mj-ink);
+  cursor: pointer;
+}
+.date small {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+.date b {
+  font-family: var(--mj-serif);
+  font-size: 18px;
+  font-weight: 600;
+}
+.date:hover {
+  border-color: var(--mj-ink);
+}
+.dateOn,
+.dateOn:hover {
+  background: var(--mj-ink);
+  border-color: var(--mj-ink);
+  color: var(--mj-cream);
+}
+.dateOn small {
+  color: var(--mj-gold);
+}
+.times {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 6px;
+}
+.time {
+  padding: 10px 0;
+  background: transparent;
+  border: 1px solid var(--mj-ink);
+  font-family: var(--mj-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mj-ink);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.time:hover {
+  background: var(--mj-sand-2);
+}
+.timeOn,
+.timeOn:hover {
+  background: var(--mj-ink);
+  color: var(--mj-cream);
+}
+.timeSkeleton {
+  height: 40px;
+  background: var(--mj-sand-2) linear-gradient(90deg, var(--mj-sand-2) 0, #efe8da 50%, var(--mj-sand-2) 100%) no-repeat;
+  background-size: 400px 100%;
+  animation: mj-shimmer 1.2s linear infinite;
+}
+.hint {
+  font-size: 12.5px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+}
+.submit:disabled:not([aria-busy]) {
+  cursor: not-allowed;
+}
+.linkBtn {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mj-sans);
+  font-size: 12.5px;
+  color: var(--mj-gold-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.linkBtn:hover {
+  color: var(--mj-ink);
+}
+.callback {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.callback input {
+  flex: 1;
+  min-width: 160px;
+  background: var(--mj-paper);
+  border: 1px solid var(--mj-line);
+  padding: 11px 13px;
+  font-family: var(--mj-sans);
+  font-size: 14px;
+  outline: none;
+}
+.callback input:focus {
+  border-color: var(--mj-ink);
+}
+.callback button {
+  background: transparent;
+  border: 1px solid var(--mj-ink);
+  padding: 11px 18px;
+  font-family: var(--mj-sans);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--mj-ink);
+}
+.callback button:hover {
+  background: var(--mj-sand-2);
 }

@@ -11,7 +11,8 @@ export type CmsPageId =
   | "rental"
   | "staff"
   | "analytics"
-  | "settings";
+  | "settings"
+  | "integrations";
 
 export type CmsPage = { id: CmsPageId; label: string; path: string; group: string; roles: Role[] };
 
@@ -25,6 +26,7 @@ export const CMS_PAGES: CmsPage[] = [
   { id: "staff", label: "Мастера и график", path: "/cms/staff", group: "Команда", roles: ["OWNER", "RECEPTION", "MASTER"] },
   { id: "analytics", label: "Аналитика", path: "/cms/analytics", group: "Развитие", roles: ["OWNER"] },
   { id: "settings", label: "Настройки", path: "/cms/settings", group: "Развитие", roles: ["OWNER"] },
+  { id: "integrations", label: "Интеграции", path: "/cms/integrations", group: "Развитие", roles: ["OWNER"] },
 ];
 
 export const ROLE_LABEL: Record<Role, string> = {

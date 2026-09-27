@@ -269,6 +269,37 @@ a.row:hover,
 }
 
 @media (max-width: 700px) {
+  .tableWrap {
+    overflow: visible;
+  }
+  .headRow {
+    display: none;
+  }
+  .row {
+    min-width: 0;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 12px 4px;
+  }
+  .row > :nth-child(1) {
+    grid-column: 1;
+  }
+  .row > :nth-child(6) {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .row > :nth-child(2),
+  .row > :nth-child(5) {
+    grid-column: 1 / -1;
+    padding-left: 42px;
+    font-size: 12.5px;
+    color: var(--mj-text-2);
+  }
+  .row > :nth-child(3),
+  .row > :nth-child(4) {
+    display: none;
+  }
   .cardStats {
     grid-template-columns: 1fr 1fr;
   }

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Website } from "@/components/site/Website";
 import { canUseSiteAdmin } from "@/lib/access";
-import { todayYmd } from "@/lib/time";
+import { bookableDates } from "@/lib/slots";
+import { addDays, todayYmd } from "@/lib/time";
 import { getCurrentUser } from "@/server/auth";
+import { getOnlineMenu } from "@/server/online-booking";
 import { getSiteContent, getSitePriceList } from "@/server/site";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +27,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
     showDraft = !!user && canUseSiteAdmin(user.role);
   }
   const content = await getSiteContent(showDraft ? "draft" : "published");
-  const prices = await getSitePriceList(showDraft ? content.serviceOverrides : {});
+  const [prices, menu] = await Promise.all([getSitePriceList(showDraft ? content.serviceOverrides : {}), getOnlineMenu()]);
+  const today = todayYmd();
 
-  return <Website c={content} prices={prices} today={todayYmd()} preview={showDraft ? {} : undefined} />;
+  return <Website c={content} prices={prices} menu={menu} dates={bookableDates(today, 14, addDays)} today={today} preview={showDraft ? {} : undefined} />;
 }

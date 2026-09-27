@@ -2,7 +2,8 @@ import { Brush, Crown, Droplet, Eye, Hand, Scissors, Sparkles, type LucideIcon }
 import { duration } from "@/lib/duration";
 import { somoni } from "@/lib/format";
 import { instagramLink, telLink, whatsappLink, type SiteContent } from "@/lib/site-content";
-import { BookingForm } from "./BookingForm";
+import type { OnlineMenu } from "@/server/online-booking";
+import { OnlineBooking } from "./OnlineBooking";
 import { Photo } from "./Photo";
 import { SiteEffects } from "./SiteEffects";
 import s from "./site.module.css";
@@ -35,7 +36,21 @@ function Mono({ size, color }: { size: number; color: string }) {
   );
 }
 
-export function Website({ c, prices, today, preview }: { c: SiteContent; prices: PriceList; today: string; preview?: { publishedAt?: string } }) {
+export function Website({
+  c,
+  prices,
+  today,
+  menu,
+  dates,
+  preview,
+}: {
+  c: SiteContent;
+  prices: PriceList;
+  today: string;
+  menu: OnlineMenu;
+  dates: string[];
+  preview?: { publishedAt?: string };
+}) {
   const wa = whatsappLink(c.contacts);
   const reviews = c.reviews.items.filter((r) => r.visible);
   const marquee = [...c.marquee, ...c.marquee];
@@ -255,7 +270,7 @@ export function Website({ c, prices, today, preview }: { c: SiteContent; prices:
           <p data-reveal className={s.bookingIntro}>
             {c.booking.intro}
           </p>
-          <BookingForm services={c.booking.services} today={today} preview={!!preview} />
+          <OnlineBooking menu={menu} dates={dates} preview={!!preview} />
         </div>
       </section>
 

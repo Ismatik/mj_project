@@ -45,3 +45,4 @@ next-env.d.ts
 !.env.example
 backups/
 media/
+/e2e-output/

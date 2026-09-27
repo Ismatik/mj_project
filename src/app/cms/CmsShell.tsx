@@ -82,11 +82,16 @@ export function CmsShell({ nav, counts, user, branch, dateLabel, canBook, childr
             </div>
             <div className={s.userDate}>{dateLabel}</div>
           </div>
-          <form action={logout}>
-            <button type="submit" className={s.logout}>
-              Выйти
-            </button>
-          </form>
+          <div className={s.userActions}>
+            <Link href="/cms/account" className={s.logout} onClick={() => setMenuOpen(false)}>
+              Пароль
+            </Link>
+            <form action={logout}>
+              <button type="submit" className={s.logout}>
+                Выйти
+              </button>
+            </form>
+          </div>
         </div>
       </aside>
       {menuOpen && <button className={s.backdrop} aria-label="Закрыть меню" onClick={() => setMenuOpen(false)} />}

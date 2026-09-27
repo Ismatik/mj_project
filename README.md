@@ -67,8 +67,14 @@ Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
 - `/admin` — texts, prices on the site, photos, reviews, contacts, SEO. Edits autosave to a draft; **Опубликовать** makes them live.
 - Prices and durations come from the CMS menu (`/cms/services`). The admin only chooses which services appear on the site.
 - Uploaded photos (JPG/PNG/WebP up to 8 MB) are stored in `MEDIA_DIR` and served from `/media/…`.
-- The website's "Онлайн-запись" form creates a request that reception sees on the CMS dashboard ("Заявки с сайта").
+- **Онлайн-запись**: guests pick a service, a master (or "любой"), a day and a free time. Free times come from the masters' schedules and existing bookings (`src/lib/slots.ts`); each booking is re-checked under a per-date lock, so two guests can't take the same slot. The booking appears in the CMS calendar as "Ожидание" (source: сайт) for reception to confirm.
+- "Не нашли удобное время?" leaves a callback request, shown on the CMS dashboard ("Заявки с сайта").
 
 ## Integrations
 
-Telegram, WhatsApp, SMS and payments each run in `MOCK` or `LIVE` mode (table `Integration`). In mock mode messages are recorded in the outbox and marked as sent without leaving the server. API keys belong in `.env` only.
+Telegram, WhatsApp, SMS and payments each run in `MOCK` or `LIVE` mode, managed on `/cms/integrations` (owner only). In mock mode messages are recorded in the outbox and marked as sent without leaving the server; the worker delivers the queue every minute, or use "Доставить сейчас". Live drivers arrive with R2 (Telegram, WhatsApp, SMS) and R3 (payments). API keys belong in `.env` only — the page shows whether they are set, never their values.
+
+## Tests
+
+- `npm test` — unit tests (booking rules, free slots, formatting, access, content).
+- `npm run e2e` — browser suites for the CMS, website, admin and online booking (see `e2e/README.md`).

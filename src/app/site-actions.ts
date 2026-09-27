@@ -3,46 +3,125 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { normalizePhone } from "@/lib/phone";
-import { validateSiteBooking, type SiteBookingErrors, type SiteBookingInput } from "@/lib/site-booking";
-import { todayYmd } from "@/lib/time";
+import { clock, longDate } from "@/lib/format";
+import { formatPhone, normalizePhone } from "@/lib/phone";
+import { BOOKING_HORIZON_DAYS } from "@/lib/slots";
+import { addDays, atSalonTime, isClosed, todayYmd } from "@/lib/time";
+import { slotsFor } from "@/server/online-booking";
 import { tooManyAttempts } from "@/server/rate-limit";
-import { getSiteContent } from "@/server/site";
 
-export type SiteBookingResult = { ok: true } | { ok: false; errors: SiteBookingErrors; message?: string };
+const ymdOk = (d: string) => /^\d{4}-\d{2}-\d{2}$/.test(d);
 
-/** Public: the website's booking request. Creates a request for reception and an outbox notification. */
-export async function requestBooking(input: SiteBookingInput & { company?: string }): Promise<SiteBookingResult> {
-  // Honeypot: real visitors never fill the hidden "company" field
-  if (input.company) return { ok: true };
+async function clientIp() {
+  return (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+}
 
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
-  if (tooManyAttempts(`site-booking:${ip}`, 5, 60 * 60 * 1000)) {
-    return { ok: false, errors: {}, message: "Слишком много заявок подряд. Позвоните нам или напишите в WhatsApp." };
+function dateError(date: string): string | null {
+  const today = todayYmd();
+  if (!ymdOk(date)) return "Выберите дату";
+  if (date < today) return "Эта дата уже прошла";
+  if (date > addDays(today, BOOKING_HORIZON_DAYS)) return "Онлайн-запись открыта на месяц вперёд";
+  if (isClosed(date)) return "По понедельникам мы отдыхаем";
+  return null;
+}
+
+/** Public: free times for a service on a date (optionally with one master). */
+export async function getSlots(serviceId: string, date: string, staffId?: string | null): Promise<{ time: string; staffIds: string[] }[]> {
+  if (tooManyAttempts(`slots:${await clientIp()}`, 300, 60 * 60 * 1000)) return [];
+  if (dateError(String(date))) return [];
+  const { slots } = await slotsFor(String(serviceId), String(date), staffId ? String(staffId) : null);
+  return slots.map((s) => ({ time: s.time, staffIds: s.staffIds }));
+}
+
+export type OnlineBookingInput = { serviceId: string; staffId?: string | null; date: string; time: string; name: string; phone: string; company?: string };
+export type OnlineBookingResult =
+  | { ok: true; summary: { name: string; service: string; master: string; when: string; phone: string } }
+  | { ok: false; field?: "name" | "phone" | "slot"; error: string };
+
+/**
+ * Public: books a real slot. The slot is re-checked inside a transaction holding a per-date lock,
+ * so two visitors can't take the same time. The booking lands in the CMS calendar as "Ожидание".
+ */
+export async function bookOnline(input: OnlineBookingInput): Promise<OnlineBookingResult> {
+  if (input.company) return { ok: false, error: "Не получилось" }; // honeypot
+  if (tooManyAttempts(`book:${await clientIp()}`, 6, 60 * 60 * 1000)) {
+    return { ok: false, error: "Слишком много записей подряд. Позвоните нам или напишите в WhatsApp." };
   }
+  const name = String(input.name ?? "").trim().slice(0, 80);
+  const phone = normalizePhone(String(input.phone ?? ""));
+  if (name.length < 2) return { ok: false, field: "name", error: "Как к вам обращаться?" };
+  if (!phone) return { ok: false, field: "phone", error: "Нужно 9 цифр, например 98 103 11 11" };
+  const date = String(input.date ?? "");
+  const time = String(input.time ?? "");
+  const de = dateError(date);
+  if (de) return { ok: false, field: "slot", error: de };
+  if (!/^\d{2}:\d{2}$/.test(time)) return { ok: false, field: "slot", error: "Выберите время" };
+  const wantedStaff = input.staffId ? String(input.staffId) : null;
 
-  const content = await getSiteContent("published");
-  const v: SiteBookingInput = {
-    name: String(input.name ?? "").trim().slice(0, 80),
-    phone: String(input.phone ?? "").slice(0, 30),
-    date: String(input.date ?? ""),
-    service: String(input.service ?? ""),
-  };
-  const errors = validateSiteBooking(v, todayYmd(), content.booking.services);
-  if (Object.keys(errors).length) return { ok: false, errors };
+  const result = await db.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${"booking:" + date}))::text AS locked`;
+    const { service, slots } = await slotsFor(String(input.serviceId), date, wantedStaff, tx);
+    if (!service) return { ok: false as const, error: "Услуга недоступна для онлайн-записи" };
+    const slot = slots.find((s) => s.time === time);
+    if (!slot) return { ok: false as const, error: "Это время только что заняли — выберите другое" };
+    const staffId = slot.staffIds[0]!;
+    const master = service.staff.find((m) => m.id === staffId)!;
 
-  const phone = normalizePhone(v.phone)!;
-  const guest = await db.guest.findUnique({ where: { phone } });
-  const request = await db.bookingRequest.create({
-    data: { name: v.name, phone, date: new Date(`${v.date}T00:00:00Z`), service: v.service, guestId: guest?.id },
+    const guest = (await tx.guest.findUnique({ where: { phone } })) ?? (await tx.guest.create({ data: { name, phone, tag: "NEW" } }));
+    const [first, last] = guest.name.split(" ");
+    const startsAt = atSalonTime(date, time);
+    const appt = await tx.appointment.create({
+      data: {
+        guestId: guest.id,
+        guestName: last ? `${first} ${last[0]}.` : first!,
+        serviceId: service.id,
+        serviceLabel: service.name,
+        startsAt,
+        durationMin: service.durationMin,
+        price: service.price,
+        status: "PENDING",
+        source: "WEBSITE",
+        staff: { create: [{ staffId }] },
+      },
+    });
+    const when = `${longDate(startsAt)}, ${clock(startsAt)}`;
+    await tx.outboxMessage.createMany({
+      data: [
+        {
+          channel: "telegram",
+          to: "reception",
+          body: `Онлайн-запись с сайта: ${guest.name}, ${formatPhone(phone)} — ${service.name}, ${when}, мастер ${master.name}. Подтвердите в календаре.`,
+          meta: { kind: "online-booking", appointmentId: appt.id },
+        },
+        {
+          channel: "whatsapp",
+          to: phone,
+          body: `Mavzunai Jovid: ${name}, вы записаны — ${service.name}, ${when}, мастер ${master.name}. ул. Бухоро 23/25. Если планы изменятся, напишите нам.`,
+          meta: { kind: "booking-confirmation", appointmentId: appt.id },
+        },
+      ],
+    });
+    return { ok: true as const, summary: { name, service: service.name, master: master.name, when, phone: formatPhone(phone) } };
   });
+
+  if (result.ok) revalidatePath("/cms", "layout");
+  return result.ok ? result : { ok: false, field: "slot", error: result.error };
+}
+
+/** Public: "перезвоните мне" when no time suits. Goes to the CMS dashboard as a website request. */
+export async function requestCallback(input: { name: string; phone: string; service: string; date?: string; company?: string }): Promise<{ ok: boolean; error?: string }> {
+  if (input.company) return { ok: true };
+  if (tooManyAttempts(`callback:${await clientIp()}`, 5, 60 * 60 * 1000)) return { ok: false, error: "Слишком много заявок подряд. Позвоните нам." };
+  const name = String(input.name ?? "").trim().slice(0, 80);
+  const phone = normalizePhone(String(input.phone ?? ""));
+  if (name.length < 2) return { ok: false, error: "Как к вам обращаться?" };
+  if (!phone) return { ok: false, error: "Нужно 9 цифр, например 98 103 11 11" };
+  const date = input.date && !dateError(input.date) ? input.date : todayYmd();
+  const service = String(input.service || "Консультация").slice(0, 80);
+  const guest = await db.guest.findUnique({ where: { phone } });
+  const req = await db.bookingRequest.create({ data: { name, phone, service, date: new Date(`${date}T00:00:00Z`), guestId: guest?.id } });
   await db.outboxMessage.create({
-    data: {
-      channel: "telegram",
-      to: "reception",
-      body: `Новая заявка с сайта: ${v.name}, ${phone}, ${v.date.split("-").reverse().join(".")}, ${v.service}`,
-      meta: { kind: "site-request", requestId: request.id },
-    },
+    data: { channel: "telegram", to: "reception", body: `Перезвонить: ${name}, ${formatPhone(phone)} — ${service}`, meta: { kind: "site-request", requestId: req.id } },
   });
   revalidatePath("/cms", "layout");
   return { ok: true };

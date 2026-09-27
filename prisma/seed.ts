@@ -2,6 +2,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, type PaymentMethod } from "../src/generated/prisma/client";
+import { clock } from "../src/lib/format";
 import { hashPassword } from "../src/lib/password";
 import { addDays, atSalonTime, isClosed, mondayOf, todayYmd, weekdayOf, type Ymd } from "../src/lib/time";
 import { DEFAULT_CONTENT } from "../src/lib/site-content";
@@ -189,16 +190,21 @@ async function main() {
 
   // Walk-in sales so daily revenue matches the dashboard chart (last 14 days) and looks plausible before that.
   const posServices = data.services.filter((s) => s.pos);
+  // Today only gets sales up to the current hour, never in the future
+  const [nowH] = clock(new Date()).split(":").map(Number);
+  const realToday = todayYmd() === today;
   for (let back = 60; back >= 0; back--) {
     const day = addDays(today, -back);
     if (isClosed(day)) continue;
+    const lastHour = back === 0 && realToday ? Math.min(17, nowH! - 1) : 17;
+    if (lastHour < 9) continue;
     const target = back < 14 ? data.revenue14[13 - back]! : 4000 + Math.round(rand() * 35) * 100;
     let total = revenueByDay[day] ?? 0;
     while (total < target - 150) {
       const candidates = posServices.filter((s) => s.price <= target - total + 100);
       const svc = candidates.length ? pick(candidates) : posServices.reduce((a, b) => (a.price < b.price ? a : b));
       const master = staffFor(svc.key, [...svc.staff], day)[0]!;
-      const hour = 9 + Math.floor(rand() * 9);
+      const hour = 9 + Math.floor(rand() * (lastHour - 8));
       const minute = pick(["00", "15", "30", "45"]);
       await db.sale.create({
         data: {

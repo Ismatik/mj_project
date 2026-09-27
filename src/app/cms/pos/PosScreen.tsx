@@ -90,7 +90,7 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
 
   return (
     <div className={s.layout}>
-      <section className={s.check} aria-label="Текущий чек">
+      <section id="check" className={s.check} aria-label="Текущий чек">
         <h1 className={s.checkTitle}>Текущий чек</h1>
         <div className={s.who}>
           <label>
@@ -168,6 +168,15 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
           </button>
         )}
       </section>
+
+      {lines.length > 0 && (
+        <a href="#check" className={s.mobileBar}>
+          <span>
+            Чек · {lines.length} · <b>{somoni(total)}</b>
+          </span>
+          <span>К оплате ↓</span>
+        </a>
+      )}
 
       <section className={s.right}>
         <h2 className={s.menuTitle}>Быстрое меню</h2>

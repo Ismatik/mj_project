@@ -263,4 +263,28 @@
   .title {
     font-size: 22px;
   }
+  .gridWrap {
+    overflow: visible;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+  .day {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 64px 1fr;
+  }
+  .dayHead {
+    border-bottom: none;
+    border-right: 1px solid var(--mj-line);
+  }
+  .closed {
+    padding: 14px;
+    text-align: left;
+  }
+  .free {
+    text-align: left;
+    padding: 6px 4px;
+  }
 }

@@ -178,6 +178,11 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
 }
+@media (max-width: 1100px) {
+  .statGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 @media (max-width: 600px) {
   .statGrid {
     grid-template-columns: 1fr 1fr;
