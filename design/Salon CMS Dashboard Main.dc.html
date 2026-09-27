@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;600;700&family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;background:#F2EDE3;}
+    a{color:#8F7A4B;} a:hover{color:#B8A06A;}
+    ::selection{background:#B8A06A;color:#26221D;}
+    input::placeholder{color:#8F7A4B;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+    @keyframes barIn{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+    @keyframes barUp{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+    @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+  </style>
+  <script src="./mj-fx.js"></script>
+</helmet>
+<div style="display:flex; min-height:100vh; font-family:'Jost',sans-serif; color:#26221D; background:#F2EDE3;">
+  <aside style="width:256px; flex-shrink:0; background:#26221D; color:#D9CFBB; display:flex; flex-direction:column;">
+    <div style="padding:26px 24px; display:flex; gap:12px; align-items:flex-start; border-bottom:1px solid #3A342B;">
+      <svg width="36" height="36" viewBox="0 0 48 48" style="flex-shrink:0;"><rect x="7" y="4" width="34" height="30" fill="none" stroke="#B8A06A" stroke-width="2.2"></rect><text x="24" y="26" text-anchor="middle" font-family="'Zen Old Mincho',serif" font-size="16" font-weight="600" fill="#B8A06A">MJ</text><text x="24" y="43" text-anchor="middle" font-family="'Jost',sans-serif" font-size="5" letter-spacing="1.4" fill="#B8A06A">MAVZUNAI JOVID</text></svg>
+      <div>
+        <div style="font-family:'Zen Old Mincho',serif; font-size:15px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#F2EDE3;">Mavzunai Jovid</div>
+        <div style="font-size:9.5px; letter-spacing:0.3em; text-transform:uppercase; color:#B8A06A; margin-top:4px;">gallery of beauty mj</div>
+      </div>
+    </div>
+    <nav style="padding:10px 0 16px; flex:1;">
+      <sc-for list="{{ navGroups }}" as="group" hint-placeholder-count="4">
+        <div style="padding:16px 24px 8px; font-size:9.5px; letter-spacing:0.28em; text-transform:uppercase; color:#B8A06A;">{{ group.label }}</div>
+        <sc-for list="{{ group.items }}" as="item" hint-placeholder-count="3">
+          <a href="#" onClick="{{ item.go }}" style="display:flex; justify-content:space-between; align-items:center; padding:9px 24px 9px 21px; font-size:13.5px; font-weight:300; letter-spacing:0.04em; text-decoration:none; color: {{ item.color }}; background: {{ item.bg }}; border-left:3px solid {{ item.border }};" style-hover="background:#332D25; color:#F2EDE3;">
+            <span>{{ item.label }}</span>
+            <sc-if value="{{ item.count }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px; color:#B8A06A;">{{ item.count }}</span></sc-if>
+          </a>
+        </sc-for>
+      </sc-for>
+    </nav>
+    <div style="padding:16px 24px; border-top:1px solid #3A342B; font-size:12px; font-weight:300;">
+      <div style="color:#F2EDE3; font-weight:500;">Мавзуна — владелица</div>
+      <div style="color:#8F7A4B;">Вс, 21 сентября 2026</div>
+    </div>
+  </aside>
+
+  <main style="flex:1; min-width:0;">
+    <header style="display:flex; align-items:center; gap:16px; padding:16px 32px; background:#EDE6D6; border-bottom:1px solid #DDD3BF;">
+      <input placeholder="Найти гостью, запись или счёт…" style="flex:1; max-width:380px; background:#F7F2E7; border:1px solid #DDD3BF; padding:10px 14px; font-family:'Jost',sans-serif; font-size:13.5px; color:#26221D; outline:none;" style-focus="border-color:#B8A06A;">
+      <div style="flex:1;"></div>
+      <span style="font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:#8F7A4B; border:1px solid #B8A06A; padding:7px 14px;">Студия на Бухоро</span>
+      <button style="background:#B8A06A; color:#26221D; border:none; padding:12px 22px; font-family:'Jost',sans-serif; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; font-weight:600; cursor:pointer;" style-hover="background:#A68D55;">+ Новая запись</button>
+    </header>
+
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:32px;">
+      <div style="border-bottom:1px solid #DDD3BF; padding-bottom:24px;">
+        <div style="font-size:10.5px; letter-spacing:0.3em; text-transform:uppercase; color:#8F7A4B;">Доброе утро, Мавзуна</div>
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:34px; font-weight:600; letter-spacing:0.06em; margin:10px 0 0;">Ваш салон сегодня — <em style="font-style:italic; color:#8F7A4B;">всё занято до 17:00</em></h1>
+        <div style="font-size:13.5px; font-weight:300; color:#5C5344; margin-top:8px; letter-spacing:0.03em;">12 гостей записано · 4 в листе ожидания · Инес и Мира — самые загруженные кресла</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:26px;">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+          <div style="padding:20px 22px; background: {{ s.bg }}; border:1px solid {{ s.border }}; animation:fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both; animation-delay: {{ s.delay }};">
+            <div style="font-size:9.5px; letter-spacing:0.26em; text-transform:uppercase; color: {{ s.labelColor }};">{{ s.label }}</div>
+            <div data-countup style="font-family:'Zen Old Mincho',serif; font-size:30px; font-weight:600; margin-top:10px; color: {{ s.valueColor }};">{{ s.value }}</div>
+            <div style="font-size:12px; font-weight:300; color: {{ s.labelColor }}; margin-top:3px;">{{ s.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid; grid-template-columns:minmax(0,3fr) minmax(0,2fr); gap:32px; margin-top:38px;">
+        <section>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid #B8A06A; padding-bottom:12px;">
+            <h2 style="font-family:'Zen Old Mincho',serif; font-size:16px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; margin:0;">Кто сегодня в кресле</h2>
+            <a href="#" onClick="{{ goCalendar }}" style="font-size:11px; letter-spacing:0.16em; text-transform:uppercase; text-decoration:none;">Календарь →</a>
+          </div>
+          <div style="display:flex; flex-direction:column;">
+            <sc-for list="{{ appts }}" as="a" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:16px; padding:15px 0 15px 8px; border-bottom:1px solid #DDD3BF; transition:background 0.3s;" style-hover="background:#EDE6D6;">
+                <div style="width:44px; height:44px; flex-shrink:0; background:#26221D; color:#B8A06A; display:flex; align-items:center; justify-content:center; font-family:'Zen Old Mincho',serif; font-weight:600; font-size:14px; letter-spacing:0.05em;">{{ a.initials }}</div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-weight:500; font-size:14px; letter-spacing:0.03em;">{{ a.client }}</div>
+                  <div style="font-size:12.5px; font-weight:300; color:#5C5344;">{{ a.service }} · мастер {{ a.staff }}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:'Zen Old Mincho',serif; font-weight:600; font-size:14px;">{{ a.time }}</div>
+                  <div style="font-size:12px; font-weight:300; color:#8F7A4B;">{{ a.price }}</div>
+                </div>
+                <span style="min-width:96px; text-align:center; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; padding:6px 10px; background: {{ a.tagBg }}; color: {{ a.tagColor }}; border:1px solid {{ a.tagBorder }};">{{ a.status }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+        <section style="display:flex; flex-direction:column; gap:34px;">
+          <div>
+            <div style="border-bottom:2px solid #B8A06A; padding-bottom:12px;">
+              <h2 style="font-family:'Zen Old Mincho',serif; font-size:16px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; margin:0;">Что любят гостьи</h2>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:14px; margin-top:20px;">
+              <sc-for list="{{ categories }}" as="c" hint-placeholder-count="6">
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px;">
+                    <span style="display:inline-flex; align-items:center; gap:8px; font-weight:500; letter-spacing:0.04em;">{{ c.icon }}{{ c.name }}</span><span style="font-weight:300; color:#8F7A4B;">{{ c.share }}</span>
+                  </div>
+                  <div style="height:8px; background:#E4DCC9;">
+                    <div style="height:100%; width: {{ c.width }}; background: {{ c.color }}; transform-origin:left; animation:barIn 1s cubic-bezier(0.22,1,0.36,1) both; animation-delay: {{ c.delay }};"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#26221D; color:#D9CFBB; padding:22px;">
+            <div style="font-size:9.5px; letter-spacing:0.28em; text-transform:uppercase; color:#B8A06A;">Выручка · сентябрь</div>
+            <div style="display:flex; align-items:flex-end; gap:5px; height:88px; margin-top:16px;">
+              <sc-for list="{{ revenue }}" as="d" hint-placeholder-count="14">
+                <div style="flex:1; height: {{ d.pct }}; background: {{ d.color }}; transform-origin:bottom; animation:barUp 0.8s cubic-bezier(0.22,1,0.36,1) both; animation-delay: {{ d.delay }};" title="{{ d.amount }}"></div>
+              </sc-for>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:300; margin-top:10px;">
+              <span>8 сен</span><span style="font-family:'Zen Old Mincho',serif; color:#B8A06A;">$12,833 за месяц · +18%</span><span>21 сен</span>
+            </div>
+          </div>
+          <div>
+            <div style="border-bottom:2px solid #B8A06A; padding-bottom:12px;">
+              <h2 style="font-family:'Zen Old Mincho',serif; font-size:16px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; margin:0;">Маленькие напоминания</h2>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:11px; margin-top:18px; font-size:13.5px; font-weight:300;">
+              <sc-for list="{{ reminders }}" as="r" hint-placeholder-count="3">
+                <div style="display:flex; gap:10px; align-items:baseline;">
+                  <span style="color:#B8A06A;">✦</span>
+                  <span>{{ r }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:32px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid #DDD3BF; padding-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:28px; font-weight:600; letter-spacing:0.06em; margin:0;">Календарь записей</h1>
+        <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#8F7A4B;">← Неделя 21–27 сентября →</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(7,minmax(130px,1fr)); gap:10px; margin-top:24px; overflow-x:auto;">
+        <sc-for list="{{ week }}" as="day" hint-placeholder-count="7">
+          <div style="background: {{ day.bg }}; border:1px solid #DDD3BF; min-height:340px;">
+            <div style="padding:12px 14px; border-bottom:1px solid #DDD3BF;">
+              <div style="font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#8F7A4B;">{{ day.dow }}</div>
+              <div style="font-family:'Zen Old Mincho',serif; font-size:20px; font-weight:600;">{{ day.date }}</div>
+            </div>
+            <sc-if value="{{ day.closed }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:24px 14px; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#B9B2A4; text-align:center;">Выходной</div>
+            </sc-if>
+            <div style="display:flex; flex-direction:column; gap:6px; padding:10px;">
+              <sc-for list="{{ day.appts }}" as="ap" hint-placeholder-count="3">
+                <div style="background:#FFFFFF; border-left:3px solid #B8A06A; padding:8px 10px; cursor:pointer; transition:box-shadow 0.3s;" style-hover="box-shadow:0 4px 14px rgba(38,34,29,0.12);">
+                  <div style="font-family:'Zen Old Mincho',serif; font-size:12.5px; font-weight:600;">{{ ap.time }} · {{ ap.client }}</div>
+                  <div style="font-size:11.5px; font-weight:300; color:#5C5344;">{{ ap.service }}</div>
+                  <div style="font-size:10.5px; color:#8F7A4B; margin-top:2px;">{{ ap.staff }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isCrm }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:32px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid #DDD3BF; padding-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:28px; font-weight:600; letter-spacing:0.06em; margin:0;">Книга гостей</h1>
+        <span style="font-size:12.5px; font-weight:300; color:#5C5344;">312 гостий · 15 новых в сентябре</span>
+      </div>
+      <div style="margin-top:20px; overflow-x:auto;">
+        <div style="display:grid; grid-template-columns:2fr 1.4fr 0.7fr 1fr 1.4fr 1fr; gap:12px; padding:10px 12px; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#8F7A4B; border-bottom:2px solid #B8A06A; min-width:760px;">
+          <span>Гостья</span><span>Телефон</span><span>Визитов</span><span>Последний</span><span>Любимая услуга</span><span>Статус</span>
+        </div>
+        <sc-for list="{{ guests }}" as="g" hint-placeholder-count="8">
+          <div style="display:grid; grid-template-columns:2fr 1.4fr 0.7fr 1fr 1.4fr 1fr; gap:12px; padding:13px 12px; font-size:13px; border-bottom:1px solid #DDD3BF; align-items:center; min-width:760px; transition:background 0.3s;" style-hover="background:#EDE6D6;">
+          <span style="display:flex; align-items:center; gap:10px;"><span style="width:32px; height:32px; flex-shrink:0; background:#26221D; color:#B8A06A; display:inline-flex; align-items:center; justify-content:center; font-family:'Zen Old Mincho',serif; font-size:11px;">{{ g.initials }}</span><span style="font-weight:500;">{{ g.name }}</span></span>
+            <span style="font-weight:300;">{{ g.phone }}</span>
+            <span style="font-family:'Zen Old Mincho',serif; font-weight:600;">{{ g.visits }}</span>
+            <span style="font-weight:300;">{{ g.last }}</span>
+            <span style="font-weight:300;">{{ g.fav }}</span>
+            <span><span style="font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; padding:5px 9px; background: {{ g.tagBg }}; color: {{ g.tagColor }}; border:1px solid {{ g.tagBorder }};">{{ g.tag }}</span></span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isPos }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:32px; display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:32px;">
+      <section style="background:#F7F2E7; border:1px solid #DDD3BF; padding:24px; align-self:start;">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:20px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin:0; border-bottom:2px solid #B8A06A; padding-bottom:12px;">Текущий чек</h1>
+        <div style="font-size:12.5px; font-weight:300; color:#5C5344; margin-top:12px;">Гостья: <span style="font-weight:500; color:#26221D;">Лейла Х.</span> · мастер Мира</div>
+        <div style="display:flex; flex-direction:column; margin-top:10px;">
+          <sc-for list="{{ check }}" as="item" hint-placeholder-count="3">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #DDD3BF; font-size:13.5px;">
+              <span style="font-weight:300;">{{ item.name }}</span>
+              <span style="display:flex; align-items:center; gap:12px;"><span style="font-family:'Zen Old Mincho',serif; font-weight:600;">{{ item.price }} c.</span><a href="#" onClick="{{ item.remove }}" style="text-decoration:none; color:#B9B2A4; font-size:15px;" title="Убрать">×</a></span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ checkEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:10px; padding:32px 12px; border-bottom:1px solid #DDD3BF; text-align:center;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B8A06A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path><path d="M16 8h-6"></path><path d="M16 12h-6"></path></svg>
+              <div style="font-family:'Zen Old Mincho',serif; font-size:15px; font-weight:600; letter-spacing:0.08em;">Чек пока пуст</div>
+              <div style="font-size:12.5px; font-weight:300; color:#5C5344; max-width:26ch;">Выберите услуги в быстром меню справа — они появятся здесь.</div>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:16px;">
+          <span style="font-size:11px; letter-spacing:0.24em; text-transform:uppercase; color:#8F7A4B;">Итого</span>
+          <span style="font-family:'Zen Old Mincho',serif; font-size:32px; font-weight:600;">{{ total }} c.</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:18px;">
+          <button onClick="{{ payCash }}" style="background:#26221D; color:#F2EDE3; border:none; padding:12px 8px; font-family:'Jost',sans-serif; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; cursor:pointer;" style-hover="background:#3A342B;">Наличные</button>
+          <button onClick="{{ payCard }}" style="background:#B8A06A; color:#26221D; border:none; padding:12px 8px; font-family:'Jost',sans-serif; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; font-weight:600; cursor:pointer;" style-hover="background:#A68D55;">Карта</button>
+          <button onClick="{{ payQr }}" style="background:transparent; color:#26221D; border:1px solid #26221D; padding:12px 8px; font-family:'Jost',sans-serif; font-size:10.5px; letter-spacing:0.16em; text-transform:uppercase; cursor:pointer;" style-hover="background:#E4DCC9;">QR</button>
+        </div>
+      </section>
+      <section>
+        <h2 style="font-family:'Zen Old Mincho',serif; font-size:20px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin:0; border-bottom:2px solid #B8A06A; padding-bottom:12px;">Быстрое меню</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:10px; margin-top:18px;">
+          <sc-for list="{{ posMenu }}" as="p" hint-placeholder-count="9">
+            <button onClick="{{ p.add }}" style="background:#F7F2E7; border:1px solid #DDD3BF; padding:16px 14px; text-align:left; font-family:'Jost',sans-serif; cursor:pointer; transition:all 0.3s;" style-hover="border-color:#B8A06A; background:#FFFFFF;">
+              <div style="font-size:13px; font-weight:500; color:#26221D;">{{ p.name }}</div>
+              <div style="font-family:'Zen Old Mincho',serif; font-size:15px; font-weight:600; color:#8F7A4B; margin-top:6px;">{{ p.price }} c.</div>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isServices }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:32px;">
+      <div style="border-bottom:1px solid #DDD3BF; padding-bottom:20px;">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:28px; font-weight:600; letter-spacing:0.06em; margin:0;">Меню услуг и цены</h1>
+      </div>
+      <sc-for list="{{ serviceGroups }}" as="grp" hint-placeholder-count="4">
+        <div style="margin-top:30px;">
+          <h2 style="display:flex; align-items:center; gap:10px; font-family:'Zen Old Mincho',serif; font-size:15px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; margin:0; border-bottom:2px solid #B8A06A; padding-bottom:10px;">{{ grp.icon }}{{ grp.name }}</h2>
+          <sc-for list="{{ grp.items }}" as="sv" hint-placeholder-count="3">
+            <div style="display:grid; grid-template-columns:2.4fr 1fr 1fr 1.2fr; gap:12px; padding:12px 8px; font-size:13.5px; border-bottom:1px solid #DDD3BF; align-items:center; transition:background 0.3s;" style-hover="background:#EDE6D6;">
+              <span style="font-weight:500;">{{ sv.name }}</span>
+              <span style="font-weight:300; color:#5C5344;">{{ sv.dur }}</span>
+              <span style="font-family:'Zen Old Mincho',serif; font-weight:600;">{{ sv.price }}</span>
+              <span><sc-if value="{{ sv.onSite }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; padding:5px 9px; border:1px solid #B8A06A; color:#8F7A4B;">на сайте</span></sc-if></span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isRental }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:32px;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid #DDD3BF; padding-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:28px; font-weight:600; letter-spacing:0.06em; margin:0;">Прокат платьев</h1>
+        <span style="font-size:12.5px; font-weight:300; color:#5C5344;">14 платьев · 5 броней на октябрь</span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; margin-top:24px;">
+        <sc-for list="{{ dresses }}" as="d" hint-placeholder-count="6">
+          <div style="border:1px solid #DDD3BF; background:#F7F2E7; transition:box-shadow 0.3s;" style-hover="box-shadow:0 8px 24px rgba(38,34,29,0.12);">
+            <div style="height:120px; background:#26221D; display:flex; align-items:center; justify-content:center;">
+              <svg width="44" height="44" viewBox="0 0 48 48"><rect x="7" y="4" width="34" height="30" fill="none" stroke="#B8A06A" stroke-width="2"></rect><text x="24" y="26" text-anchor="middle" font-family="'Zen Old Mincho',serif" font-size="15" font-weight="600" fill="#B8A06A">MJ</text><text x="24" y="43" text-anchor="middle" font-family="'Jost',sans-serif" font-size="4.6" letter-spacing="1.3" fill="#B8A06A">{{ d.type }}</text></svg>
+            </div>
+            <div style="padding:16px;">
+              <div style="font-family:'Zen Old Mincho',serif; font-size:16px; font-weight:600;">{{ d.name }}</div>
+              <div style="font-size:12px; font-weight:300; color:#5C5344; margin-top:4px;">Размер {{ d.size }} · {{ d.price }} c./день</div>
+              <div style="margin-top:10px;"><span style="font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; padding:5px 9px; background: {{ d.tagBg }}; color: {{ d.tagColor }}; border:1px solid {{ d.tagBorder }};">{{ d.status }}</span></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:32px;">
+      <div style="border-bottom:1px solid #DDD3BF; padding-bottom:20px;">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:28px; font-weight:600; letter-spacing:0.06em; margin:0;">Мастера и график</h1>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-top:24px;">
+        <sc-for list="{{ staff }}" as="m" hint-placeholder-count="5">
+          <div style="border:1px solid #DDD3BF; background:#F7F2E7; padding:20px; transition:box-shadow 0.3s;" style-hover="box-shadow:0 8px 24px rgba(38,34,29,0.12);">
+            <div style="display:flex; gap:14px; align-items:center;">
+              <div style="width:48px; height:48px; flex-shrink:0; background:#26221D; color:#B8A06A; display:flex; align-items:center; justify-content:center; font-family:'Zen Old Mincho',serif; font-weight:600; font-size:16px;">{{ m.initials }}</div>
+              <div>
+                <div style="font-family:'Zen Old Mincho',serif; font-size:17px; font-weight:600;">{{ m.name }}</div>
+                <div style="font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:#8F7A4B;">{{ m.role }}</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:5px; margin-top:16px;">
+              <sc-for list="{{ m.days }}" as="dd" hint-placeholder-count="7">
+                <span style="flex:1; text-align:center; font-size:10px; padding:5px 0; background: {{ dd.bg }}; color: {{ dd.color }}; border:1px solid #DDD3BF;">{{ dd.label }}</span>
+              </sc-for>
+            </div>
+            <div style="margin-top:14px;">
+              <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:5px;"><span style="color:#5C5344; font-weight:300;">Загрузка недели</span><span style="font-weight:500;">{{ m.load }}</span></div>
+              <div style="height:7px; background:#E4DCC9;"><div style="height:100%; width: {{ m.load }}; background:#B8A06A;"></div></div>
+            </div>
+            <div style="font-size:12px; font-weight:300; color:#5C5344; margin-top:12px;">Выручка сентября: <span style="font-family:'Zen Old Mincho',serif; font-weight:600; color:#26221D;">{{ m.revenue }}</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isAnalytics }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:32px;">
+      <div style="border-bottom:1px solid #DDD3BF; padding-bottom:20px;">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:28px; font-weight:600; letter-spacing:0.06em; margin:0;">Аналитика</h1>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:24px;">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="padding:20px 22px; background: {{ k.bg }}; border:1px solid {{ k.border }};">
+            <div style="font-size:9.5px; letter-spacing:0.26em; text-transform:uppercase; color: {{ k.labelColor }};">{{ k.label }}</div>
+            <div data-countup style="font-family:'Zen Old Mincho',serif; font-size:30px; font-weight:600; margin-top:10px; color: {{ k.valueColor }};">{{ k.value }}</div>
+            <div style="font-size:12px; font-weight:300; color: {{ k.labelColor }}; margin-top:3px;">{{ k.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; margin-top:32px;">
+        <div style="background:#26221D; color:#D9CFBB; padding:24px;">
+          <div style="font-size:9.5px; letter-spacing:0.28em; text-transform:uppercase; color:#B8A06A;">Выручка · последние 14 дней</div>
+          <div style="display:flex; align-items:flex-end; gap:5px; height:130px; margin-top:18px;">
+            <sc-for list="{{ revenue }}" as="d" hint-placeholder-count="14">
+              <div style="flex:1; height: {{ d.pct }}; background: {{ d.color }}; transform-origin:bottom; animation:barUp 0.8s cubic-bezier(0.22,1,0.36,1) both; animation-delay: {{ d.delay }};" title="{{ d.amount }}"></div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <div style="border-bottom:2px solid #B8A06A; padding-bottom:12px;">
+            <h2 style="font-family:'Zen Old Mincho',serif; font-size:15px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; margin:0;">Пиковые часы</h2>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:18px;">
+            <sc-for list="{{ hours }}" as="h" hint-placeholder-count="5">
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span style="font-weight:500;">{{ h.label }}</span><span style="font-weight:300; color:#8F7A4B;">{{ h.share }}</span></div>
+                <div style="height:8px; background:#E4DCC9;"><div style="height:100%; width: {{ h.width }}; background:#B8A06A; transform-origin:left; animation:barIn 1s both;"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:32px; max-width:680px;">
+      <div style="border-bottom:1px solid #DDD3BF; padding-bottom:20px;">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:28px; font-weight:600; letter-spacing:0.06em; margin:0;">Настройки салона</h1>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:18px; margin-top:26px;">
+        <sc-for list="{{ settings }}" as="f" hint-placeholder-count="6">
+          <label style="display:block;">
+            <div style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#8F7A4B; margin-bottom:7px;">{{ f.label }}</div>
+            <input defaultValue="{{ f.value }}" style="width:100%; box-sizing:border-box; background:#F7F2E7; border:1px solid #DDD3BF; padding:11px 14px; font-family:'Jost',sans-serif; font-size:14px; color:#26221D; outline:none;" style-focus="border-color:#B8A06A;">
+          </label>
+        </sc-for>
+        <div style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+          <button onClick="{{ save }}" style="background:#B8A06A; color:#26221D; border:none; padding:13px 26px; font-family:'Jost',sans-serif; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; font-weight:600; cursor:pointer;" style-hover="background:#A68D55;">Сохранить</button>
+          <sc-if value="{{ savedNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px; color:#8F7A4B;">✦ Сохранено</span></sc-if>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1360}}">
+class Component extends DCLogic {
+  state = { page: 'dashboard', check: [ { name: 'Пробный свадебный образ', price: 950 }, { name: 'Маникюр, гель-лак', price: 280 } ], saved: false };
+  componentDidMount() {
+    const go = () => window.MJ.loader.run(1900, 'Открываем салон…').then(() => window.MJ.countUp());
+    if (window.MJ) go(); else window.addEventListener('load', () => window.MJ && go());
+  }
+  switchPage(id) {
+    this.setState({ page: id, saved: false });
+    if (!window.MJ) return;
+    window.MJ.skeleton('main > header + *', 480).then(() => window.MJ.countUp());
+  }
+  pay(method) {
+    const MJ = window.MJ;
+    const total = this.state.check.reduce((s, it) => s + it.price, 0);
+    if (!total) { MJ && MJ.toast('Добавьте услугу в чек', 'Касса'); return; }
+    if (!MJ) { this.setState({ check: [] }); return; }
+    MJ.loader.run(1700, 'Проводим оплату · ' + method).then(() => {
+      this.setState({ check: [] });
+      MJ.toast('Оплата ' + total.toLocaleString('ru-RU') + ' c. принята · ' + method, 'Касса');
+    });
+  }
+  renderVals() {
+    const e = React.createElement;
+    const ICONS = {
+      scissors: [e('circle',{cx:6,cy:6,r:3,key:'a'}), e('path',{d:'M8.12 8.12 12 12',key:'b'}), e('path',{d:'M20 4 8.12 15.88',key:'c'}), e('circle',{cx:6,cy:18,r:3,key:'d'}), e('path',{d:'M14.8 14.8 20 20',key:'e'})],
+      hand: [e('path',{d:'M18 11V6a2 2 0 0 0-4 0v5',key:'a'}), e('path',{d:'M14 10V4a2 2 0 0 0-4 0v6',key:'b'}), e('path',{d:'M10 10.5V6a2 2 0 0 0-4 0v8',key:'c'}), e('path',{d:'M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15',key:'d'})],
+      eye: [e('path',{d:'M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0',key:'a'}), e('circle',{cx:12,cy:12,r:3,key:'b'})],
+      droplet: [e('path',{d:'M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z',key:'a'})],
+      sparkles: [e('path',{d:'M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z',key:'a'})],
+      brush: [e('path',{d:'m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08',key:'a'}), e('path',{d:'M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z',key:'b'})],
+      crown: [e('path',{d:'M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.735H5.81a1 1 0 0 1-.957-.735L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z',key:'a'}), e('path',{d:'M5 21h14',key:'b'})],
+    };
+    const icon = (name, size) => e('svg', {width:size||16, height:size||16, viewBox:'0 0 24 24', fill:'none', stroke:'#8F7A4B', strokeWidth:2, strokeLinecap:'round', strokeLinejoin:'round', style:{flexShrink:0}}, ICONS[name]);
+    const page = this.state.page;
+    const nav = (label, id, count) => ({
+      label, count: count || null,
+      color: page === id ? '#F2EDE3' : '#D9CFBB',
+      bg: page === id ? '#332D25' : 'transparent',
+      border: page === id ? '#B8A06A' : 'transparent',
+      go: (ev) => { ev.preventDefault(); if (id && id !== page) this.switchPage(id); },
+    });
+    const tags = {
+      done: { tagBg: '#E4DCC9', tagColor: '#5C5344', tagBorder: '#DDD3BF' },
+      chair: { tagBg: '#B8A06A', tagColor: '#26221D', tagBorder: '#B8A06A' },
+      confirmed: { tagBg: 'transparent', tagColor: '#8F7A4B', tagBorder: '#B8A06A' },
+      pending: { tagBg: 'transparent', tagColor: '#8F7A4B', tagBorder: '#DDD3BF' },
+    };
+    const initials = (n) => n.split(' ').map((w) => w[0]).join('');
+    return {
+      isDashboard: page === 'dashboard', isCalendar: page === 'calendar', isCrm: page === 'crm', isPos: page === 'pos',
+      isServices: page === 'services', isRental: page === 'rental', isStaff: page === 'staff', isAnalytics: page === 'analytics', isSettings: page === 'settings',
+      goCalendar: (ev) => { ev.preventDefault(); this.switchPage('calendar'); },
+      navGroups: [
+        { label: 'Мой салон', items: [nav('Мой салон сегодня', 'dashboard'), nav('Ресепшен и касса', 'pos')] },
+        { label: 'Гостьи', items: [nav('Книга гостей', 'crm'), nav('Календарь записей', 'calendar', '12')] },
+        { label: 'Услуги', items: [nav('Меню услуг и цены', 'services'), nav('Прокат платьев', 'rental', '5')] },
+        { label: 'Команда', items: [nav('Мастера и график', 'staff')] },
+        { label: 'Развитие', items: [nav('Аналитика', 'analytics'), nav('Настройки', 'settings')] },
+      ],
+      stats: [
+        { label: 'Сегодня', value: '$486', sub: '6 гостий рассчитано', bg: '#F7F2E7', border: '#DDD3BF', labelColor: '#8F7A4B', valueColor: '#26221D' },
+        { label: 'Гостьи сегодня', value: '12', sub: '2 пришли без записи', bg: '#F7F2E7', border: '#DDD3BF', labelColor: '#8F7A4B', valueColor: '#26221D' },
+        { label: 'За месяц', value: '$12,833', sub: '+18% — лучший сентябрь', bg: '#26221D', border: '#26221D', labelColor: '#B8A06A', valueColor: '#F2EDE3' },
+        { label: 'Постоянные', value: '312', sub: '15 новых лиц за месяц', bg: '#F7F2E7', border: '#DDD3BF', labelColor: '#8F7A4B', valueColor: '#26221D' },
+      ].map((s, i) => ({ ...s, delay: (i * 0.09).toFixed(2) + 's' })),
+      appts: [
+        ['Марта К.', 'Балаяж + стрижка', 'Инес', '09:00', '$140', 'Готово', 'done'],
+        ['София Р.', 'Гель-лак, пыльная роза', 'Петра', '10:30', '$45', 'Готово', 'done'],
+        ['Анна Л.', 'Ламинирование ресниц', 'Мира', '12:00', '$68', 'В кресле', 'chair'],
+        ['Хлоя Б.', 'Уход за кожей', 'Инес', '13:30', '$110', 'Придёт', 'confirmed'],
+        ['Юки Т.', 'Стрижка и укладка', 'Дарио', '15:30', '$62', 'Ожидание', 'pending'],
+        ['Лейла Х.', 'Пробный свадебный образ', 'Мира', '17:00', '$95', 'Придёт', 'confirmed'],
+      ].map(([client, service, staff, time, price, status, kind]) => ({ client, service, staff, time, price, status, ...tags[kind], initials: initials(client) })),
+      categories: [
+        ['Волосы', 32, 'scissors'], ['Ногти', 21, 'hand'], ['Ресницы и брови', 17, 'eye'], ['Уход за кожей', 12, 'droplet'], ['Спа', 11, 'sparkles'], ['Макияж', 7, 'brush'],
+      ].map(([name, p, ic], i) => ({ name, share: p + '%', width: p + '%', color: i === 0 ? '#8F7A4B' : '#B8A06A', icon: icon(ic), delay: (0.2 + i * 0.1).toFixed(2) + 's' })),
+      revenue: [420,510,380,640,720,560,480,690,750,610,530,820,700,486].map((v, i) => ({
+        pct: Math.round((v / 820) * 100) + '%', color: i === 13 ? '#B8A06A' : '#4A4234', amount: '$' + v, delay: (0.3 + i * 0.05).toFixed(2) + 's',
+      })),
+      reminders: [
+        'День рождения Марты в четверг — маленький подарок?',
+        'Гель-лак «розовое золото» заканчивается (3 шт.)',
+        'Отправить советы по уходу гостьям после чисток',
+      ],
+      week: [
+        { dow: 'Пн', date: '22', closed: true, appts: [] },
+        { dow: 'Вт', date: '23', appts: [['09:00','Марта К.','Балаяж + стрижка','Инес'],['11:30','Нигора С.','Брови + ресницы','Мира'],['14:00','Зарина А.','Маникюр','Петра'],['16:30','Дильноза Р.','Укладка','Дарио']] },
+        { dow: 'Ср', date: '24', appts: [['09:30','Севара М.','Уход за кожей','Инес'],['12:00','Лола Х.','Гель-лак','Петра'],['15:00','Малика Ю.','Стрижка','Дарио']] },
+        { dow: 'Чт', date: '25', appts: [['10:00','Марта К.','ДР: подарок ✦','—'],['11:00','Фарзона И.','Свадебный образ, проба','Мира'],['13:30','Гульнора Т.','Окрашивание','Инес'],['17:00','Шахло К.','Педикюр','Петра']] },
+        { dow: 'Пт', date: '26', appts: [['09:00','Азиза Н.','Ламинирование ресниц','Мира'],['12:30','Мохира Д.','Макияж вечерний','Мира'],['14:30','Рухшона В.','Маникюр + педикюр','Петра']] },
+        { dow: 'Сб', date: '27', appts: [['08:30','Фарзона И.','СВАДЬБА: образ под ключ','Мира + Инес'],['09:00','Мама невесты','Причёска + макияж','Дарио'],['10:00','Подружки ×3','Укладки','Петра'],['15:00','Камила С.','Гель-лак','Петра']] },
+        { dow: 'Вс', date: '28', appts: [['10:00','Наргис Б.','Стрижка','Дарио'],['12:00','Дилором А.','Брови','Мира']] },
+      ].map((d) => ({ ...d, closed: !!d.closed, bg: d.closed ? '#EDE6D6' : '#F7F2E7', appts: d.appts.map(([time, client, service, staff]) => ({ time, client, service, staff })) })),
+      guests: [
+        ['Марта Каримова', '+992 93 501-22-14', 24, '21 сен', 'Балаяж', 'VIP', 'chair'],
+        ['Фарзона Икромова', '+992 98 700-45-90', 3, '18 сен', 'Свадебный образ', 'Невеста', 'confirmed'],
+        ['София Рахимова', '+992 90 112-38-77', 17, '21 сен', 'Гель-лак', 'Постоянная', 'done'],
+        ['Анна Литвинова', '+992 93 880-04-51', 9, '21 сен', 'Ресницы', 'Постоянная', 'done'],
+        ['Севара Мирзоева', '+992 91 455-19-08', 12, '14 сен', 'Уход за кожей', 'Постоянная', 'done'],
+        ['Лейла Хамидова', '+992 98 322-67-33', 2, '17 сен', 'Макияж', 'Новая', 'pending'],
+        ['Гульнора Ташева', '+992 90 640-28-16', 21, '12 сен', 'Окрашивание', 'VIP', 'chair'],
+        ['Наргис Бобоева', '+992 93 218-90-42', 6, '7 сен', 'Стрижка', 'Постоянная', 'done'],
+      ].map(([name, phone, visits, last, fav, tag, kind]) => ({ name, phone, visits, last, fav, tag, ...tags[kind], initials: initials(name) })),
+      check: this.state.check.map((item, i) => ({ ...item, remove: (ev) => { ev.preventDefault(); this.setState((s) => ({ check: s.check.filter((_, j) => j !== i) })); } })),
+      total: this.state.check.reduce((sum, it) => sum + it.price, 0),
+      checkEmpty: this.state.check.length === 0,
+      payCash: () => this.pay('Наличные'), payCard: () => this.pay('Карта'), payQr: () => this.pay('QR'),
+      posMenu: [
+        ['Стрижка + укладка', 180], ['Окрашивание', 450], ['Балаяж', 700], ['Маникюр, гель-лак', 280], ['Педикюр', 320], ['Брови: архитектура', 150], ['Ламинирование ресниц', 340], ['Макияж вечерний', 400], ['Уход за кожей', 520],
+      ].map(([name, price]) => ({ name, price, add: () => { this.setState((s) => ({ check: [...s.check, { name, price }] })); window.MJ && window.MJ.toast('В чек: ' + name, 'Касса'); } })),
+      serviceGroups: [
+        { name: 'Волосы', icon: icon('scissors', 18), items: [
+          ['Стрижка + укладка', '60 мин', '180 c.', true], ['Окрашивание в один тон', '120 мин', '450 c.', true], ['Балаяж / шатуш', '180 мин', '700 c.', true], ['Свадебная причёска', '90 мин', '550 c.', true],
+        ]},
+        { name: 'Ногти', icon: icon('hand', 18), items: [
+          ['Маникюр, гель-лак', '90 мин', '280 c.', true], ['Педикюр', '75 мин', '320 c.', true], ['Дизайн (за ноготь)', '10 мин', '15 c.', false],
+        ]},
+        { name: 'Брови и ресницы', icon: icon('eye', 18), items: [
+          ['Архитектура бровей', '45 мин', '150 c.', true], ['Ламинирование ресниц', '60 мин', '340 c.', true],
+        ]},
+        { name: 'Макияж и образы', icon: icon('crown', 18), items: [
+          ['Макияж дневной', '45 мин', '250 c.', true], ['Макияж вечерний', '60 мин', '400 c.', true], ['Свадебный образ под ключ', '3 часа', '1500 c.', true], ['Пробный образ', '90 мин', '950 c.', false],
+        ]},
+      ].map((grp) => ({ ...grp, items: grp.items.map(([name, dur, price, onSite]) => ({ name, dur, price, onSite })) })),
+      dresses: [
+        ['«Амира»', 'СВАДЕБНОЕ', '42–44', 900, 'Свободно', 'done'], ['«Ситора»', 'СВАДЕБНОЕ', '46–48', 850, 'Бронь 27 сен', 'chair'], ['«Лола»', 'ВЕЧЕРНЕЕ', '42', 400, 'Свободно', 'done'], ['«Малика»', 'СВАДЕБНОЕ', '40–42', 1100, 'Бронь 4 окт', 'chair'], ['«Наргис»', 'ВЕЧЕРНЕЕ', '44', 350, 'В химчистке', 'pending'], ['«Гуландом»', 'ВЕЧЕРНЕЕ', '46', 380, 'Свободно', 'done'],
+      ].map(([name, type, size, price, status, kind]) => ({ name: 'Платье ' + name, type, size, price, status, ...tags[kind] })),
+      staff: [
+        ['Мавзуна', 'Владелица · стилист', [0,1,1,1,1,1,0], '92%', '4 120 c.'],
+        ['Инес', 'Колорист', [0,1,1,1,1,1,1], '88%', '3 540 c.'],
+        ['Мира', 'Брови · ресницы · макияж', [0,1,1,0,1,1,1], '84%', '2 980 c.'],
+        ['Петра', 'Ногтевой сервис', [0,1,1,1,1,1,0], '76%', '2 210 c.'],
+        ['Дарио', 'Парикмахер', [0,0,1,1,1,1,1], '61%', '1 830 c.'],
+      ].map(([name, role, days, load, revenue]) => ({
+        name, role, load, revenue, initials: name[0],
+        days: days.map((on, i) => ({ label: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'][i], bg: on ? '#26221D' : 'transparent', color: on ? '#B8A06A' : '#B9B2A4' })),
+      })),
+      kpis: [
+        { label: 'Выручка месяца', value: '$12,833', sub: '+18% к августу', bg: '#26221D', border: '#26221D', labelColor: '#B8A06A', valueColor: '#F2EDE3' },
+        { label: 'Средний чек', value: '312 c.', sub: '+9% к августу', bg: '#F7F2E7', border: '#DDD3BF', labelColor: '#8F7A4B', valueColor: '#26221D' },
+        { label: 'Возвращаемость', value: '68%', sub: 'гостьи приходят снова', bg: '#F7F2E7', border: '#DDD3BF', labelColor: '#8F7A4B', valueColor: '#26221D' },
+        { label: 'Записи с сайта', value: '41', sub: 'через WhatsApp-кнопку', bg: '#F7F2E7', border: '#DDD3BF', labelColor: '#8F7A4B', valueColor: '#26221D' },
+      ],
+      hours: [
+        ['09:00–11:00', 26], ['11:00–13:00', 22], ['13:00–15:00', 14], ['15:00–17:00', 24], ['17:00–18:00', 14],
+      ].map(([label, p]) => ({ label, share: p + '%', width: (p * 3.5) + '%' })),
+      settings: [
+        { label: 'Название', value: 'Mavzunai Jovid — Gallery of Beauty MJ' },
+        { label: 'Адрес', value: 'ул. Бухоро, 23/25, 1–2 этаж, Душанбе' },
+        { label: 'Телефон', value: '+992 98 103 11 11' },
+        { label: 'Instagram', value: '@mavzunai.jovid.official' },
+        { label: 'Часы работы', value: 'Вт–Вс 09:00–18:00 · Пн — выходной' },
+        { label: 'Валюта', value: 'сомони (TJS)' },
+      ],
+      savedNote: this.state.saved,
+      save: () => { this.setState({ saved: true }); window.MJ && window.MJ.toast('Настройки салона сохранены'); },
+    };
+  }
+}
+</script>
+</body>
+</html>

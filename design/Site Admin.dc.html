@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;600;700&family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;background:#F2EDE3;}
+    a{color:#8F7A4B;} a:hover{color:#B8A06A;}
+    ::selection{background:#B8A06A;color:#26221D;}
+    input::placeholder,textarea::placeholder{color:#B9B2A4;}
+  </style>
+  <script src="./mj-fx.js"></script>
+</helmet>
+<div style="min-height:100vh; font-family:'Jost',sans-serif; color:#26221D; background:#F2EDE3;">
+  <header style="display:flex; align-items:center; gap:16px; padding:14px 32px; background:#26221D; color:#F2EDE3; flex-wrap:wrap;">
+    <svg width="30" height="30" viewBox="0 0 48 48"><rect x="7" y="4" width="34" height="30" fill="none" stroke="#B8A06A" stroke-width="2.4"></rect><text x="24" y="26.5" text-anchor="middle" font-family="'Zen Old Mincho',serif" font-size="17" font-weight="600" fill="#B8A06A">MJ</text></svg>
+    <div style="font-family:'Zen Old Mincho',serif; font-size:15px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase;">Админка сайта</div>
+    <span style="font-size:11px; letter-spacing:0.16em; color:#B9B2A4;">mavzunai-jovid · Gallery of Beauty MJ</span>
+    <div style="flex:1;"></div>
+    <a href="Mavzunai Jovid Website Main.dc.html" style="border:1px solid #B8A06A; color:#B8A06A; padding:9px 18px; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none;" style-hover="background:rgba(184,160,106,0.15);">Открыть сайт ↗</a>
+    <button onClick="{{ publish }}" style="background:#B8A06A; color:#26221D; border:none; padding:10px 20px; font-family:'Jost',sans-serif; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; font-weight:600; cursor:pointer;" style-hover="background:#A68D55;">Опубликовать</button>
+  </header>
+  <sc-if value="{{ published }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#B8A06A; color:#26221D; padding:10px 32px; font-size:12.5px; letter-spacing:0.06em;">✦ Изменения опубликованы на сайте</div>
+  </sc-if>
+
+  <div style="display:flex; align-items:flex-start;">
+    <nav style="width:230px; flex-shrink:0; border-right:1px solid #DDD3BF; padding:20px 0; position:sticky; top:0;">
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="6">
+        <a href="#" onClick="{{ s.go }}" style="display:block; padding:11px 24px; font-size:13px; letter-spacing:0.05em; text-decoration:none; color: {{ s.color }}; background: {{ s.bg }}; border-left:3px solid {{ s.border }}; font-weight: {{ s.weight }};" style-hover="background:#EDE6D6; color:#26221D;">{{ s.label }}</a>
+      </sc-for>
+    </nav>
+
+    <main style="flex:1; min-width:0; padding:32px; max-width:760px;">
+      <sc-if value="{{ isTexts }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:24px; font-weight:600; letter-spacing:0.06em; margin:0 0 6px;">Тексты секций</h1>
+        <p style="font-size:12.5px; font-weight:300; color:#5C5344; margin:0 0 24px;">Заголовки и описания, которые видят гостьи на сайте.</p>
+        <div style="display:flex; flex-direction:column; gap:22px;">
+          <sc-for list="{{ texts }}" as="t" hint-placeholder-count="5">
+            <div style="border:1px solid #DDD3BF; background:#F7F2E7; padding:18px 20px;">
+              <div style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#8F7A4B; margin-bottom:10px;">{{ t.section }}</div>
+              <input defaultValue="{{ t.title }}" style="width:100%; box-sizing:border-box; background:#FFFFFF; border:1px solid #DDD3BF; padding:10px 13px; font-family:'Zen Old Mincho',serif; font-size:15px; color:#26221D; outline:none; margin-bottom:9px;" style-focus="border-color:#B8A06A;">
+              <textarea defaultValue="{{ t.body }}" rows="{{ t.rows }}" style="width:100%; box-sizing:border-box; background:#FFFFFF; border:1px solid #DDD3BF; padding:10px 13px; font-family:'Jost',sans-serif; font-size:13.5px; font-weight:300; color:#26221D; outline:none; resize:vertical;" style-focus="border-color:#B8A06A;"></textarea>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPrices }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:24px; font-weight:600; letter-spacing:0.06em; margin:0 0 6px;">Услуги и цены на сайте</h1>
+        <p style="font-size:12.5px; font-weight:300; color:#5C5344; margin:0 0 24px;">Что показывать в секции «Наши услуги». Цены синхронизируются с CMS.</p>
+        <div style="display:flex; flex-direction:column;">
+          <sc-for list="{{ prices }}" as="p" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:12px; align-items:center; padding:12px 8px; border-bottom:1px solid #DDD3BF; font-size:13.5px;">
+              <span style="font-weight:500;">{{ p.name }}</span>
+              <input defaultValue="{{ p.price }}" style="box-sizing:border-box; width:100%; background:#FFFFFF; border:1px solid #DDD3BF; padding:8px 11px; font-family:'Jost',sans-serif; font-size:13px; outline:none;" style-focus="border-color:#B8A06A;">
+              <span style="font-weight:300; color:#5C5344;">{{ p.dur }}</span>
+              <button onClick="{{ p.toggle }}" style="background: {{ p.btnBg }}; color: {{ p.btnColor }}; border:1px solid #B8A06A; padding:7px 13px; font-family:'Jost',sans-serif; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer;">{{ p.btnLabel }}</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPhotos }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:24px; font-weight:600; letter-spacing:0.06em; margin:0 0 6px;">Фотографии</h1>
+        <p style="font-size:12.5px; font-weight:300; color:#5C5344; margin:0 0 24px;">Сейчас стоят временные ч/б фото. Замените их на съёмку салона.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:16px;">
+          <sc-for list="{{ photos }}" as="ph" hint-placeholder-count="5">
+            <div style="border:1px solid #DDD3BF; background:#F7F2E7;">
+              <img src="{{ ph.src }}" alt="{{ ph.label }}" style="display:block; width:100%; height:130px; object-fit:cover; filter:grayscale(1);">
+              <div style="padding:12px 14px;">
+                <div style="font-size:12.5px; font-weight:500;">{{ ph.label }}</div>
+                <div style="font-size:11px; font-weight:300; color:#8F7A4B; margin-top:2px;">{{ ph.place }}</div>
+                <button style="margin-top:10px; background:transparent; border:1px solid #26221D; color:#26221D; padding:7px 13px; font-family:'Jost',sans-serif; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer;" style-hover="background:#26221D; color:#F2EDE3;">Заменить</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isReviews }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:24px; font-weight:600; letter-spacing:0.06em; margin:0 0 6px;">Отзывы</h1>
+        <p style="font-size:12.5px; font-weight:300; color:#5C5344; margin:0 0 24px;">Что показывается в секции «Нас любят гости». Скрытые отзывы остаются в архиве.</p>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="3">
+            <div style="border:1px solid #DDD3BF; background: {{ r.bg }}; padding:18px 20px; opacity: {{ r.opacity }};">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap;">
+                <span style="font-family:'Zen Old Mincho',serif; font-size:14px; font-weight:600;">{{ r.author }} <span style="color:#B8A06A;">★★★★★</span></span>
+                <button onClick="{{ r.toggle }}" style="background:transparent; border:1px solid #26221D; color:#26221D; padding:6px 12px; font-family:'Jost',sans-serif; font-size:9.5px; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer;" style-hover="background:#26221D; color:#F2EDE3;">{{ r.btnLabel }}</button>
+              </div>
+              <p style="font-size:13px; font-weight:300; line-height:1.7; color:#5C5344; margin:10px 0 0; font-style:italic;">{{ r.text }}</p>
+              <div style="font-size:11px; color:#8F7A4B; margin-top:8px;">{{ r.source }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isContacts }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:24px; font-weight:600; letter-spacing:0.06em; margin:0 0 6px;">Контакты и часы</h1>
+        <p style="font-size:12.5px; font-weight:300; color:#5C5344; margin:0 0 24px;">Показываются в шапке, футере и кнопках WhatsApp.</p>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <sc-for list="{{ contacts }}" as="c" hint-placeholder-count="6">
+            <label style="display:block;">
+              <div style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#8F7A4B; margin-bottom:7px;">{{ c.label }}</div>
+              <input defaultValue="{{ c.value }}" style="width:100%; box-sizing:border-box; background:#F7F2E7; border:1px solid #DDD3BF; padding:11px 14px; font-family:'Jost',sans-serif; font-size:14px; color:#26221D; outline:none;" style-focus="border-color:#B8A06A;">
+            </label>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSeo }}" hint-placeholder-val="{{ false }}">
+        <h1 style="font-family:'Zen Old Mincho',serif; font-size:24px; font-weight:600; letter-spacing:0.06em; margin:0 0 6px;">SEO</h1>
+        <p style="font-size:12.5px; font-weight:300; color:#5C5344; margin:0 0 24px;">Как страница выглядит в Google и при пересылке ссылки.</p>
+        <label style="display:block; margin-bottom:16px;">
+          <div style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#8F7A4B; margin-bottom:7px;">Title <span style="color:#B9B2A4;">(до 60 символов)</span></div>
+          <input defaultValue="Mavzunai Jovid — салон красоты и свадебный зал в Душанбе" style="width:100%; box-sizing:border-box; background:#F7F2E7; border:1px solid #DDD3BF; padding:11px 14px; font-family:'Jost',sans-serif; font-size:14px; outline:none;" style-focus="border-color:#B8A06A;">
+        </label>
+        <label style="display:block; margin-bottom:24px;">
+          <div style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#8F7A4B; margin-bottom:7px;">Description <span style="color:#B9B2A4;">(до 160 символов)</span></div>
+          <textarea rows="3" defaultValue="Gallery of Beauty MJ: волосы, ногти, макияж, свадебные образы и прокат платьев. ул. Бухоро 23/25. Запись в WhatsApp +992 98 103 11 11." style="width:100%; box-sizing:border-box; background:#F7F2E7; border:1px solid #DDD3BF; padding:11px 14px; font-family:'Jost',sans-serif; font-size:14px; font-weight:300; outline:none; resize:vertical;" style-focus="border-color:#B8A06A;"></textarea>
+        </label>
+        <div style="border:1px solid #DDD3BF; background:#FFFFFF; padding:18px 20px; max-width:560px;">
+          <div style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#8F7A4B; margin-bottom:10px;">Предпросмотр в поиске</div>
+          <div style="font-size:12px; color:#5C5344;">mavzunai-jovid.tj</div>
+          <div style="font-size:17px; color:#1a0dab; margin-top:3px;">Mavzunai Jovid — салон красоты и свадебный зал в Душанбе</div>
+          <div style="font-size:13px; font-weight:300; color:#5C5344; margin-top:4px; line-height:1.5;">Gallery of Beauty MJ: волосы, ногти, макияж, свадебные образы и прокат платьев. ул. Бухоро 23/25. Запись в WhatsApp +992 98 103 11 11.</div>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200}}">
+class Component extends DCLogic {
+  state = { section: 'texts', published: false, hidden: {}, onSite: { 'Дизайн (за ноготь)': false } };
+  renderVals() {
+    const sec = this.state.section;
+    const item = (label, id) => ({
+      label, color: sec === id ? '#26221D' : '#5C5344',
+      bg: sec === id ? '#EDE6D6' : 'transparent',
+      border: sec === id ? '#B8A06A' : 'transparent',
+      weight: sec === id ? 500 : 300,
+      go: (ev) => { ev.preventDefault(); this.setState({ section: id }); },
+    });
+    const u = (id) => 'https://images.unsplash.com/' + id + '?q=70&w=500&auto=format&fit=crop&sat=-100';
+    return {
+      published: this.state.published,
+      publish: () => { this.setState({ published: true }); window.MJ && window.MJ.toast('Изменения опубликованы на сайте', 'Сайт'); },
+      isTexts: sec === 'texts', isPrices: sec === 'prices', isPhotos: sec === 'photos', isReviews: sec === 'reviews', isContacts: sec === 'contacts', isSeo: sec === 'seo',
+      sections: [item('Тексты секций', 'texts'), item('Услуги и цены', 'prices'), item('Фотографии', 'photos'), item('Отзывы', 'reviews'), item('Контакты и часы', 'contacts'), item('SEO', 'seo')],
+      texts: [
+        { section: 'Hero — главный экран', title: 'Красота, которая вдохновляет', body: 'Роскошь ухода. Ваша вневременная красота.', rows: 2 },
+        { section: 'Наша философия', title: 'Наша философия', body: 'Красота — это не только образ, это уверенность и характер. Мавзуна и её команда создают персональный опыт для каждой гостьи: от утреннего маникюра до свадебного образа под ключ — в тишине, заботе и без спешки.', rows: 4 },
+        { section: 'Свадебный зал', title: 'Ваш самый красивый день', body: 'Причёска, макияж и маникюр в одно утро — без спешки. Прокат свадебных и вечерних платьев с примеркой и подгонкой по фигуре, пробный образ до торжества и образы для мамы и подружек невесты.', rows: 4 },
+        { section: 'О салоне', title: 'О салоне', body: 'Два этажа в центре Душанбе: салон красоты и свадебный зал под одной крышей. Идеальная чистота, внимательные мастера и владелица Мавзуна, которая сама подскажет, что пойдёт именно вам.', rows: 4 },
+      ],
+      prices: [
+        ['Стрижка + укладка', '180 c.', '60 мин'], ['Окрашивание в один тон', '450 c.', '120 мин'], ['Балаяж / шатуш', '700 c.', '180 мин'], ['Маникюр, гель-лак', '280 c.', '90 мин'], ['Педикюр', '320 c.', '75 мин'], ['Архитектура бровей', '150 c.', '45 мин'], ['Ламинирование ресниц', '340 c.', '60 мин'], ['Свадебный образ под ключ', '1500 c.', '3 часа'], ['Дизайн (за ноготь)', '15 c.', '10 мин'],
+      ].map(([name, price, dur]) => {
+        const on = this.state.onSite[name] !== false;
+        return { name, price, dur,
+          btnLabel: on ? 'На сайте ✓' : 'Скрыто',
+          btnBg: on ? '#B8A06A' : 'transparent', btnColor: on ? '#26221D' : '#8F7A4B',
+          toggle: () => this.setState((s) => ({ onSite: { ...s.onSite, [name]: !(s.onSite[name] !== false) } })),
+        };
+      }),
+      photos: [
+        { label: 'Hero — главный экран', place: 'верх страницы', src: u('photo-1688395199230-ab7c7170a4b6') },
+        { label: 'Свадебный зал', place: 'секция «Невестам»', src: u('photo-1708134128589-0dfd38b2203a') },
+        { label: 'Интерьер', place: 'секция «О салоне»', src: u('photo-1781450090585-1a511b7066d9') },
+        { label: 'Отзыв — Zukhra K.', place: 'аватар', src: u('photo-1650292266612-a634d749626f') },
+        { label: 'Отзыв — D I', place: 'аватар', src: u('photo-1731907547491-dd745791d8b5') },
+      ],
+      reviews: [
+        ['Zukhra K.', '«Очень приятная атмосфера, идеальная чистота. Владелица Мавзуна сама подсказала, что мне пойдёт — результат идеальный. Советую всем подругам!»', 'Tripadvisor · сен 2022'],
+        ['D I, Душанбе', '«Проходил мимо, зашёл — и был в восторге от салона. Очень уютно, доброжелательный персонал, услуги на высоте. Процветания вам!»', 'Tripadvisor · июл 2023'],
+        ['Фарзона И.', '«Свадебный образ — мечта. Платье, причёска, макияж — всё в одном месте, и всё идеально.»', 'Instagram · черновик'],
+      ].map(([author, text, source], i) => {
+        const hidden = !!this.state.hidden[i];
+        return { author, text, source,
+          bg: hidden ? '#EDE6D6' : '#F7F2E7', opacity: hidden ? 0.55 : 1,
+          btnLabel: hidden ? 'Показать' : 'Скрыть',
+          toggle: () => this.setState((s) => ({ hidden: { ...s.hidden, [i]: !s.hidden[i] } })),
+        };
+      }),
+      contacts: [
+        { label: 'Телефон', value: '+992 98 103 11 11' },
+        { label: 'WhatsApp', value: 'wa.me/992981031111' },
+        { label: 'Instagram — салон', value: '@mavzunai.jovid.official' },
+        { label: 'Instagram — галерея', value: '@mavzunai_jovid_gallery_beauty' },
+        { label: 'Адрес', value: 'ул. Бухоро, 23/25, 1–2 этаж, Шохмансур, Душанбе' },
+        { label: 'Часы работы', value: 'Вт–Вс 09:00–18:00 · Понедельник — выходной' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

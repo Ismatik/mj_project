@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;600;700&family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <style>
+    body{margin:0;background:#26221D;}
+    a{color:#26221D;} a:hover{color:#5C5344;}
+    a{transition:all .45s cubic-bezier(.22,1,.36,1);}
+    ::selection{background:#26221D;color:#F2EDE3;}
+    @keyframes shimmer{0%{background-position:130% 0;}55%{background-position:-130% 0;}100%{background-position:-130% 0;}}
+    @keyframes dust{0%{transform:translateY(10px);opacity:0;}25%{opacity:0.55;}75%{opacity:0.35;}100%{transform:translateY(-130px);opacity:0;}}
+    @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+  </style>
+  <script src="./mj-fx.js"></script>
+</helmet>
+<div style="font-family:'Jost',sans-serif; color:#26221D; background:#F2EDE3; font-weight:400;">
+
+  <nav style="display:flex; align-items:center; gap:32px; padding:18px 48px; background:#F2EDE3; border-bottom:1px solid #DDD3BF; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <svg width="40" height="40" viewBox="0 0 48 48"><rect x="7" y="4" width="34" height="30" fill="none" stroke="#26221D" stroke-width="2.4"></rect><text x="24" y="26.5" text-anchor="middle" font-family="'Zen Old Mincho',serif" font-size="17" font-weight="600" fill="#26221D">MJ</text><text x="24" y="44" text-anchor="middle" font-family="'Jost',sans-serif" font-size="5.2" letter-spacing="1.6" fill="#26221D">MAVZUNAI JOVID</text></svg>
+      <div>
+        <div style="font-family:'Zen Old Mincho',serif; font-size:19px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase;">Mavzunai Jovid</div>
+        <div style="font-size:10px; letter-spacing:0.32em; text-transform:uppercase; color:#5C5344;">gallery of beauty</div>
+      </div>
+    </div>
+    <div style="flex:1;"></div>
+    <div style="display:flex; gap:26px; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; font-weight:500;">
+      <a href="#uslugi" style="text-decoration:none; color:#26221D;">Услуги</a>
+      <a href="#nevesta" style="text-decoration:none; color:#26221D;">Невестам</a>
+      <a href="#otzyvy" style="text-decoration:none; color:#26221D;">Отзывы</a>
+      <a href="#kontakty" style="text-decoration:none; color:#26221D;">Контакты</a>
+    </div>
+    <a href="https://wa.me/992981031111" style="background:#26221D; color:#F2EDE3; padding:12px 24px; font-size:11.5px; letter-spacing:0.2em; text-transform:uppercase; font-weight:600; text-decoration:none;" style-hover="background:#3A342B; transform:translateY(-2px); box-shadow:0 10px 28px rgba(38,34,29,0.35);">Записаться</a>
+  </nav>
+
+  <header style="display:grid; grid-template-columns:minmax(0,6fr) minmax(0,6fr); background:#26221D; color:#F2EDE3;">
+    <div style="padding:88px 48px 88px 64px; display:flex; flex-direction:column; justify-content:center; position:relative; overflow:hidden;">
+      <div style="position:absolute; inset:0; pointer-events:none;">
+        <sc-for list="{{ dust }}" as="d" hint-placeholder-count="7">
+          <span style="position:absolute; left: {{ d.left }}; bottom: {{ d.bottom }}; width: {{ d.size }}; height: {{ d.size }}; border-radius:50%; background:radial-gradient(circle,#F2EDE3,transparent 70%); animation:dust {{ d.dur }} linear infinite; animation-delay: {{ d.delay }};"></span>
+        </sc-for>
+      </div>
+      <div data-reveal style="font-size:11px; letter-spacing:0.34em; text-transform:uppercase; color:#D9CFBB; position:relative;">Душанбе · Gallery of Beauty MJ</div>
+      <h1 data-reveal data-blur style="font-family:'Zen Old Mincho',serif; font-size:clamp(28px,4vw,60px); font-weight:600; letter-spacing:0.03em; overflow-wrap:break-word; line-height:1.12; margin:22px 0 0; text-transform:uppercase; position:relative; background:linear-gradient(100deg,#F2EDE3 42%,#FFFFFF 50%,#F2EDE3 58%); background-size:240% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 8s ease-in-out infinite;">Красота,<br>которая вдохновляет</h1>
+      <p data-reveal style="font-size:16px; font-weight:300; letter-spacing:0.06em; color:#D9CFBB; margin:22px 0 0; position:relative;">Роскошь ухода. Ваша вневременная красота.</p>
+      <div data-reveal style="display:flex; gap:14px; margin-top:38px; flex-wrap:wrap; position:relative;">
+        <a href="https://wa.me/992981031111" style="background:#F2EDE3; color:#26221D; padding:14px 28px; font-size:11.5px; letter-spacing:0.2em; text-transform:uppercase; font-weight:600; text-decoration:none;" style-hover="background:#FFFFFF; transform:translateY(-2px); box-shadow:0 10px 28px rgba(242,237,227,0.25);">Записаться на визит</a>
+        <a href="#uslugi" style="border:1px solid #F2EDE3; color:#F2EDE3; padding:14px 28px; font-size:11.5px; letter-spacing:0.2em; text-transform:uppercase; font-weight:500; text-decoration:none;" style-hover="background:rgba(242,237,227,0.12); transform:translateY(-2px);">Услуги</a>
+      </div>
+      <div data-reveal style="display:flex; gap:26px; margin-top:52px; font-size:12px; letter-spacing:0.1em; color:#D9CFBB; position:relative;">
+        <span>★ 5.0 Tripadvisor</span><span style="color:#5C5344;">|</span><span>№1 среди спа и салонов Душанбе</span>
+      </div>
+    </div>
+    <div style="min-height:540px; position:relative; overflow:hidden;">
+      <div data-parallax style="position:absolute; inset:0; will-change:transform;">
+        <image-slot id="lux-hero" shape="rect" placeholder="Фото: героиня или интерьер салона" src="https://images.unsplash.com/photo-1688395199230-ab7c7170a4b6?q=75&w=1400&auto=format&fit=crop&sat=-100" credit="Photo by engin akyurt on Unsplash" credit-href="https://unsplash.com/@enginakyurt"></image-slot>
+      </div>
+    </div>
+  </header>
+
+  <section style="background:#2B2620; color:#F2EDE3; padding:76px 48px; text-align:center; position:relative; overflow:hidden;">
+    <div data-spotlight style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(460px circle at 50% 30%, rgba(242,237,227,0.07), transparent 65%);"></div>
+    <svg data-reveal width="76" height="76" viewBox="0 0 48 48" style="margin:0 auto;"><circle cx="24" cy="24" r="23" fill="#F2EDE3"></circle><rect x="12" y="10" width="24" height="21" fill="none" stroke="#26221D" stroke-width="1.7"></rect><text x="24" y="26" text-anchor="middle" font-family="'Zen Old Mincho',serif" font-size="12" font-weight="600" fill="#26221D">MJ</text><text x="24" y="37.5" text-anchor="middle" font-family="'Jost',sans-serif" font-size="3.4" letter-spacing="1" fill="#26221D">MAVZUNAI JOVID</text></svg>
+    <h2 data-reveal data-blur style="font-family:'Zen Old Mincho',serif; font-size:26px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; margin:26px 0 0;">Наша философия</h2>
+    <div style="width:44px; height:2px; background:#F2EDE3; margin:18px auto 0;"></div>
+    <p data-reveal data-blur style="font-size:15.5px; font-weight:300; line-height:1.9; letter-spacing:0.03em; color:#D9CFBB; max-width:56ch; margin:24px auto 0;">Красота — это не только образ, это уверенность и характер. Мавзуна и её команда создают персональный опыт для каждой гостьи: от утреннего маникюра до свадебного образа под ключ — в тишине, заботе и без спешки.</p>
+  </section>
+
+  <section id="uslugi" style="background:#F2EDE3; padding:76px 48px;">
+    <h2 data-reveal style="font-family:'Zen Old Mincho',serif; font-size:26px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; margin:0; text-align:center;">Наши услуги</h2>
+    <div style="width:44px; height:2px; background:#26221D; margin:18px auto 0;"></div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-top:48px; max-width:1100px; margin-left:auto; margin-right:auto;">
+      <sc-for list="{{ services }}" as="s" hint-placeholder-count="4">
+        <div data-reveal style="padding:10px 32px 18px; border-right:1px solid #DDD3BF; text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px;">
+          <div style="height:44px; display:flex; align-items:center;">{{ s.icon }}</div>
+          <div style="font-family:'Zen Old Mincho',serif; font-size:15px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase;">{{ s.name }}</div>
+          <div style="font-size:13.5px; font-weight:300; line-height:1.7; color:#5C5344;">{{ s.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <div style="background:#26221D; border-top:1px solid #3A342B; border-bottom:1px solid #3A342B; overflow:hidden; padding:20px 0;">
+    <div style="display:flex; width:max-content; animation:marquee 28s linear infinite;">
+      <sc-for list="{{ marquee }}" as="m" hint-placeholder-count="12">
+        <span style="font-family:'Zen Old Mincho',serif; font-size:22px; letter-spacing:0.24em; text-transform:uppercase; color:transparent; -webkit-text-stroke:1px rgba(242,237,227,0.55); white-space:nowrap; padding:0 26px;">{{ m }}</span>
+      </sc-for>
+    </div>
+  </div>
+  <section id="nevesta" style="background:#26221D; color:#F2EDE3;">
+    <div style="display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr);">
+      <div style="min-height:440px; position:relative; overflow:hidden;">
+        <div data-parallax style="position:absolute; inset:0; will-change:transform;">
+          <image-slot id="lux-bride" shape="rect" placeholder="Фото: свадебный образ или платья" src="https://images.unsplash.com/photo-1708134128589-0dfd38b2203a?q=75&w=1200&auto=format&fit=crop&sat=-100" credit="Photo by 550Park Luxury Wedding Films on Unsplash" credit-href="https://unsplash.com/@550park"></image-slot>
+        </div>
+      </div>
+      <div data-reveal style="padding:76px 64px; display:flex; flex-direction:column; justify-content:center;">
+        <div style="font-size:11px; letter-spacing:0.34em; text-transform:uppercase; color:#D9CFBB;">Свадебный зал</div>
+        <h2 style="font-family:'Zen Old Mincho',serif; font-size:30px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; line-height:1.3; margin:18px 0 0;">Ваш самый<br>красивый день</h2>
+        <div style="width:44px; height:2px; background:#F2EDE3; margin:20px 0 0;"></div>
+        <p style="font-size:15px; font-weight:300; line-height:1.85; color:#D9CFBB; max-width:52ch; margin:22px 0 0;">Причёска, макияж и маникюр в одно утро — без спешки. Прокат свадебных и вечерних платьев с примеркой и подгонкой по фигуре, пробный образ до торжества и образы для мамы и подружек невесты.</p>
+        <a href="https://wa.me/992981031111" style="background:#F2EDE3; color:#26221D; padding:14px 28px; font-size:11.5px; letter-spacing:0.2em; text-transform:uppercase; font-weight:600; text-decoration:none; align-self:flex-start; margin-top:32px;" style-hover="background:#FFFFFF; transform:translateY(-2px); box-shadow:0 10px 28px rgba(242,237,227,0.25);">Обсудить образ</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="otzyvy" style="background:#2B2620; color:#F2EDE3; padding:76px 48px; text-align:center;">
+    <h2 data-reveal data-blur style="font-family:'Zen Old Mincho',serif; font-size:26px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; margin:0;">Нас любят гости</h2>
+    <div style="width:44px; height:2px; background:#F2EDE3; margin:18px auto 0;"></div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:48px; max-width:900px; margin:48px auto 0;">
+      <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="2">
+        <blockquote data-reveal style="margin:0; display:flex; flex-direction:column; align-items:center; gap:18px;">
+          <div style="width:84px; height:84px; position:relative;">
+            <image-slot id="{{ r.slotId }}" shape="circle" placeholder="Фото" src="{{ r.photo }}" credit="{{ r.credit }}" credit-href="{{ r.creditHref }}"></image-slot>
+          </div>
+          <div style="color:#F2EDE3; font-size:13px; letter-spacing:4px;">★★★★★</div>
+          <p style="font-size:14.5px; font-weight:300; line-height:1.8; font-style:italic; color:#D9CFBB; max-width:40ch; margin:0;">{{ r.text }}</p>
+          <footer style="font-size:12px; letter-spacing:0.22em; text-transform:uppercase; color:#D9CFBB;">— {{ r.author }}</footer>
+        </blockquote>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background:#F2EDE3;">
+    <div style="display:grid; grid-template-columns:minmax(0,6fr) minmax(0,6fr); max-width:1200px; margin:0 auto; padding:76px 48px; gap:56px; align-items:center;">
+      <div style="min-height:360px; position:relative; overflow:hidden;">
+        <div data-parallax style="position:absolute; inset:0; will-change:transform;">
+          <image-slot id="lux-interior" shape="rect" placeholder="Фото интерьера салона" src="https://api.mino.tj/storage/53935/conversions/16BBF696-509D-4AB2-8205-82B0860153C6-panel.jpg" credit="Фото: Beauty Studio Mavzunai Jovid (mino.tj)" credit-href="https://mino.tj/biz/beauty-studio-mavzunai-jovid-dushanbe"></image-slot>
+        </div>
+      </div>
+      <div data-reveal>
+        <h2 style="font-family:'Zen Old Mincho',serif; font-size:26px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; margin:0;">О салоне</h2>
+        <div style="width:44px; height:2px; background:#26221D; margin:18px 0 0;"></div>
+        <p style="font-size:15px; font-weight:300; line-height:1.85; color:#5C5344; margin:22px 0 0;">Два этажа в центре Душанбе: салон красоты и свадебный зал под одной крышей. Идеальная чистота, внимательные мастера и владелица Мавзуна, которая сама подскажет, что пойдёт именно вам. Загляните на чашку чая — покажем салон и подберём мастера.</p>
+        <div style="display:flex; gap:36px; margin-top:30px;">
+          <sc-for list="{{ facts }}" as="f" hint-placeholder-count="3">
+            <div>
+              <div style="font-family:'Zen Old Mincho',serif; font-size:24px; font-weight:600; color:#26221D;">{{ f.value }}</div>
+              <div style="font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; color:#5C5344; margin-top:4px;">{{ f.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="zapis" style="background:#EDE6D6; padding:76px 48px;">
+    <div style="max-width:760px; margin:0 auto;">
+      <h2 data-reveal style="font-family:'Zen Old Mincho',serif; font-size:26px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; margin:0; text-align:center;">Онлайн-запись</h2>
+      <div style="width:44px; height:2px; background:#26221D; margin:18px auto 0;"></div>
+      <p data-reveal style="font-size:15px; font-weight:300; line-height:1.8; color:#5C5344; text-align:center; margin:22px auto 0; max-width:46ch; text-wrap:pretty;">Оставьте заявку — администратор перезвонит в течение часа и подтвердит время.</p>
+      <sc-if value="{{ bookForm }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ submit }}" noValidate="{{ true }}" style="margin-top:40px; display:flex; flex-direction:column; gap:24px;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:18px;">
+            <sc-for list="{{ fields }}" as="f" hint-placeholder-count="3">
+              <div style="display:flex; flex-direction:column; gap:7px;">
+                <label style="position:relative; display:block;">
+                  <input type="{{ f.type }}" name="{{ f.id }}" value="{{ f.value }}" min="{{ f.min }}" autoComplete="{{ f.auto }}" onChange="{{ f.onChange }}" onFocus="{{ f.onFocus }}" onBlur="{{ f.onBlur }}" style="width:100%; box-sizing:border-box; background:#F7F2E7; border:1px solid {{ f.border }}; padding:25px 40px 9px 15px; font-family:'Jost',sans-serif; font-size:15px; color:#26221D; outline:none; transition:border-color 0.25s; border-radius:0;">
+                  <span style="position:absolute; left:15px; top: {{ f.labelTop }}; font-size: {{ f.labelSize }}; letter-spacing:0.18em; text-transform:uppercase; color: {{ f.labelColor }}; pointer-events:none; transition:top 0.22s cubic-bezier(0.22,1,0.36,1), font-size 0.22s cubic-bezier(0.22,1,0.36,1), color 0.22s;">{{ f.label }}</span>
+                  <sc-if value="{{ f.valid }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; right:15px; top:18px; color:#8F7A4B; font-size:15px;">✓</span></sc-if>
+                </label>
+                <sc-if value="{{ f.showError }}" hint-placeholder-val="{{ false }}"><div role="alert" style="font-size:12px; color:#8C3A2B; letter-spacing:0.02em;">{{ f.error }}</div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color: {{ serviceLabelColor }};">Услуга</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <sc-for list="{{ bookServices }}" as="o" hint-placeholder-count="5">
+                <button type="button" onClick="{{ o.pick }}" style="background: {{ o.bg }}; color: {{ o.color }}; border:1px solid #26221D; padding:10px 18px; font-family:'Jost',sans-serif; font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; transition:background 0.25s, color 0.25s;">{{ o.name }}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ serviceShowError }}" hint-placeholder-val="{{ false }}"><div role="alert" style="font-size:12px; color:#8C3A2B;">Выберите услугу</div></sc-if>
+          </div>
+          <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+            <button type="submit" disabled="{{ sending }}" style="background:#26221D; color:#F2EDE3; border:none; padding:16px 34px; font-family:'Jost',sans-serif; font-size:11.5px; letter-spacing:0.22em; text-transform:uppercase; font-weight:600; cursor:pointer; transition:background 0.25s;" style-hover="background:#3A342B;">{{ submitLabel }}</button>
+            <span style="font-size:12px; font-weight:300; color:#5C5344;">Вт–Вс, 09:00–18:00 · понедельник — выходной</span>
+          </div>
+        </form>
+      </sc-if>
+      <sc-if value="{{ bookDone }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:40px; background:#26221D; color:#F2EDE3; padding:40px; display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center;">
+          <div style="font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:#B8A06A;">Заявка принята</div>
+          <div style="font-family:'Zen Old Mincho',serif; font-size:26px; font-weight:600; letter-spacing:0.06em;">Спасибо, {{ bookName }}!</div>
+          <p style="font-size:14.5px; font-weight:300; line-height:1.8; color:#D9CFBB; margin:0; max-width:44ch;">Ждём вас {{ bookDate }} · {{ bookService }}. Администратор позвонит на {{ bookPhone }} и подтвердит время.</p>
+          <button type="button" onClick="{{ bookAgain }}" style="margin-top:10px; background:transparent; color:#F2EDE3; border:1px solid #F2EDE3; padding:12px 24px; font-family:'Jost',sans-serif; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; cursor:pointer;" style-hover="background:#3A342B;">Новая запись</button>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <footer id="kontakty" style="background:#26221D; color:#D9CFBB;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:40px; padding:64px 48px; max-width:1200px; margin:0 auto;">
+      <div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <svg width="36" height="36" viewBox="0 0 48 48"><rect x="7" y="4" width="34" height="30" fill="none" stroke="#F2EDE3" stroke-width="2.2"></rect><text x="24" y="26" text-anchor="middle" font-family="'Zen Old Mincho',serif" font-size="16" font-weight="600" fill="#F2EDE3">MJ</text><text x="24" y="43" text-anchor="middle" font-family="'Jost',sans-serif" font-size="5" letter-spacing="1.4" fill="#F2EDE3">MAVZUNAI JOVID</text></svg>
+          <div style="font-family:'Zen Old Mincho',serif; font-size:16px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#F2EDE3;">Mavzunai Jovid</div>
+        </div>
+        <p style="font-size:13.5px; font-weight:300; line-height:1.8; margin:16px 0 0;">Gallery of Beauty MJ.<br>Салон красоты и свадебный зал.</p>
+      </div>
+      <div style="font-size:14px; font-weight:300; line-height:2.1;">
+        <div style="font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:#B9B2A4; margin-bottom:10px;">Контакты</div>
+        <div><a href="tel:+992981031111" style="color:#F2EDE3; text-decoration:none;">+992 98 103 11 11</a></div>
+        <div><a href="https://wa.me/992981031111" style="color:#F2EDE3; text-decoration:none;">WhatsApp</a></div>
+        <div><a href="https://instagram.com/mavzunai.jovid.official" style="color:#F2EDE3; text-decoration:none;">@mavzunai.jovid.official</a></div>
+        <div><a href="https://instagram.com/mavzunai_jovid_gallery_beauty" style="color:#F2EDE3; text-decoration:none;">@mavzunai_jovid_gallery_beauty</a></div>
+      </div>
+      <div style="font-size:14px; font-weight:300; line-height:2.1;">
+        <div style="font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:#B9B2A4; margin-bottom:10px;">Адрес и часы</div>
+        <div>ул. Бухоро, 23/25, 1–2 этаж</div>
+        <div>Шохмансур, Душанбе</div>
+        <div>Вт–Вс: 09:00–18:00</div>
+        <div>Понедельник — выходной</div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #3A342B; padding:18px 48px; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#B9B2A4; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+      <span>© 2026 Mavzunai Jovid</span>
+      <span>Душанбе · Таджикистан</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280},&quot;introAlways&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Эффекты&quot;}}">
+class Component extends DCLogic {
+  state = { book: { name: '', phone: '', date: '', service: null }, touched: {}, focus: null, tried: false, sending: false, done: false };
+  componentDidMount() {
+    const start = () => { this.initFx(); window.MJ && window.MJ.blurUp(); };
+    let seen = false; try { seen = sessionStorage.getItem('mj-intro') === '1'; sessionStorage.setItem('mj-intro', '1'); } catch (e) {}
+    const always = this.props.introAlways ?? true;
+    if (window.MJ && (always || !seen)) window.MJ.loader.run(2300, 'Добро пожаловать').then(start); else start();
+  }
+  validate(k, v) {
+    if (k === 'name') return v.trim().length < 2 ? 'Как к вам обращаться?' : '';
+    if (k === 'phone') { let d = v.replace(/\D/g, ''); if (d.startsWith('992')) d = d.slice(3); return d.length !== 9 ? 'Нужно 9 цифр, например 98 103 11 11' : ''; }
+    if (k === 'date') {
+      if (!v) return 'Выберите дату';
+      const d = new Date(v + 'T12:00'), t = new Date(); t.setHours(0, 0, 0, 0);
+      if (d < t) return 'Эта дата уже прошла';
+      if (d.getDay() === 1) return 'По понедельникам мы отдыхаем';
+      return '';
+    }
+    return '';
+  }
+  submit(ev) {
+    ev.preventDefault();
+    const b = this.state.book;
+    const bad = ['name', 'phone', 'date'].some((k) => this.validate(k, b[k])) || !b.service;
+    if (bad) { this.setState({ tried: true }); return; }
+    const btn = ev.currentTarget.querySelector('button[type=submit]');
+    this.setState({ sending: true });
+    setTimeout(() => {
+      window.MJ && btn && window.MJ.sparkle(btn);
+      setTimeout(() => this.setState({ sending: false, done: true }), 250);
+    }, 900);
+  }
+  initFx() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const els = Array.from(document.querySelectorAll('[data-reveal]'));
+    els.forEach((el) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(26px)';
+      if (el.hasAttribute('data-blur')) el.style.filter = 'blur(12px)';
+      el.style.transition = 'opacity 0.9s cubic-bezier(0.22,1,0.36,1), transform 0.9s cubic-bezier(0.22,1,0.36,1), filter 0.9s cubic-bezier(0.22,1,0.36,1)';
+    });
+    const pending = new Set(els);
+    const pars = document.querySelectorAll('[data-parallax]');
+    const onScroll = () => {
+      const vh = window.innerHeight;
+      let i = 0;
+      pending.forEach((el) => {
+        if (el.getBoundingClientRect().top < vh * 0.92) {
+          const delay = i++ * 110;
+          setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'none'; el.style.filter = 'none'; }, delay);
+          pending.delete(el);
+        }
+      });
+      pars.forEach((el) => {
+        const r = el.parentElement.getBoundingClientRect();
+        const p = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / vh));
+        el.style.transform = 'translateY(' + (p * -30).toFixed(1) + 'px) scale(1.14)';
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    onScroll();
+    requestAnimationFrame(onScroll);
+    const sp = document.querySelector('[data-spotlight]');
+    if (sp) {
+      const host = sp.parentElement;
+      host.addEventListener('mousemove', (ev) => {
+        const r = host.getBoundingClientRect();
+        sp.style.background = 'radial-gradient(460px circle at ' + (ev.clientX - r.left) + 'px ' + (ev.clientY - r.top) + 'px, rgba(242,237,227,0.12), transparent 65%)';
+      });
+    }
+    setTimeout(onScroll, 400);
+    // fail-open: anything still hidden after 2.5s reveals itself
+    const failOpen = setTimeout(() => pending.forEach((el) => { el.style.opacity = '1'; el.style.transform = 'none'; el.style.filter = 'none'; pending.delete(el); }), 2500);
+    this._cleanup = () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); clearTimeout(failOpen); };
+  }
+  componentWillUnmount() { if (this._cleanup) this._cleanup(); }
+  renderVals() {
+    const e = React.createElement;
+    const ICONS = {
+      scissors: [e('circle',{cx:6,cy:6,r:3,key:'a'}), e('path',{d:'M8.12 8.12 12 12',key:'b'}), e('path',{d:'M20 4 8.12 15.88',key:'c'}), e('circle',{cx:6,cy:18,r:3,key:'d'}), e('path',{d:'M14.8 14.8 20 20',key:'e'})],
+      hand: [e('path',{d:'M18 11V6a2 2 0 0 0-4 0v5',key:'a'}), e('path',{d:'M14 10V4a2 2 0 0 0-4 0v6',key:'b'}), e('path',{d:'M10 10.5V6a2 2 0 0 0-4 0v8',key:'c'}), e('path',{d:'M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15',key:'d'})],
+      brush: [e('path',{d:'m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08',key:'a'}), e('path',{d:'M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z',key:'b'})],
+      crown: [e('path',{d:'M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.735H5.81a1 1 0 0 1-.957-.735L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z',key:'a'}), e('path',{d:'M5 21h14',key:'b'})],
+    };
+    const st = this.state, b = st.book;
+    const today = new Date(); const iso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    const fields = [['name', 'Ваше имя', 'text', 'given-name'], ['phone', 'Телефон', 'tel', 'tel'], ['date', 'Дата визита', 'date', 'off']].map(([id, label, type, auto]) => {
+      const v = b[id], err = this.validate(id, v), shown = !!err && (st.touched[id] || st.tried), focused = st.focus === id;
+      const up = focused || !!v || type === 'date';
+      return { id, label, type, auto, value: v, min: type === 'date' ? iso : undefined, error: err, showError: shown, valid: !!v && !err && !focused,
+        labelTop: up ? '8px' : '18px', labelSize: up ? '9.5px' : '12px', labelColor: shown ? '#8C3A2B' : (focused ? '#26221D' : '#8F7A4B'),
+        border: shown ? '#8C3A2B' : (focused ? '#26221D' : '#DDD3BF'),
+        onChange: (ev) => { const val = ev.target.value; this.setState((s) => ({ book: { ...s.book, [id]: val } })); },
+        onFocus: () => this.setState({ focus: id }),
+        onBlur: () => this.setState((s) => ({ focus: null, touched: { ...s.touched, [id]: true } })) };
+    });
+    const bookVals = {
+      fields, bookForm: !st.done, bookDone: st.done, sending: st.sending,
+      submitLabel: st.sending ? 'Отправляем…' : 'Записаться',
+      submit: (ev) => this.submit(ev),
+      serviceShowError: st.tried && !b.service, serviceLabelColor: st.tried && !b.service ? '#8C3A2B' : '#8F7A4B',
+      bookServices: ['Волосы', 'Ногти', 'Макияж и брови', 'Свадебный образ', 'Консультация'].map((name) => ({ name,
+        bg: b.service === name ? '#26221D' : 'transparent', color: b.service === name ? '#F2EDE3' : '#26221D',
+        pick: () => this.setState((s) => ({ book: { ...s.book, service: name } })) })),
+      bookName: b.name.trim(), bookService: (b.service || '').toLowerCase(), bookPhone: b.phone,
+      bookDate: b.date ? new Date(b.date + 'T12:00').toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }) : '',
+      bookAgain: () => this.setState({ book: { name: '', phone: '', date: '', service: null }, touched: {}, tried: false, done: false }),
+    };
+    const icon = (name) => e('svg', {width:38, height:38, viewBox:'0 0 24 24', fill:'none', stroke:'#26221D', strokeWidth:1.2, strokeLinecap:'round', strokeLinejoin:'round'}, ICONS[name]);
+    return {
+      ...bookVals,
+      dust: [
+        { left: '12%', bottom: '8%', size: '5px', dur: '9s', delay: '0s' },
+        { left: '28%', bottom: '16%', size: '3px', dur: '12s', delay: '2.5s' },
+        { left: '45%', bottom: '5%', size: '6px', dur: '10s', delay: '1.2s' },
+        { left: '61%', bottom: '20%', size: '4px', dur: '13s', delay: '4s' },
+        { left: '74%', bottom: '10%', size: '3px', dur: '11s', delay: '0.8s' },
+        { left: '86%', bottom: '24%', size: '5px', dur: '14s', delay: '3.2s' },
+        { left: '35%', bottom: '30%', size: '3px', dur: '12s', delay: '5.5s' },
+      ],
+      marquee: ['Волосы','Ногти','Макияж','Брови и ресницы','Свадебные образы','Прокат платьев','Волосы','Ногти','Макияж','Брови и ресницы','Свадебные образы','Прокат платьев'],
+      services: [
+        { icon: icon('scissors'), name: 'Волосы', desc: 'Стрижки, окрашивание, балаяж и укладки — оттенок под ваш тон кожи.' },
+        { icon: icon('hand'), name: 'Ногти', desc: 'Маникюр и педикюр, гель-лак, нюдовые и смелые дизайны.' },
+        { icon: icon('brush'), name: 'Макияж и брови', desc: 'Дневной, вечерний и свадебный макияж. Архитектура бровей и ресницы.' },
+        { icon: icon('crown'), name: 'Свадебные образы', desc: 'Образ под ключ и прокат свадебных и вечерних платьев.' },
+      ],
+      reviews: [
+        { slotId: 'rev-zukhra', photo: 'https://images.unsplash.com/photo-1650292266612-a634d749626f?q=75&w=400&auto=format&fit=crop&sat=-100', credit: 'Photo by Alexander Krivitskiy on Unsplash', creditHref: 'https://unsplash.com/@krivitskiy', text: '«Очень приятная атмосфера, идеальная чистота. Владелица Мавзуна сама подсказала, что мне пойдёт — результат идеальный. Советую всем подругам!»', author: 'Zukhra K.' },
+        { slotId: 'rev-di', photo: 'https://images.unsplash.com/photo-1731907547491-dd745791d8b5?q=75&w=400&auto=format&fit=crop&sat=-100', credit: 'Photo by Anshul on Unsplash', creditHref: 'https://unsplash.com/@tomatopictures1', text: '«Проходил мимо, зашёл — и был в восторге от салона. Очень уютно, доброжелательный персонал, услуги на высоте. Процветания вам!»', author: 'D I, Душанбе' },
+      ],
+      facts: [
+        { value: '5.0', label: 'Tripadvisor' },
+        { value: '№1', label: 'в Душанбе' },
+        { value: '119K', label: 'подписчиков' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

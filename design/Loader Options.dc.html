@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="./mj-fx.js"></script>
+  <style>body{margin:0;background:#EDE6D6;} a{color:#26221D;} a:hover{color:#8F7A4B;}</style>
+</helmet>
+<section style="padding:48px; font-family:'Jost',sans-serif; color:#26221D;">
+  <div style="font-size:10.5px; letter-spacing:0.3em; text-transform:uppercase; color:#8F7A4B;">Лоадер · варианты</div>
+  <h1 style="font-family:'Zen Old Mincho',serif; font-size:30px; font-weight:600; letter-spacing:0.06em; margin:10px 0 32px;">Выберите «ноготки»</h1>
+  <div style="display:flex; flex-wrap:wrap; gap:24px;">
+    <sc-for list="{{ options }}" as="o" hint-placeholder-count="4">
+      <div id="{{ o.id }}" style="width:300px; background:#F2EDE3; border:1px solid #DDD3BF; display:flex; flex-direction:column;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #DDD3BF;">
+          <span style="background:#26221D; color:#B8A06A; font-size:11px; font-weight:600; letter-spacing:0.14em; padding:4px 9px;">{{ o.id }}</span>
+          <span style="font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#8F7A4B;">{{ o.tag }}</span>
+        </div>
+        <div ref="{{ o.ref }}" style="height:230px; display:flex; align-items:center; justify-content:center;"></div>
+        <div style="padding:16px 18px 20px; border-top:1px solid #DDD3BF;">
+          <div style="font-family:'Zen Old Mincho',serif; font-size:17px; font-weight:600; letter-spacing:0.06em;">{{ o.name }}</div>
+          <div style="font-size:13px; font-weight:300; line-height:1.6; color:#5C5344; margin-top:6px; text-wrap:pretty;">{{ o.desc }}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  refs = {};
+  stops = [];
+  componentDidMount() {
+    const run = () => ['fan', 'tips', 'bottle', 'mono'].forEach((v) => { const el = this.refs[v]; if (el && window.MJ) this.stops.push(window.MJ.mountNails(el, v, { width: 190 })); });
+    if (window.MJ) setTimeout(run, 50); else window.addEventListener('load', run);
+  }
+  componentWillUnmount() { this.stops.forEach((s) => s()); }
+  renderVals() {
+    const r = (k) => (el) => { this.refs[k] = el; };
+    return {
+      options: [
+        { id: '2a', tag: 'веер', ref: r('fan'), name: 'Веер типсов', desc: 'Пять миндальных ногтей веером, как палитра у мастера. Кисть красит их по очереди.' },
+        { id: '2b', tag: 'пальчики', ref: r('tips'), name: 'Кончики пальцев', desc: 'Пять пальцев поднимаются снизу и растворяются в фоне. Рука есть, но без анатомии.' },
+        { id: '2c', tag: 'флакон', ref: r('bottle'), name: 'Флакон и ноготь', desc: 'Чёрный флакон MJ и один крупный ноготь. Кисть кладёт лак в три мазка, затем появляется блик.' },
+        { id: '2d', tag: 'монограмма', ref: r('mono'), name: 'Монограмма', desc: 'Знак MJ, под ним пять ногтей-индикаторов без кисти. Самый строгий вариант.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
