@@ -14,7 +14,21 @@ export async function sweepOutbox(db: PrismaClient, limit = 50): Promise<number>
   for (const msg of queued) {
     const mode = modeOf.get(msg.channel);
     if (!mode) continue; // channel switched off — stays queued
-    const result = await channelFor(msg.channel as ChannelKey, mode).send(msg.to, msg.body);
+    const channel = channelFor(msg.channel as ChannelKey, mode);
+    let result: { ok: true } | { ok: false; error: string };
+    if (mode === "LIVE" && msg.channel === "telegram" && msg.to === "reception") {
+      // Reception alerts go to every chat linked with "/staff CODE"
+      const staff = await db.telegramChat.findMany({ where: { isStaff: true, NOT: { id: { startsWith: "sim-" } } }, select: { id: true } });
+      if (!staff.length) result = { ok: false, error: "Нет чата ресепшена: отправьте боту /staff КОД из CMS → Интеграции" };
+      else {
+        const all = await Promise.all(staff.map((c) => channel.send(c.id, msg.body)));
+        result = all.find((r) => !r.ok) ?? { ok: true };
+      }
+    } else if (mode === "LIVE" && msg.channel === "telegram" && msg.to.startsWith("sim-")) {
+      result = { ok: true }; // simulator chats never leave the server
+    } else {
+      result = await channel.send(msg.to, msg.body);
+    }
     await db.outboxMessage.update({
       where: { id: msg.id },
       data: result.ok

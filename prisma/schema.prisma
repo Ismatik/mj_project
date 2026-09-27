@@ -106,6 +106,7 @@ model Guest {
   sales        Sale[]
   dressBookings DressBooking[]
   requests     BookingRequest[]
+  telegramChats TelegramChat[]
 }
 
 enum AppointmentStatus {
@@ -143,6 +144,9 @@ model Appointment {
   note        String?
   createdAt   DateTime           @default(now())
   staff       AppointmentStaff[]
+  /// When the day-before and hours-before reminders were queued
+  remindedDayAt   DateTime?
+  remindedHoursAt DateTime?
 
   @@index([startsAt])
 }
@@ -271,6 +275,25 @@ model BookingRequest {
   createdAt DateTime      @default(now())
 
   @@index([status, createdAt])
+}
+
+// ─── Telegram bot ────────────────────────────────────────
+
+/// A Telegram chat with the salon bot (a guest, or a staff chat that receives reception alerts).
+/// Simulator chats from the CMS use ids starting with "sim-".
+model TelegramChat {
+  id        String   @id /// Telegram chat id
+  guest     Guest?   @relation(fields: [guestId], references: [id])
+  guestId   String?
+  firstName String?
+  username  String?
+  /// Conversation state of the bot (current step and choices)
+  state     Json     @default("{}")
+  isStaff   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([guestId])
 }
 
 // ─── Integrations (mock first) ───────────────────────────

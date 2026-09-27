@@ -3,11 +3,10 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { clock, longDate } from "@/lib/format";
 import { formatPhone, normalizePhone } from "@/lib/phone";
 import { BOOKING_HORIZON_DAYS } from "@/lib/slots";
-import { addDays, atSalonTime, isClosed, todayYmd } from "@/lib/time";
-import { slotsFor } from "@/server/online-booking";
+import { addDays, isClosed, todayYmd } from "@/lib/time";
+import { createGuestBooking, slotsFor } from "@/server/online-booking";
 import { tooManyAttempts } from "@/server/rate-limit";
 
 const ymdOk = (d: string) => /^\d{4}-\d{2}-\d{2}$/.test(d);
@@ -58,52 +57,7 @@ export async function bookOnline(input: OnlineBookingInput): Promise<OnlineBooki
   if (!/^\d{2}:\d{2}$/.test(time)) return { ok: false, field: "slot", error: "Выберите время" };
   const wantedStaff = input.staffId ? String(input.staffId) : null;
 
-  const result = await db.$transaction(async (tx) => {
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${"booking:" + date}))::text AS locked`;
-    const { service, slots } = await slotsFor(String(input.serviceId), date, wantedStaff, tx);
-    if (!service) return { ok: false as const, error: "Услуга недоступна для онлайн-записи" };
-    const slot = slots.find((s) => s.time === time);
-    if (!slot) return { ok: false as const, error: "Это время только что заняли — выберите другое" };
-    const staffId = slot.staffIds[0]!;
-    const master = service.staff.find((m) => m.id === staffId)!;
-
-    const guest = (await tx.guest.findUnique({ where: { phone } })) ?? (await tx.guest.create({ data: { name, phone, tag: "NEW" } }));
-    const [first, last] = guest.name.split(" ");
-    const startsAt = atSalonTime(date, time);
-    const appt = await tx.appointment.create({
-      data: {
-        guestId: guest.id,
-        guestName: last ? `${first} ${last[0]}.` : first!,
-        serviceId: service.id,
-        serviceLabel: service.name,
-        startsAt,
-        durationMin: service.durationMin,
-        price: service.price,
-        status: "PENDING",
-        source: "WEBSITE",
-        staff: { create: [{ staffId }] },
-      },
-    });
-    const when = `${longDate(startsAt)}, ${clock(startsAt)}`;
-    await tx.outboxMessage.createMany({
-      data: [
-        {
-          channel: "telegram",
-          to: "reception",
-          body: `Онлайн-запись с сайта: ${guest.name}, ${formatPhone(phone)} — ${service.name}, ${when}, мастер ${master.name}. Подтвердите в календаре.`,
-          meta: { kind: "online-booking", appointmentId: appt.id },
-        },
-        {
-          channel: "whatsapp",
-          to: phone,
-          body: `Mavzunai Jovid: ${name}, вы записаны — ${service.name}, ${when}, мастер ${master.name}. ул. Бухоро 23/25. Если планы изменятся, напишите нам.`,
-          meta: { kind: "booking-confirmation", appointmentId: appt.id },
-        },
-      ],
-    });
-    return { ok: true as const, summary: { name, service: service.name, master: master.name, when, phone: formatPhone(phone) } };
-  });
-
+  const result = await createGuestBooking({ serviceId: String(input.serviceId), staffId: wantedStaff, date, time, name, phone, source: "WEBSITE" });
   if (result.ok) revalidatePath("/cms", "layout");
   return result.ok ? result : { ok: false, field: "slot", error: result.error };
 }

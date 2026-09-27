@@ -154,3 +154,39 @@
     flex-wrap: wrap;
   }
 }
+
+.tg {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 300;
+  background: var(--mj-sand);
+  padding: 10px 12px;
+}
+.tgRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: baseline;
+}
+.tg code {
+  font-family: ui-monospace, monospace;
+  background: var(--mj-white);
+  padding: 1px 5px;
+}
+.linkBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mj-sans);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  text-decoration: none;
+  cursor: pointer;
+}
+.linkBtn:hover {
+  color: var(--mj-ink);
+}

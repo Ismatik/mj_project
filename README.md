@@ -74,6 +74,14 @@ Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
 
 Telegram, WhatsApp, SMS and payments each run in `MOCK` or `LIVE` mode, managed on `/cms/integrations` (owner only). In mock mode messages are recorded in the outbox and marked as sent without leaving the server; the worker delivers the queue every minute, or use "Доставить сейчас". Live drivers arrive with R2 (Telegram, WhatsApp, SMS) and R3 (payments). API keys belong in `.env` only — the page shows whether they are set, never their values.
 
+## Telegram bot
+
+Guests book, see, move and cancel their visits in Telegram; reception gets alerts; guests get reminders a day and 2 hours before.
+
+- The conversation logic lives in `src/lib/bot/engine.ts` (tested without Telegram). The same engine answers real Telegram updates (`/api/telegram/webhook`) and the **simulator** in the CMS (`/cms/integrations/telegram`), where the owner can try every flow before the bot is connected.
+- Staff link a chat for reception alerts by sending the bot `/staff CODE` (the code is on `/cms/integrations`).
+- Going live: create the bot with @BotFather, put `TELEGRAM_BOT_TOKEN` and a long random `TELEGRAM_WEBHOOK_SECRET` in `.env`, restart, then CMS → Интеграции → Telegram → "Подключить webhook" and switch to "Живой". Requires the public HTTPS domain in `SITE_DOMAIN`.
+
 ## Tests
 
 - `npm test` — unit tests (booking rules, free slots, formatting, access, content).

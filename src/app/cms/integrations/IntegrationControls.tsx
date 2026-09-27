@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { Button } from "@/components/ui/Button";
-import { deliverNow, sendTestMessage, setIntegrationEnabled, setIntegrationMode } from "./actions";
+import { connectTelegramWebhook, deliverNow, newStaffCode, runRemindersNow, sendTestMessage, setIntegrationEnabled, setIntegrationMode } from "./actions";
 import s from "./integrations.module.css";
 
 export function IntegrationControls({ k, title, mode, enabled, channel }: { k: string; title: string; mode: string; enabled: boolean; channel: boolean }) {
@@ -61,5 +61,69 @@ export function DeliverNow() {
     >
       Доставить сейчас
     </Button>
+  );
+}
+
+/** Telegram-specific tools: staff code, webhook, reminders, simulator link. */
+export function TelegramTools({ staffCode, staffChats, configured }: { staffCode: string; staffChats: number; configured: boolean }) {
+  const fx = useFx();
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  return (
+    <div className={s.tg}>
+      <div className={s.tgRow}>
+        <span>
+          Чат ресепшена: отправьте боту <code>/staff {staffCode}</code> · привязано чатов: {staffChats}
+        </span>
+        <button
+          type="button"
+          className={s.linkBtn}
+          disabled={pending}
+          onClick={() =>
+            start(async () => {
+              const code = await newStaffCode();
+              fx.toast(`Новый код: ${code}`, "Telegram");
+              router.refresh();
+            })
+          }
+        >
+          Новый код
+        </button>
+      </div>
+      <div className={s.tgRow}>
+        <a href="/cms/integrations/telegram" className={s.linkBtn}>
+          Открыть симулятор бота →
+        </a>
+        <button
+          type="button"
+          className={s.linkBtn}
+          disabled={pending}
+          onClick={() =>
+            start(async () => {
+              const n = await runRemindersNow();
+              fx.toast(n ? `Напоминаний в очереди: ${n}` : "Сейчас напоминать некому", "Напоминания");
+              router.refresh();
+            })
+          }
+        >
+          Проверить напоминания
+        </button>
+        {configured && (
+          <button
+            type="button"
+            className={s.linkBtn}
+            disabled={pending}
+            onClick={() =>
+              start(async () => {
+                const res = await connectTelegramWebhook();
+                fx.toast(res.message, "Telegram");
+              })
+            }
+          >
+            Подключить webhook
+          </button>
+        )}
+      </div>
+    </div>
   );
 }

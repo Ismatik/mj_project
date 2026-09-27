@@ -1,5 +1,6 @@
 // Messaging connectors. Every channel has a mock driver (records the message as sent) and a live driver.
-// Live drivers are added per release: Telegram and WhatsApp in R2, SMS when a gateway contract exists.
+// Live drivers are added per release: Telegram (R2 Sprint 1), WhatsApp later in R2, SMS when a gateway contract exists.
+import { sendText, telegramConfigured } from "./telegram-api";
 
 export type ChannelKey = "telegram" | "whatsapp" | "sms";
 export type DeliveryResult = { ok: true } | { ok: false; error: string };
@@ -15,7 +16,16 @@ export const mockChannel: MessageChannel = {
   },
 };
 
-const liveChannels: Partial<Record<ChannelKey, MessageChannel>> = {};
+
+const liveChannels: Partial<Record<ChannelKey, MessageChannel>> = {
+  telegram: {
+    async send(to, body) {
+      if (!telegramConfigured()) return { ok: false, error: "TELEGRAM_BOT_TOKEN / TELEGRAM_WEBHOOK_SECRET are not set" };
+      const res = await sendText(to, body);
+      return res.ok ? { ok: true } : { ok: false, error: res.description ?? "Telegram error" };
+    },
+  },
+};
 
 export function channelFor(key: ChannelKey, mode: "MOCK" | "LIVE"): MessageChannel {
   if (mode === "MOCK") return mockChannel;

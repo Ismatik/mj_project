@@ -84,6 +84,12 @@ Start Meta Business verification during R1 so WhatsApp is ready for R2.
 
 ### R2 — Guest channels (~3 weeks)
 
+| Sprint | Deliverables | Status |
+|---|---|---|
+| 1 | Telegram bot (booking, my bookings with reschedule/cancel, prices, contacts), CMS simulator, reception alerts via `/staff`, reminders 24 h / 2 h, live webhook ready for the token | done |
+| 2 | Guest account on the website (sign-in by code via Telegram / WhatsApp / SMS), masters and portfolio pages | |
+| 3 | WhatsApp live driver, RU / TJ / EN for website, bot and message templates | |
+
 - Telegram bot live (booking, reschedule, cancel, bonus balance, reminders, staff alerts).
 - WhatsApp live as second channel.
 - Guest account: sign-in by code, visit history, one-tap rebook, cancel/reschedule, favourite master.

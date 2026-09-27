@@ -8,16 +8,19 @@ export type IntegrationInfo = {
   goLive: string;
   /** Release in which the live driver is connected. */
   liveIn: string;
+  /** Live driver exists in the code (switchable once the keys are set). */
+  liveReady?: boolean;
 };
 
 export const INTEGRATIONS: IntegrationInfo[] = [
   {
     key: "telegram",
     title: "Telegram",
-    purpose: "Уведомления ресепшену о новых записях; в R2 — бот для записи гостей и напоминания.",
-    envKeys: ["TELEGRAM_BOT_TOKEN"],
-    goLive: "Создайте бота у @BotFather и добавьте токен в .env на сервере.",
+    purpose: "Бот для гостей: запись, «Мои записи» с отменой и переносом, цены, контакты. Уведомления ресепшену и напоминания гостям.",
+    envKeys: ["TELEGRAM_BOT_TOKEN", "TELEGRAM_WEBHOOK_SECRET"],
+    goLive: "Создайте бота у @BotFather, добавьте токен и любой длинный секрет в .env, перезапустите сервер, нажмите «Подключить webhook» и переключите в «Живой».",
     liveIn: "R2",
+    liveReady: true,
   },
   {
     key: "whatsapp",

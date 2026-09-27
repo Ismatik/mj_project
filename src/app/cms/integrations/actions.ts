@@ -5,6 +5,9 @@ import { db } from "@/lib/db";
 import { INTEGRATIONS } from "@/lib/integrations";
 import { getCurrentUser } from "@/server/auth";
 import { sweepOutbox } from "@/server/integrations/outbox";
+import { queueReminders } from "@/server/integrations/reminders";
+import { getMe, setWebhook, telegramConfigured } from "@/server/integrations/telegram-api";
+import { rotateStaffCode } from "@/server/telegram/deps";
 
 async function requireOwner() {
   const user = await getCurrentUser();
@@ -25,7 +28,10 @@ export async function setIntegrationMode(key: string, mode: "MOCK" | "LIVE"): Pr
   await requireOwner();
   const info = INTEGRATIONS.find((i) => i.key === key);
   if (!info) return { ok: false, error: "Неизвестная интеграция" };
-  if (mode === "LIVE") return { ok: false, error: `Живое подключение ${info.title} появится в ${info.liveIn}. Пока работает мок.` };
+  if (mode === "LIVE") {
+    if (!info.liveReady) return { ok: false, error: `Живое подключение ${info.title} появится в ${info.liveIn}. Пока работает мок.` };
+    if (!info.envKeys.every((k) => !!process.env[k])) return { ok: false, error: `Сначала добавьте ${info.envKeys.join(" и ")} в .env на сервере.` };
+  }
   await db.integration.upsert({ where: { key }, update: { mode }, create: { key, mode } });
   revalidatePath("/cms/integrations");
   return { ok: true };
@@ -45,4 +51,30 @@ export async function deliverNow(): Promise<number> {
   const n = await sweepOutbox(db);
   revalidatePath("/cms/integrations");
   return n;
+}
+
+export async function runRemindersNow(): Promise<number> {
+  await requireOwner();
+  const n = await queueReminders(db);
+  revalidatePath("/cms/integrations");
+  return n;
+}
+
+export async function newStaffCode(): Promise<string> {
+  await requireOwner();
+  const code = await rotateStaffCode();
+  revalidatePath("/cms/integrations");
+  return code;
+}
+
+/** Points Telegram at this server's webhook. Needs the token, the secret and a public HTTPS domain. */
+export async function connectTelegramWebhook(): Promise<{ ok: boolean; message: string }> {
+  await requireOwner();
+  if (!telegramConfigured()) return { ok: false, message: "Добавьте TELEGRAM_BOT_TOKEN и TELEGRAM_WEBHOOK_SECRET в .env и перезапустите сервер." };
+  const domain = (process.env.SITE_DOMAIN ?? "").replace(/^https?:\/\//, "");
+  if (!domain || domain.startsWith("localhost")) return { ok: false, message: "Нужен публичный домен с HTTPS (SITE_DOMAIN в .env)." };
+  const me = await getMe();
+  if (!me.ok) return { ok: false, message: `Telegram не принял токен: ${me.description ?? "ошибка"}` };
+  const res = await setWebhook(`https://${domain}/api/telegram/webhook`);
+  return res.ok ? { ok: true, message: `Бот @${me.result.username} подключён к https://${domain}` } : { ok: false, message: res.description ?? "Ошибка Telegram" };
 }
