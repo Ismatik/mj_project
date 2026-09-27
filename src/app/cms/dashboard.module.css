@@ -1,0 +1,90 @@
+.hero {
+  border-bottom: 1px solid var(--mj-line);
+  padding-bottom: 24px;
+}
+.title {
+  font-family: var(--mj-serif);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 10px 0 0;
+}
+.title em {
+  font-style: italic;
+  color: var(--mj-gold-deep);
+}
+.lead {
+  font-size: 13.5px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+.stats {
+  margin-top: 26px;
+}
+.section {
+  margin-top: 38px;
+  max-width: 820px;
+}
+.empty {
+  font-size: 13.5px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+}
+.appt {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 0 15px 8px;
+  border-bottom: 1px solid var(--mj-line);
+  transition: background 0.3s;
+}
+.appt:hover {
+  background: var(--mj-sand);
+}
+.apptMain {
+  flex: 1;
+  min-width: 0;
+}
+.apptName {
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+}
+.apptSub {
+  font-size: 12.5px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+}
+.apptRight {
+  text-align: right;
+}
+.apptTime {
+  font-family: var(--mj-serif);
+  font-weight: 600;
+  font-size: 14px;
+}
+.apptPrice {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--mj-gold-deep);
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 24px;
+  }
+  .appt {
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding-left: 0;
+  }
+  .apptMain {
+    flex-basis: calc(100% - 60px);
+  }
+  .apptRight {
+    text-align: left;
+    flex: 1;
+  }
+}

@@ -173,6 +173,23 @@
 }
 
 /* ── Stat card ───────────────────────────────────────── */
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+@media (max-width: 600px) {
+  .statGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .statGrid .stat {
+    padding: 16px 14px;
+  }
+  .statGrid .statValue {
+    font-size: 21px;
+  }
+}
 .stat {
   padding: 20px 22px;
   background: var(--mj-paper);

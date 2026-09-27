@@ -11,6 +11,7 @@ import { NailLoader } from "@/components/fx/NailLoader";
 import { clock, longDate, shortDate, somoni } from "@/lib/format";
 import { appointmentStatus, guestTag } from "@/lib/labels";
 import { atSalonTime } from "@/lib/time";
+import { requireRole } from "@/server/auth";
 import { getDashboard } from "@/server/dashboard";
 import { FxDemo } from "./FxDemo";
 import s from "./styleguide.module.css";
@@ -32,6 +33,7 @@ const PALETTE = [
 ] as const;
 
 export default async function StyleguidePage() {
+  await requireRole(["OWNER"], "/styleguide");
   const d = await getDashboard();
   const date = atSalonTime(d.today, "12:00");
   const first = d.revenue14[0]!;

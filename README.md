@@ -10,7 +10,7 @@ Website, website admin and salon CMS for **Mavzunai Jovid — Gallery of Beauty 
 Next.js 16 (App Router, TypeScript) · PostgreSQL 16 + Prisma 7 · pg-boss worker · Caddy (HTTPS) · Docker Compose.
 
 ```
-src/app/            routes (/, /styleguide; /cms, /admin, /login follow in Sprint 2+)
+src/app/            routes: / · /login · /cms/* · /admin · /styleguide (owner only)
 src/components/fx/  effects: MJ nail loader, toasts, count-up, skeleton, sparkles
 src/components/ui/  shared components: buttons, tags, headings, stat cards, bars, fields, monogram
 src/lib/            formatting (somoni, dates in Dushanbe time), passwords, db client
@@ -48,7 +48,14 @@ npm run worker                # optional, in a second terminal
 
 Useful scripts: `npm test` · `npm run typecheck` · `npm run lint` · `npm run db:reset` (drops and re-seeds).
 
-Demo sign-in accounts (used from Sprint 2): `mavzuna` (owner), `reception`, `content` — password from `SEED_OWNER_PASSWORD`.
+Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
+
+| Login | Role | Sees |
+|---|---|---|
+| `mavzuna` | owner | all 9 CMS sections, site admin |
+| `reception` | reception | everything except analytics and settings; can book |
+| `mira` | master | calendar (own bookings), services, staff schedule |
+| `content` | content manager | site admin only |
 
 ## Demo data
 

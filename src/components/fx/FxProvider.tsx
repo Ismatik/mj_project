@@ -32,6 +32,16 @@ export function useFx(): Fx {
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
+/** Full-screen cream page with the MJ nail loader. */
+export function LoaderScreen({ label, hiding }: { label: string; hiding?: boolean }) {
+  return (
+    <div role="status" className={`${styles.loader} ${hiding ? styles.loaderHiding : ""}`}>
+      <NailLoader width={160} />
+      <div className={styles.loaderLabel}>{label}</div>
+    </div>
+  );
+}
+
 export function FxProvider({ children }: { children: ReactNode }) {
   const [loader, setLoader] = useState<LoaderState>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -78,12 +88,7 @@ export function FxProvider({ children }: { children: ReactNode }) {
     <FxContext.Provider value={fx}>
       {children}
 
-      {loader && (
-        <div role="status" className={`${styles.loader} ${loader.hiding ? styles.loaderHiding : ""}`}>
-          <NailLoader width={160} />
-          <div className={styles.loaderLabel}>{loader.label}</div>
-        </div>
-      )}
+      {loader && <LoaderScreen label={loader.label} hiding={loader.hiding} />}
 
       {sk && (
         <div aria-hidden="true" className={styles.skeletonOverlay} style={{ ...sk.rect, opacity: sk.hiding ? 0 : 1 }}>

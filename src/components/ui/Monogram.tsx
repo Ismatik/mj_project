@@ -11,7 +11,7 @@ export function Monogram({
   title?: string;
 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" style={{ flexShrink: 0 }} role="img" aria-label={title}>
+    <svg width={size} height={size} viewBox="0 0 48 48" style={{ flexShrink: 0, overflow: "visible" }} role="img" aria-label={title}>
       <rect x={7} y={4} width={34} height={30} fill="none" stroke={color} strokeWidth={2.2} />
       <text x={24} y={26} textAnchor="middle" fontFamily="var(--mj-serif)" fontSize={16} fontWeight={600} fill={color}>
         MJ

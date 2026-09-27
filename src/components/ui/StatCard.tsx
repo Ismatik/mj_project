@@ -17,7 +17,7 @@ export function StatCard({ label, value, sub, dark, index = 0, run }: Stat & { i
 
 export function StatGrid({ stats, run }: { stats: Stat[]; run?: number }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+    <div className={s.statGrid}>
       {stats.map((st, i) => (
         <StatCard key={st.label} {...st} index={i} run={run} />
       ))}

@@ -46,6 +46,8 @@ async function wipe() {
     db.user.deleteMany(),
     db.staff.deleteMany(),
   ]);
+  // Receipts start at №1001 on a fresh demo
+  await db.$executeRawUnsafe(`ALTER SEQUENCE "Sale_number_seq" RESTART WITH 1001`);
 }
 
 async function main() {
@@ -80,6 +82,7 @@ async function main() {
           showOnSite: s.site,
           showInPos: s.pos,
           sortOrder: si,
+          staff: { connect: s.staff.map((k) => ({ id: staffId[k]! })) },
         },
       });
       serviceId[s.key] = row.id;
@@ -244,6 +247,7 @@ async function main() {
       { name: "Мавзуна", login: process.env.SEED_OWNER_LOGIN || "mavzuna", passwordHash: hash, role: "OWNER", staffId: staffId.mavzuna },
       { name: "Ресепшен", login: "reception", passwordHash: hash, role: "RECEPTION" },
       { name: "Контент-менеджер", login: "content", passwordHash: hash, role: "CONTENT" },
+      { name: "Мира", login: "mira", passwordHash: hash, role: "MASTER", staffId: staffId.mira },
     ],
   });
 

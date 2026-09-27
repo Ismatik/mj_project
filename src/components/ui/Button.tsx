@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, ComponentProps } from "react";
+import type { ComponentProps } from "react";
 import s from "./ui.module.css";
 
 type Variant = "gold" | "ink" | "outline" | "outlineGold";
@@ -10,7 +10,7 @@ type Common = { variant?: Variant; size?: Size; block?: boolean };
 const cls = ({ variant = "gold", size = "md", block }: Common, extra?: string) =>
   [s.btn, s[variant], s[size], block ? s.block : "", extra ?? ""].filter(Boolean).join(" ");
 
-export function Button({ variant, size, block, className, type = "button", ...rest }: Common & ButtonHTMLAttributes<HTMLButtonElement>) {
+export function Button({ variant, size, block, className, type = "button", ...rest }: Common & ComponentProps<"button">) {
   return <button type={type} className={cls({ variant, size, block }, className)} {...rest} />;
 }
 

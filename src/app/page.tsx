@@ -10,8 +10,8 @@ export default function Home() {
         <div style={{ fontSize: 11, letterSpacing: "0.26em", textTransform: "uppercase", color: "var(--mj-gold-deep)" }}>
           Сайт скоро откроется
         </div>
-        <Link href="/styleguide" style={{ fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-          Компоненты и эффекты →
+        <Link href="/login" style={{ fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+          Вход для команды →
         </Link>
       </div>
     </main>

@@ -55,6 +55,7 @@ model Staff {
   user        User?
   appointments AppointmentStaff[]
   sales       Sale[]
+  services    Service[] @relation("ServiceStaff")
 }
 
 model ServiceCategory {
@@ -80,6 +81,8 @@ model Service {
   active      Boolean         @default(true)
   appointments Appointment[]
   saleItems   SaleItem[]
+  /// Masters qualified to perform this service
+  staff       Staff[]         @relation("ServiceStaff")
 }
 
 // ─── Guests & bookings ───────────────────────────────────
@@ -162,6 +165,8 @@ enum PaymentMethod {
 
 model Sale {
   id        String        @id @default(cuid())
+  /// Human-readable receipt number ("Чек №1042")
+  number    Int           @unique @default(autoincrement())
   guest     Guest?        @relation(fields: [guestId], references: [id])
   guestId   String?
   staff     Staff?        @relation(fields: [staffId], references: [id])
