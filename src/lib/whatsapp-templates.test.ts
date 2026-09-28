@@ -4,12 +4,12 @@ import { metaTemplates } from "./whatsapp-templates";
 
 describe("WhatsApp templates for Meta", () => {
   const all = metaTemplates();
-  it("four messages in Russian and English", () => {
-    expect(all).toHaveLength(8);
-    expect(new Set(all.map((t) => `${t.name}/${t.language}`)).size).toBe(8);
+  it("five messages in Russian and English", () => {
+    expect(all).toHaveLength(10);
+    expect(new Set(all.map((t) => `${t.name}/${t.language}`)).size).toBe(10);
   });
   it("placeholders match the parameters the driver sends, with examples", () => {
-    for (const t of all.filter((x) => x.category === "UTILITY")) {
+    for (const t of all.filter((x) => x.category !== "AUTHENTICATION")) {
       const body = t.components[0] as { text: string; example: { body_text: string[][] } };
       const kind = Object.values(WHATSAPP_TEMPLATES).find((w) => w?.name === t.name)!;
       const placeholders = [...body.text.matchAll(/\{\{(\d+)\}\}/g)].map((m) => Number(m[1]));

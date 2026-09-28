@@ -408,3 +408,64 @@
 .payDeposit:hover {
   background: var(--mj-gold-hover);
 }
+.offerBadge {
+  font-style: normal;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--mj-gold);
+  color: var(--mj-ink);
+  padding: 2px 6px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+.promo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.promo input {
+  flex: 1;
+  min-width: 160px;
+  border: 1px solid var(--mj-line);
+  background: var(--mj-paper);
+  padding: 12px 14px;
+  font-family: var(--mj-sans);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  outline: none;
+  border-radius: 0;
+}
+.promo input:focus {
+  border-color: var(--mj-ink);
+}
+.promo button {
+  border: 1px solid var(--mj-ink);
+  background: var(--mj-ink);
+  color: var(--mj-cream);
+  padding: 0 18px;
+  font-family: var(--mj-sans);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.promo button:disabled {
+  opacity: 0.4;
+}
+.promo .error {
+  flex-basis: 100%;
+}
+.promoApplied {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--mj-paper);
+  border-left: 2px solid var(--mj-gold);
+  font-size: 14px;
+}

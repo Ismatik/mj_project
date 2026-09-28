@@ -152,13 +152,13 @@ try {
   // WhatsApp templates go to Meta from the CMS; a second press finds them already there
   await owner.click('button:has-text("Отправить шаблоны в Meta")');
   await owner.waitForSelector('[role=status]:has-text("Готово")');
-  check('templates submitted to Meta', templates.length === 8 && (await owner.textContent('[role=status]:has-text("Готово")')).includes('отправлено 8'), String(templates.length));
+  check('templates submitted to Meta', templates.length === 10 && (await owner.textContent('[role=status]:has-text("Готово")')).includes('отправлено 10'), String(templates.length));
   check('auth template in Meta format', templates.some((t) => t.name === 'mj_login_code' && t.category === 'AUTHENTICATION' && t.language === 'ru'));
   await owner.reload();
-  check('approval status shown', (await owner.$$('text=на проверке')).length === 8);
+  check('approval status shown', (await owner.$$('text=на проверке')).length === 10);
   await owner.click('button:has-text("Отправить шаблоны в Meta")');
-  await owner.waitForSelector('[role=status]:has-text("уже были 8")');
-  check('resubmitting is harmless', templates.length === 8);
+  await owner.waitForSelector('[role=status]:has-text("уже были 10")');
+  check('resubmitting is harmless', templates.length === 10);
 
   await owner.goto(BASE + '/cms/integrations/telegram');
   await owner.click('button:has-text("Сбросить")').catch(() => {});

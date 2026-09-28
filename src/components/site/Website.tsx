@@ -2,19 +2,27 @@ import Link from "next/link";
 import { Brush, Crown, Droplet, Eye, Hand, Scissors, Sparkles, type LucideIcon } from "lucide-react";
 import { dict } from "@/lib/i18n/dict";
 import { moneyDict } from "@/lib/i18n/dict-money";
+import { loyaltyDict } from "@/lib/i18n/dict-loyalty";
+import { dayMonthYear } from "@/lib/i18n/format";
 import { duration, somoni } from "@/lib/i18n/format";
 import { localePath, type Lang } from "@/lib/i18n/locales";
 import { whatsappLink, type SiteContent } from "@/lib/site-content";
 import type { SiteMaster } from "@/server/masters";
 import type { OnlineMenu } from "@/server/online-booking";
 import { MasterCard } from "./MasterCard";
-import { OnlineBooking, type BookingPreset } from "./OnlineBooking";
+import { offerLabel } from "@/lib/i18n/format";
+import { OnlineBooking, type BookingPreset, type Offer } from "./OnlineBooking";
 import { Photo } from "./Photo";
 import { SiteFooter, SiteNav, type NavGuest } from "./SiteChrome";
 import { SiteEffects } from "./SiteEffects";
 import s from "./site.module.css";
 
 const ICONS: Record<string, LucideIcon> = { scissors: Scissors, hand: Hand, brush: Brush, crown: Crown, eye: Eye, sparkles: Sparkles, droplet: Droplet };
+
+/** A promotion shown in the "Акции" section */
+export type SitePromo = { id: string; title: string; description: string; kind: "PERCENT" | "FIXED"; value: number; code: string | null; startsOn: string; endsOn: string; serviceIds: string[] };
+/** "31 октября" (without the year) */
+const dayMonth = (ymd: string, lang: Lang) => dayMonthYear(new Date(`${ymd}T07:00:00Z`), lang).replace(/ \d{4}$/, "");
 
 type PriceList = { id: string; name: string; services: { id: string; name: string; durationMin: number; price: number }[] }[];
 
@@ -39,6 +47,8 @@ export function Website({
   guest,
   preset,
   lang,
+  offers,
+  promos,
 }: {
   c: SiteContent;
   prices: PriceList;
@@ -50,7 +60,16 @@ export function Website({
   guest: (NavGuest & { phone: string; favouriteStaffId: string | null }) | null;
   preset?: BookingPreset;
   lang: Lang;
+  offers: Offer[];
+  promos: SitePromo[];
 }) {
+  const lt = loyaltyDict(lang);
+  const svcName = new Map(menu.flatMap((c) => c.services).map((x) => [x.id, x.name]));
+  const serviceNames = (ids: string[]) =>
+    ids
+      .map((id) => svcName.get(id))
+      .filter(Boolean)
+      .join(", ");
   const t = dict(lang);
   const mt = moneyDict(lang);
   const reviews = c.reviews.items.filter((r) => r.visible);
@@ -267,6 +286,37 @@ export function Website({
         </div>
       </section>
 
+      {promos.length > 0 && (
+        <section id="akcii" className={s.light} aria-labelledby="offers-title">
+          <h2 id="offers-title" data-reveal className={`${s.h2} ${s.center}`}>
+            {lt.offers.title}
+          </h2>
+          <div className={s.rule} />
+          <div className={s.offers}>
+            {promos.map((p) => (
+              <article key={p.id} data-reveal className={s.offer}>
+                <div className={s.offerValue}>{offerLabel(p, lang)}</div>
+                <h3 className={s.offerTitle}>{p.title}</h3>
+                {p.description && <p className={s.offerText}>{p.description}</p>}
+                <div className={s.offerMeta}>
+                  {p.startsOn > today ? lt.offers.dates(dayMonth(p.startsOn, lang), dayMonth(p.endsOn, lang)) : lt.offers.until(dayMonth(p.endsOn, lang))}
+                  {" · "}
+                  {p.serviceIds.length ? serviceNames(p.serviceIds) : lt.offers.allServices}
+                </div>
+                {p.code && (
+                  <div className={s.offerCode}>
+                    {lt.offers.code}: <b>{p.code}</b>
+                  </div>
+                )}
+                <a href={p.serviceIds.length === 1 ? `?service=${p.serviceIds[0]}#zapis` : "#zapis"} className={s.textLink}>
+                  {lt.offers.book} →
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className={s.giftPromo} aria-labelledby="gift-promo">
         <div data-reveal className={s.giftPromoInner}>
           <div className={s.giftCard} aria-hidden="true">
@@ -294,7 +344,7 @@ export function Website({
           <p data-reveal className={s.bookingIntro}>
             {c.booking.intro}
           </p>
-          <OnlineBooking menu={menu} dates={dates} preview={!!preview} preset={preset} guest={guest} lang={lang} />
+          <OnlineBooking menu={menu} dates={dates} preview={!!preview} preset={preset} guest={guest} lang={lang} offers={offers} />
         </div>
       </section>
 

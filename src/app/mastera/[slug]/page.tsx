@@ -14,6 +14,8 @@ import { bookableDates } from "@/lib/slots";
 import { addDays, todayYmd } from "@/lib/time";
 import { getCurrentGuest } from "@/server/guest-auth";
 import { alternates, getLang } from "@/server/lang";
+import { db } from "@/lib/db";
+import { siteOffers } from "@/server/loyalty/core";
 import { getSiteMasters } from "@/server/masters";
 import { getOnlineMenu } from "@/server/online-booking";
 import { getSiteContent } from "@/server/site";
@@ -44,7 +46,7 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
   const { c, lang, master } = await findMaster((await params).slug);
   if (!master) notFound();
   const t = dict(lang);
-  const [menu, guest] = await Promise.all([getOnlineMenu(lang), getCurrentGuest()]);
+  const [menu, guest, offers] = await Promise.all([getOnlineMenu(lang), getCurrentGuest(), siteOffers(db, todayYmd())]);
   const favourite = guest?.favouriteStaffId === master.id;
   // Booking with this master only
   const ownMenu = menu
@@ -138,7 +140,11 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
             </h2>
             <div className={s.rule} />
             <p className={s.bookingIntro}>{t.masters.bookingIntro}</p>
-            <OnlineBooking menu={ownMenu} dates={bookableDates(today, 14, addDays)} preset={{ staffId: master.id }} guest={guest} lang={lang} />
+            <OnlineBooking menu={ownMenu} dates={bookableDates(today, 14, addDays)} preset={{ staffId: master.id }}
+              guest={guest}
+              lang={lang}
+              offers={offers.booking.map((o) => ({ ...o, title: o.titles[lang] }))}
+            />
           </div>
         </section>
       )}

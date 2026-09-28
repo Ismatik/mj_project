@@ -1,17 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { clock, somoni } from "@/lib/format";
 import { paymentMethod } from "@/lib/labels";
 import type { PosData } from "@/server/pos";
-import { settle } from "@/lib/money";
-import { checkGift, paySale, type PayInput } from "./actions";
+import { promoPrice, settleReceipt } from "@/lib/loyalty";
+import { checkGift, checkPosPromo, findGuestForPos, guestPoints, paySale, type PayInput } from "./actions";
 import s from "./pos.module.css";
 
-type Line = { key: string; serviceId: string; name: string; price: number; appointmentId?: string; depositPaid?: number };
+type Line = { key: string; serviceId: string; name: string; price: number; appointmentId?: string; depositPaid?: number; fullPrice?: number | null };
 type Gift = { code: string; balance: number; recipientName: string };
+type PosGuest = NonNullable<Awaited<ReturnType<typeof guestPoints>>>;
+type Promo = Extract<Awaited<ReturnType<typeof checkPosPromo>>, { ok: true }>["promo"];
 type Who = { guestId: string | null; guestName: string | null; staffId: string | null };
 
 const METHODS: { key: PayInput["method"]; cls: string }[] = [
@@ -29,7 +31,7 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
   const fromAppt = (id: string | undefined) => data.waiting.find((a) => a.id === id && a.serviceId);
   const first = fromAppt(initialAppt);
   const [lines, setLines] = useState<Line[]>(() =>
-    first ? [{ key: first.id, serviceId: first.serviceId!, name: first.service, price: first.price, appointmentId: first.id, depositPaid: first.depositPaid }] : [],
+    first ? [{ key: first.id, serviceId: first.serviceId!, name: first.service, price: first.price, appointmentId: first.id, depositPaid: first.depositPaid, fullPrice: first.fullPrice }] : [],
   );
   const [who, setWho] = useState<Who>(() => ({ guestId: first?.guestId ?? null, guestName: first?.guestName ?? null, staffId: first?.staffId ?? null }));
   const [paying, setPaying] = useState(false);
@@ -37,20 +39,52 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
   const [giftInput, setGiftInput] = useState("");
   const [giftError, setGiftError] = useState("");
   const [checking, setChecking] = useState(false);
+  const [bonus, setBonus] = useState<PosGuest | null>(null);
+  const [usePoints, setUsePoints] = useState(0);
+  const [phoneInput, setPhoneInput] = useState("");
+  const [guestError, setGuestError] = useState("");
+  const [promo, setPromo] = useState<Promo | null>(null);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoError, setPromoError] = useState("");
 
-  const total = lines.reduce((sum, l) => sum + l.price, 0);
-  const split = settle(total, lines.reduce((sum, l) => sum + (l.depositPaid ?? 0), 0), gift?.balance ?? 0, gift?.balance ?? 0);
+  /** Line price shown: bookings as booked; quick-menu lines with today's offer or the promo code if it gives more */
+  const linePrice = (l: Line) => {
+    if (l.appointmentId || !promo) return l.price;
+    const full = l.fullPrice ?? l.price;
+    if (promo.serviceIds.length && !promo.serviceIds.includes(l.serviceId)) return l.price;
+    return Math.min(l.price, promoPrice(full, promo).price);
+  };
+  const total = lines.reduce((sum, l) => sum + linePrice(l), 0);
+  const split = settleReceipt(total, {
+    deposit: lines.reduce((sum, l) => sum + (l.depositPaid ?? 0), 0),
+    giftBalance: gift?.balance ?? 0,
+    giftWanted: gift?.balance ?? 0,
+    points: bonus?.balance ?? 0,
+    pointsWanted: usePoints,
+    maxPointsPercent: bonus?.maxSpendPercent ?? 0,
+  });
+  const maxPoints = bonus ? Math.min(bonus.balance, Math.floor(((total - split.deposit) * bonus.maxSpendPercent) / 100), total - split.deposit - split.gift) : 0;
+
+  // Her points once the guest is known (from a booking or found by phone)
+  useEffect(() => {
+    let alive = true;
+    if (who.guestId) void guestPoints(who.guestId).then((g) => alive && setBonus(g));
+    return () => {
+      alive = false;
+    };
+  }, [who.guestId]);
+  const shownBonus = who.guestId && bonus?.id === who.guestId ? bonus : null;
   const inCheck = new Set(lines.map((l) => l.appointmentId).filter(Boolean));
 
-  function addService(id: string, name: string, price: number) {
-    setLines((ls) => [...ls, { key: newKey(), serviceId: id, name, price }]);
+  function addService(id: string, name: string, price: number, fullPrice: number | null) {
+    setLines((ls) => [...ls, { key: newKey(), serviceId: id, name, price, fullPrice }]);
     fx.toast(`В чек: ${name}`, "Касса");
   }
 
   function addAppointment(id: string) {
     const a = fromAppt(id);
     if (!a || inCheck.has(a.id)) return;
-    setLines((ls) => [...ls, { key: a.id, serviceId: a.serviceId!, name: a.service, price: a.price, appointmentId: a.id, depositPaid: a.depositPaid }]);
+    setLines((ls) => [...ls, { key: a.id, serviceId: a.serviceId!, name: a.service, price: a.price, appointmentId: a.id, depositPaid: a.depositPaid, fullPrice: a.fullPrice }]);
     setWho((w) => ({ guestId: w.guestId ?? a.guestId, guestName: w.guestName ?? a.guestName, staffId: w.staffId ?? a.staffId }));
   }
 
@@ -60,6 +94,30 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
     setGift(null);
     setGiftInput("");
     setGiftError("");
+    setBonus(null);
+    setUsePoints(0);
+    setPromo(null);
+    setPromoInput("");
+    setPromoError("");
+    setPhoneInput("");
+    setGuestError("");
+  }
+
+  async function findByPhone() {
+    setGuestError("");
+    const res = await findGuestForPos(phoneInput);
+    if (!res.ok) return setGuestError(res.error);
+    setBonus(res.guest);
+    setWho((w) => ({ ...w, guestId: res.guest.id, guestName: res.guest.name }));
+    setPhoneInput("");
+  }
+
+  async function applyPromo() {
+    setPromoError("");
+    const res = await checkPosPromo(promoInput);
+    if (!res.ok) return setPromoError(res.error);
+    setPromo(res.promo);
+    fx.toast(`Промокод ${res.promo.code}: ${res.promo.title}`, "Касса");
   }
 
   async function applyGift() {
@@ -89,6 +147,8 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
           staffId: who.staffId,
           giftCode: gift?.code ?? null,
           giftAmount: split.gift,
+          promoCode: promo?.code ?? null,
+          points: split.bonus,
           lines: lines.map((l) => ({ serviceId: l.serviceId, appointmentId: l.appointmentId ?? null })),
         }),
         new Promise((r) => setTimeout(r, 1700)),
@@ -130,6 +190,7 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
                   {a.guestName}
                 </option>
               ))}
+              {who.guestId && !data.waiting.some((a) => a.guestId === who.guestId) && <option value={who.guestId}>{who.guestName}</option>}
             </select>
           </label>
           <label>
@@ -145,6 +206,48 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
           </label>
         </div>
 
+        {!who.guestId && (
+          <form
+            className={s.giftForm}
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (phoneInput.trim()) void findByPhone();
+            }}
+          >
+            <input aria-label="Телефон гостьи" placeholder="Гостья по телефону — для бонусов" inputMode="tel" value={phoneInput} onChange={(e) => setPhoneInput(e.target.value)} />
+            <button type="submit" disabled={!phoneInput.trim()}>
+              Найти
+            </button>
+          </form>
+        )}
+        {guestError && (
+          <div role="alert" className={s.giftError}>
+            {guestError}
+          </div>
+        )}
+        {shownBonus?.enabled && (
+          <div className={s.bonus} aria-label="Бонусы гостьи">
+            <span>
+              Бонусы: <b>{shownBonus.balance}</b> · {shownBonus.tier} {shownBonus.percent}%
+            </span>
+            {maxPoints > 0 && (
+              <label>
+                списать{" "}
+                <input
+                  aria-label="Списать бонусы"
+                  inputMode="numeric"
+                  value={usePoints ? String(usePoints) : ""}
+                  placeholder={`до ${maxPoints}`}
+                  onChange={(e) => setUsePoints(Math.min(maxPoints, Number(e.target.value.replace(/\D/g, "")) || 0))}
+                />
+                <button type="button" onClick={() => setUsePoints(maxPoints)}>
+                  все {maxPoints}
+                </button>
+              </label>
+            )}
+          </div>
+        )}
+
         <div className={s.lines}>
           {lines.map((l) => (
             <div key={l.key} className={s.line}>
@@ -152,9 +255,10 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
                 {l.name}
                 {l.appointmentId && <small> · по записи</small>}
                 {!!l.depositPaid && <small className={s.deposit}>предоплата онлайн {somoni(l.depositPaid)}</small>}
+                {linePrice(l) < (l.fullPrice ?? l.price) && <small className={s.deposit}>скидка {somoni((l.fullPrice ?? l.price) - linePrice(l))}</small>}
               </span>
               <span className={s.lineRight}>
-                <span className={s.linePrice}>{somoni(l.price)}</span>
+                <span className={s.linePrice}>{somoni(linePrice(l))}</span>
                 <button type="button" className={s.remove} title="Убрать" aria-label={`Убрать ${l.name}`} onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))}>
                   ×
                 </button>
@@ -206,7 +310,39 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
           )}
         </div>
 
-        {(split.deposit > 0 || split.gift > 0) && (
+        <div className={s.gift}>
+          {promo ? (
+            <div className={s.giftApplied}>
+              <span>
+                Промокод {promo.code}
+                <small>{promo.title}</small>
+              </span>
+              <button type="button" className={s.remove} aria-label="Убрать промокод" onClick={() => setPromo(null)}>
+                ×
+              </button>
+            </div>
+          ) : (
+            <form
+              className={s.giftForm}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (promoInput.trim()) void applyPromo();
+              }}
+            >
+              <input aria-label="Промокод" placeholder="Промокод" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} />
+              <button type="submit" disabled={!promoInput.trim()}>
+                Применить
+              </button>
+            </form>
+          )}
+          {promoError && (
+            <div role="alert" className={s.giftError}>
+              {promoError}
+            </div>
+          )}
+        </div>
+
+        {(split.deposit > 0 || split.gift > 0 || split.bonus > 0) && (
           <div className={s.breakdown}>
             <div>
               <span>Услуги</span>
@@ -224,10 +360,16 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
                 <span>−{somoni(split.gift)}</span>
               </div>
             )}
+            {split.bonus > 0 && (
+              <div>
+                <span>Бонусы</span>
+                <span>−{somoni(split.bonus)}</span>
+              </div>
+            )}
           </div>
         )}
         <div className={s.total}>
-          <span className={s.totalLabel}>{split.deposit || split.gift ? "К оплате" : "Итого"}</span>
+          <span className={s.totalLabel}>{split.deposit || split.gift || split.bonus ? "К оплате" : "Итого"}</span>
           <span className={s.totalValue}>{somoni(split.paid)}</span>
         </div>
         <div className={s.pay}>
@@ -257,9 +399,12 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
         <h2 className={s.menuTitle}>Быстрое меню</h2>
         <div className={s.menu}>
           {data.menu.map((p) => (
-            <button key={p.id} type="button" className={s.menuItem} onClick={() => addService(p.id, p.name, p.price)}>
+            <button key={p.id} type="button" className={s.menuItem} onClick={() => addService(p.id, p.name, p.price, p.fullPrice)}>
               <div className={s.menuName}>{p.name}</div>
-              <div className={s.menuPrice}>{somoni(p.price)}</div>
+              <div className={s.menuPrice}>
+                {p.fullPrice && <s className={s.oldPrice}>{somoni(p.fullPrice)}</s>} {somoni(p.price)}
+              </div>
+              {p.offer && <div className={s.offerTag}>{p.offer}</div>}
             </button>
           ))}
         </div>
@@ -291,6 +436,8 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
                   {clock(r.createdAt)} · {r.paid ? paymentMethod[r.method] : "без доплаты"}
                   {r.depositAmount ? ` · предоплата ${somoni(r.depositAmount)}` : ""}
                   {r.giftCardAmount ? ` · сертификат ${somoni(r.giftCardAmount)}` : ""}
+                  {r.bonusAmount ? ` · бонусы ${somoni(r.bonusAmount)}` : ""}
+                  {r.bonusEarned ? ` · +${r.bonusEarned} б.` : ""}
                   {r.guest ? ` · ${r.guest}` : ""}
                   {r.staff ? ` · ${r.staff}` : ""}
                 </small>

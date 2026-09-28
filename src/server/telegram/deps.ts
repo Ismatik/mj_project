@@ -4,11 +4,12 @@ import type { Prisma } from "@/generated/prisma/client";
 import type { BotDeps, BotState } from "@/lib/bot/engine";
 import { db } from "@/lib/db";
 import { localize } from "@/lib/i18n/content";
-import { when } from "@/lib/i18n/format";
+import { dayMonthYear, somoni as somoniIn, when } from "@/lib/i18n/format";
 import { asLang, isLang, localePath } from "@/lib/i18n/locales";
 import { bookableDates } from "@/lib/slots";
 import { addDays, todayYmd } from "@/lib/time";
 import { cancelByGuest, createGuestBooking, getOnlineMenu, rescheduleByGuest, slotsFor, upcomingForGuest } from "../online-booking";
+import { guestBonus, siteOffers } from "../loyalty/core";
 import { siteUrl } from "../payments/core";
 import { getSiteContent } from "../site";
 
@@ -86,5 +87,21 @@ export function botDeps(): BotDeps {
     },
     staffCode: getStaffCode,
     formatWhen: (d, lang) => when(d, lang),
+    async bonus(guestId, lang) {
+      const b = await guestBonus(db, guestId, lang);
+      return b.enabled ? { balance: b.balance, tier: b.tier.name, percent: b.tier.percent, maxSpendPercent: b.maxSpendPercent } : null;
+    },
+    async offers(lang) {
+      const today = todayYmd();
+      return (await siteOffers(db, today)).shown
+        .filter((o) => o.startsOn <= today)
+        .map((o) => ({
+          title: o.titles[lang],
+          description: o.descriptions[lang],
+          label: o.kind === "PERCENT" ? `−${o.value}%` : `−${somoniIn(o.value, lang)}`,
+          until: dayMonthYear(new Date(`${o.endsOn}T07:00:00Z`), lang),
+          code: o.code,
+        }));
+    },
   };
 }

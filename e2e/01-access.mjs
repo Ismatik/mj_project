@@ -44,7 +44,7 @@ const navLabels = (p) => p.$$eval('aside nav a', (as) => as.map((a) => a.querySe
   check('entry loader shows after login', await p.isVisible('text=Открываем салон…'));
   await p.waitForTimeout(2600);
   check('welcome param removed', !p.url().includes('welcome'));
-  check('owner sees 11 pages', (await navLabels(p)).length === 11, (await navLabels(p)).join(', '));
+  check('owner sees 12 pages', (await navLabels(p)).length === 12, (await navLabels(p)).join(', '));
   await p.goto(`${BASE}/cms`); await p.waitForTimeout(1500);
   await p.screenshot({ path: `${out}/dashboard.png`, fullPage: true });
 

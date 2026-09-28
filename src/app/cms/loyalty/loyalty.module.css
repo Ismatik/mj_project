@@ -1,0 +1,223 @@
+.grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 440px) minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 22px;
+  align-items: start;
+}
+.panel {
+  background: var(--mj-paper);
+  border: 1px solid var(--mj-line);
+  padding: 20px 22px;
+}
+.muted {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--mj-text-2);
+  margin: 4px 0 12px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+.form label small {
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--mj-text-2);
+}
+.form input,
+.form textarea,
+.form select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--mj-line);
+  background: var(--mj-cream);
+  padding: 8px 10px;
+  font-family: var(--mj-sans);
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--mj-ink);
+  border-radius: 0;
+  outline: none;
+  resize: vertical;
+}
+.form input:focus,
+.form textarea:focus {
+  border-color: var(--mj-ink);
+}
+.form .check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--mj-ink);
+}
+.form .check input {
+  width: auto;
+}
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tierHead,
+.tier {
+  display: grid;
+  grid-template-columns: 100px 1fr 100px;
+  gap: 10px;
+  align-items: center;
+  font-size: 13.5px;
+}
+.tierHead span {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+.tier b {
+  font-family: var(--mj-serif);
+  font-weight: 600;
+}
+.pct {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.promos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.add {
+  align-self: flex-start;
+  border: 1px dashed var(--mj-gold);
+  background: transparent;
+  padding: 10px 14px;
+  font-family: var(--mj-sans);
+  font-size: 13px;
+  color: var(--mj-gold-deep);
+  cursor: pointer;
+}
+.promo {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--mj-line);
+}
+.off {
+  opacity: 0.55;
+}
+.promoValue {
+  font-family: var(--mj-serif);
+  font-size: 24px;
+  font-weight: 600;
+}
+.promoMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+}
+.promoMain small {
+  font-size: 12px;
+  color: var(--mj-text-2);
+}
+.edit,
+.linkBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mj-sans);
+  font-size: 12.5px;
+  color: var(--mj-gold-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.editor {
+  border: 1px solid var(--mj-line);
+  border-top: 2px solid var(--mj-gold);
+  background: var(--mj-cream);
+  padding: 16px 18px;
+}
+.langs {
+  display: flex;
+  gap: 6px;
+}
+.langs button {
+  border: 1px solid var(--mj-line);
+  background: transparent;
+  padding: 5px 10px;
+  font-family: var(--mj-sans);
+  font-size: 12px;
+  cursor: pointer;
+}
+.langs button[aria-selected="true"] {
+  background: var(--mj-ink);
+  color: var(--mj-cream);
+  border-color: var(--mj-ink);
+}
+.valueRow {
+  display: flex;
+  gap: 6px;
+}
+.valueRow select {
+  width: 90px;
+}
+.services {
+  border: 1px solid var(--mj-line);
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 4px 12px;
+  margin: 0;
+}
+.services legend {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  padding: 0 4px;
+}
+.services .check {
+  font-size: 13px;
+}
+.checks {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.error {
+  font-size: 13px;
+  color: #8c3a2b;
+}
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

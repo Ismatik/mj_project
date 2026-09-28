@@ -1,10 +1,11 @@
 // Background worker: every minute releases unpaid prepayment holds and delivers queued outbox messages;
-// every 10 minutes queues visit reminders.
+// every 10 minutes queues visit reminders; every morning gives birthday points.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PgBoss } from "pg-boss";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { sweepOutbox } from "../src/server/integrations/outbox";
+import { awardBirthdays } from "../src/server/loyalty/core";
 import { releaseExpired } from "../src/server/payments/core";
 import { queueReminders } from "../src/server/integrations/reminders";
 
@@ -16,6 +17,7 @@ const boss = new PgBoss({ connectionString, schema: "pgboss" });
 
 const SWEEP = "outbox-sweep";
 const REMINDERS = "reminders";
+const BIRTHDAYS = "birthdays";
 
 async function main() {
   boss.on("error", (e) => console.error("[worker]", e));
@@ -34,6 +36,13 @@ async function main() {
   await boss.work(REMINDERS, async () => {
     const n = await queueReminders(db);
     if (n) console.log(`[worker] reminders: queued ${n}`);
+  });
+  // Birthday points and greetings, every morning at 09:00 in Dushanbe
+  await boss.createQueue(BIRTHDAYS);
+  await boss.schedule(BIRTHDAYS, "0 9 * * *", undefined, { tz: "Asia/Dushanbe" });
+  await boss.work(BIRTHDAYS, async () => {
+    const n = await awardBirthdays(db);
+    if (n) console.log(`[worker] birthdays: ${n}`);
   });
   console.log("[worker] ready");
 

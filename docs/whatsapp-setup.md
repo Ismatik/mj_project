@@ -28,7 +28,7 @@ The platform sends WhatsApp messages through Meta's **WhatsApp Business Platform
 7. **Verify token.** Invent any long random string → `WHATSAPP_VERIFY_TOKEN`.
 8. **Server.** Add the five values to `.env` on the VPS. Optionally add `WHATSAPP_TEST_TO`, the number that receives test messages. Then run `docker compose up -d`.
 9. **Webhook.** Go to the app → *WhatsApp → Configuration* → *Callback URL* `https://<SITE_DOMAIN>/api/whatsapp/webhook`, *Verify token* = `WHATSAPP_VERIFY_TOKEN` → *Verify and save*. Under *Webhook fields*, subscribe to **messages**.
-10. **Templates.** In the CMS go to *Интеграции → Шаблоны сообщений → **Отправить шаблоны в Meta***. This submits all eight templates below (4 messages × Russian and English). Their status shows in the same table. Review usually takes minutes to a day. Nothing needs to be typed in Meta by hand.
+10. **Templates.** In the CMS go to *Интеграции → Шаблоны сообщений → **Отправить шаблоны в Meta***. This submits all ten templates below (5 messages × Russian and English). Their status shows in the same table. Review usually takes minutes to a day. Nothing needs to be typed in Meta by hand.
 11. **Payment.** In WhatsApp Manager → *Payment settings*, add the card.
 12. **Business verification.** Go to business.facebook.com → *Security center* → *Start verification* and upload the documents. Until verified, Meta limits how many guests you can message first per day (a few hundred), and the display name may not show.
 13. **Go live.** In the CMS go to *Интеграции → WhatsApp* → **Тест**. This sends Meta's built-in `hello_world` to `WHATSAPP_TEST_TO`. Press *Доставить сейчас* and check the phone. Then switch to **Живой**.
@@ -42,6 +42,7 @@ Parameters `{{1}}`, `{{2}}`… are filled in automatically. Guests who speak Taj
 | `mj_booking_confirmation` | Utility | Mavzunai Jovid: {{1}}, вы записаны — {{2}}, {{3}}, мастер {{4}}. Ждём вас по адресу: ул. Бухоро, 23/25, Душанбе. Если планы изменятся, просто ответьте на это сообщение. | Mavzunai Jovid: {{1}}, you're booked — {{2}}, {{3}}, with {{4}}. We're at 23/25 Bukhoro St, Dushanbe. If your plans change, just reply to this message. |
 | `mj_reminder_day` | Utility | Mavzunai Jovid: напоминаем о записи — {{1}}, {{2}}, мастер {{3}}. ул. Бухоро, 23/25. Если планы изменились, ответьте на это сообщение, и мы перенесём визит. | Mavzunai Jovid: a reminder of your booking — {{1}}, {{2}} with {{3}}. 23/25 Bukhoro St. If your plans have changed, reply to this message and we'll move your visit. |
 | `mj_reminder_hours` | Utility | Mavzunai Jovid: ждём вас сегодня в {{1}} — {{2}}, мастер {{3}}. ул. Бухоро, 23/25, Душанбе. | Mavzunai Jovid: see you today at {{1}} — {{2}} with {{3}}. 23/25 Bukhoro St, Dushanbe. |
+| `mj_birthday` | Marketing | Mavzunai Jovid: {{1}}, с днём рождения! Дарим вам {{2}} бонусов — ими можно оплатить до {{3}}% визита. Ждём вас в салоне на ул. Бухоро, 23/25. | Mavzunai Jovid: happy birthday, {{1}}! Here are {{2}} bonus points from us — use them for up to {{3}}% of a visit. See you at 23/25 Bukhoro St. |
 | `mj_login_code` | Authentication | Text fixed by Meta: «{{1}} — ваш код подтверждения…» + button «Скопировать код» | “{{1}} is your verification code…” + “Copy code” button |
 
 The texts live in `src/lib/whatsapp-templates.ts`. If Meta rejects one, change its text there, keeping the name and the order of the parameters, and press the button again. You can also edit it in WhatsApp Manager.
@@ -49,6 +50,7 @@ The texts live in `src/lib/whatsapp-templates.ts`. If Meta rejects one, change i
 ## Costs
 
 - Meta charges per delivered template message. The price depends on the category (authentication and utility are the cheapest; marketing is the most expensive) and on the guest's country. Check the current rate card: <https://developers.facebook.com/docs/whatsapp/pricing>.
+- `mj_birthday` is a *Marketing* template (Meta's rules: a greeting with a gift is promotional). It costs more than the others and a guest can mute marketing messages from the salon in WhatsApp. If you'd rather not pay for it, set «Подарок ко дню рождения» to 0 in CMS → Бонусы и акции — the points and greeting are then skipped.
 - Replies to a guest within 24 hours of her last message are free-form and free.
 - The platform uses WhatsApp only for guests without the Telegram bot. Telegram is free, so the more guests use the bot, the lower the bill.
 

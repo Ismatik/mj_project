@@ -116,6 +116,9 @@ model Guest {
   sessions      GuestSession[]
   /// Language of messages to her: ru | tg | en (last used on the website or in the bot)
   lang          String         @default("ru")
+  /// Bonus points (1 point = 1 somoni); the ledger is BonusTx
+  bonusBalance  Int            @default(0)
+  bonusTxs      BonusTx[]
 }
 
 /// Website account session of a guest (signed in with a code sent to her phone).
@@ -186,6 +189,10 @@ model Appointment {
   /// An online booking waiting for its prepayment holds the time until then; afterwards it is released
   holdUntil       DateTime?
   payments        Payment[]
+  /// Promotion or promo code applied to the price (price before it in fullPrice)
+  promotion       Promotion? @relation(fields: [promotionId], references: [id])
+  promotionId     String?
+  fullPrice       Int?
 
   @@index([startsAt])
 }
@@ -221,10 +228,14 @@ model Sale {
   paid      Int           @default(0)
   depositAmount  Int      @default(0)
   giftCardAmount Int      @default(0)
+  /// Paid with bonus points, and points earned for this receipt
+  bonusAmount    Int      @default(0)
+  bonusEarned    Int      @default(0)
   method    PaymentMethod
   createdAt DateTime      @default(now())
   items     SaleItem[]
   redemptions GiftRedemption[]
+  bonusTxs    BonusTx[]
 
   @@index([createdAt])
 }
@@ -237,6 +248,10 @@ model SaleItem {
   serviceId String?
   name      String
   price     Int
+  /// Discount by a promotion already taken off the price
+  discount    Int        @default(0)
+  promotion   Promotion? @relation(fields: [promotionId], references: [id])
+  promotionId String?
 }
 
 // ─── Dress rental ────────────────────────────────────────
@@ -457,4 +472,61 @@ model GiftRedemption {
   saleId     String
   amount     Int
   createdAt  DateTime @default(now())
+}
+
+// ─── Bonus program and promotions (R3) ───────────────────
+
+enum BonusKind {
+  EARN
+  SPEND
+  BIRTHDAY
+  WELCOME
+  MANUAL
+}
+
+/// Every change of a guest's points; Guest.bonusBalance is the running total.
+model BonusTx {
+  id        String    @id @default(cuid())
+  guest     Guest     @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  guestId   String
+  delta     Int
+  kind      BonusKind
+  sale      Sale?     @relation(fields: [saleId], references: [id], onDelete: SetNull)
+  saleId    String?
+  note      String?
+  createdBy String?
+  createdAt DateTime  @default(now())
+
+  @@index([guestId, createdAt])
+}
+
+enum PromotionKind {
+  PERCENT
+  FIXED
+}
+
+/// An offer (applied automatically in its dates) or a promo code (applied when entered).
+model Promotion {
+  id            String        @id @default(cuid())
+  title         String
+  titleTg       String?
+  titleEn       String?
+  description   String?
+  descriptionTg String?
+  descriptionEn String?
+  kind          PromotionKind
+  value         Int
+  /// Services it covers; empty = all
+  serviceIds    String[]
+  startsOn      DateTime      @db.Date
+  endsOn        DateTime      @db.Date
+  /// Promo code (upper case); null = automatic offer
+  code          String?       @unique
+  active        Boolean       @default(true)
+  showOnSite    Boolean       @default(true)
+  usageLimit    Int?
+  usedCount     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  appointments  Appointment[]
+  saleItems     SaleItem[]
 }

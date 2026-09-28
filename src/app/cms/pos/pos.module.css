@@ -426,3 +426,53 @@
   display: flex;
   justify-content: space-between;
 }
+
+/* Bonus points and offers */
+.bonus {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 9px 12px;
+  background: var(--mj-sand);
+  border-left: 2px solid var(--mj-gold);
+  font-size: 13px;
+}
+.bonus label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mj-text-2);
+}
+.bonus input {
+  width: 74px;
+  border: 1px solid var(--mj-line);
+  background: var(--mj-paper);
+  padding: 5px 8px;
+  font-family: var(--mj-sans);
+  font-size: 13px;
+  border-radius: 0;
+}
+.bonus button {
+  border: none;
+  background: none;
+  color: var(--mj-gold-deep);
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: var(--mj-sans);
+  font-size: 12.5px;
+}
+.oldPrice {
+  color: var(--mj-text-muted);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+.offerTag {
+  margin-top: 6px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}

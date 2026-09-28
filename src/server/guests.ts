@@ -1,6 +1,7 @@
 import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
+import { guestBonus } from "./loyalty/core";
 import { phoneDigits } from "@/lib/phone";
 import { todayYmd } from "@/lib/time";
 import { monthPrepositional, monthToDate } from "./ranges";
@@ -85,7 +86,9 @@ export async function getGuestCard(id: string) {
     status: a.status,
   });
 
+  const bonus = await guestBonus(db, guest.id);
   return {
+    bonus,
     id: guest.id,
     name: guest.name,
     phone: guest.phone,

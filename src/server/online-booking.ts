@@ -3,6 +3,8 @@ import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { clock, longDate, somoni } from "@/lib/format";
 import { DEPOSIT_HOLD_MIN, depositFor } from "@/lib/money";
+import { loyaltyDict } from "@/lib/i18n/dict-loyalty";
+import { bestOffer, normalizePromoCode, promoApplies, promoPrice } from "@/lib/loyalty";
 import { formatPhone } from "@/lib/phone";
 import { freeSlots, type BusyInterval } from "@/lib/slots";
 import { nameIn } from "@/lib/i18n/content";
@@ -11,6 +13,7 @@ import { when } from "@/lib/i18n/format";
 import { LANG_NAME, type Lang } from "@/lib/i18n/locales";
 import { addDays, atSalonTime, todayYmd, type Ymd } from "@/lib/time";
 import { appointmentVars, guestMessage, messageContext } from "./integrations/guest-messages";
+import { promotionsBetween } from "./loyalty/core";
 import { namerFor } from "./names";
 import { getSiteContent } from "./site";
 
@@ -98,6 +101,7 @@ export type GuestBookingResult =
       summary: { name: string; service: string; master: string; when: string; phone: string };
       /** Prepayment to make online before the time is confirmed */
       payment?: { id: string; amount: number; payBy: string };
+      promo?: { title: string; price: number; fullPrice: number };
     }
   | { ok: false; error: string };
 
@@ -125,9 +129,12 @@ export async function createGuestBooking(input: {
   guestId?: string;
   telegramChatId?: string;
   lang?: Lang;
+  /** Promo code typed by the guest (otherwise the best automatic offer applies) */
+  promoCode?: string | null;
 }): Promise<GuestBookingResult> {
   const lang = input.lang ?? "ru";
   const e = dict(lang).errors;
+  const pe = loyaltyDict(lang).promo;
   return db.$transaction(async (tx) => {
     await lockDate(tx, input.date);
     const { service, slots } = await slotsFor(input.serviceId, input.date, input.staffId, tx);
@@ -136,6 +143,17 @@ export async function createGuestBooking(input: {
     if (!slot) return { ok: false as const, error: e.slotTaken };
     const staffId = slot.staffIds[0]!;
     const master = service.staff.find((m) => m.id === staffId)!;
+    // Promotion: the code she typed, or the best automatic offer on that day
+    const promos = await promotionsBetween(tx, input.date);
+    let promo: (typeof promos)[number] | null = null;
+    if (input.promoCode) {
+      const code = normalizePromoCode(input.promoCode);
+      const found = promos.find((p) => p.code === code);
+      if (!found) return { ok: false as const, error: (await tx.promotion.findUnique({ where: { code } })) ? pe.invalid : pe.unknown };
+      if (!promoApplies(found, service.id, input.date)) return { ok: false as const, error: pe.invalid };
+      promo = found;
+    } else promo = bestOffer(promos, service.id, service.price, input.date);
+    const price = promo ? promoPrice(service.price, promo).price : service.price;
 
     const found =
       (input.guestId ? await tx.guest.findUnique({ where: { id: input.guestId } }) : null) ?? (await tx.guest.findUnique({ where: { phone: input.phone } }));
@@ -146,7 +164,7 @@ export async function createGuestBooking(input: {
       : await tx.guest.create({ data: { name: input.name, phone: input.phone, tag: "NEW", lang } });
     const startsAt = atSalonTime(input.date, input.time);
     // Services with a prepayment (weddings, long looks) hold the time until it is paid online
-    const deposit = depositFor(service.price, service.depositPercent);
+    const deposit = depositFor(price, service.depositPercent);
     const holdUntil = deposit ? new Date(Date.now() + DEPOSIT_HOLD_MIN * 60_000) : null;
     const appt = await tx.appointment.create({
       data: {
@@ -158,12 +176,16 @@ export async function createGuestBooking(input: {
         serviceLabel: service.name,
         startsAt,
         durationMin: service.durationMin,
-        price: service.price,
+        price,
+        fullPrice: promo ? service.price : null,
+        promotionId: promo?.id ?? null,
+        note: promo ? `${promo.code ? `Промокод ${promo.code}` : "Акция"}: ${promo.title}` : null,
         status: "PENDING",
         source: input.source,
         staff: { create: [{ staffId }] },
       },
     });
+    if (promo) await tx.promotion.update({ where: { id: promo.id }, data: { usedCount: { increment: 1 } } });
     const via = input.source === "TELEGRAM" ? "Telegram" : "сайта";
     const ctx = await messageContext(tx);
     const varsIn = (l: Lang) => appointmentVars(ctx, l, { startsAt, serviceId: service.id, serviceLabel: service.name, staff: [master] }, input.name);
@@ -172,7 +194,7 @@ export async function createGuestBooking(input: {
       {
         channel: "telegram",
         to: "reception",
-        body: `Онлайн-запись с ${via}: ${guest.name}, ${formatPhone(guest.phone)} — ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}.${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}${deposit ? ` Ждёт предоплату ${somoni(deposit)} до ${clock(holdUntil!)}.` : " Подтвердите в календаре."}`,
+        body: `Онлайн-запись с ${via}: ${guest.name}, ${formatPhone(guest.phone)} — ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}.${promo ? ` ${promo.code ? `Промокод ${promo.code}` : `Акция «${promo.title}»`}: ${somoni(price)} вместо ${somoni(service.price)}.` : ""}${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}${deposit ? ` Ждёт предоплату ${somoni(deposit)} до ${clock(holdUntil!)}.` : " Подтвердите в календаре."}`,
         meta: { kind: "online-booking", appointmentId: appt.id },
       },
     ];
@@ -200,6 +222,7 @@ export async function createGuestBooking(input: {
       appointmentId: appt.id,
       ...(payment ? { payment: { id: payment.id, amount: payment.amount, payBy: clock(holdUntil!) } } : {}),
       summary: { name: input.name, service: vars.service!, master: vars.master!, when: vars.when!, phone: formatPhone(guest.phone) },
+      ...(promo ? { promo: { title: promo.titles[lang], price, fullPrice: service.price } } : {}),
     };
   });
 }

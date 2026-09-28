@@ -57,6 +57,10 @@ export interface BotDeps {
   /** Code that links a chat as a reception chat (shown on /cms/integrations) */
   staffCode(): Promise<string>;
   formatWhen(d: Date, lang: Lang): string;
+  /** Her bonus points (null when the program is off) */
+  bonus(guestId: string, lang: Lang): Promise<{ balance: number; tier: string; percent: number; maxSpendPercent: number } | null>;
+  /** Current offers and public promo codes */
+  offers(lang: Lang): Promise<{ title: string; description: string; label: string; until: string; code: string | null }[]>;
 }
 
 const rows = <T>(xs: T[], n: number): T[][] => Array.from({ length: Math.ceil(xs.length / n) }, (_, i) => xs.slice(i * n, i * n + n));
@@ -75,6 +79,10 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     [
       { text: t.my, data: "my" },
       { text: t.prices, data: "prices" },
+    ],
+    [
+      { text: t.bonusBtn, data: "bonus" },
+      { text: t.offersBtn, data: "offers" },
     ],
     [{ text: t.contacts, data: "contacts" }],
     [{ text: t.language, data: "lang" }],
@@ -215,7 +223,7 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
       await menu(t.welcome(u.firstName));
       return out;
     }
-    const map: Record<string, string> = { "/book": "book", "/my": "my", "/prices": "prices", "/contacts": "contacts", "/menu": "menu", "/lang": "lang" };
+    const map: Record<string, string> = { "/book": "book", "/my": "my", "/prices": "prices", "/contacts": "contacts", "/menu": "menu", "/lang": "lang", "/bonus": "bonus", "/offers": "offers" };
     if (map[text]) u = { ...u, data: map[text] };
     else {
       await menu(t.onlyButtons);
@@ -375,6 +383,25 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
       }
       await save({ step: "idle" });
       out.push({ text: t.moved(res.summary), buttons: mainMenu() });
+      break;
+    }
+
+    case "bonus": {
+      if (!chat.guest) {
+        await askPhone("my");
+        break;
+      }
+      const b = await deps.bonus(chat.guest.id, lang);
+      out.push({ text: b ? t.bonusInfo(b) : t.bonusOff, buttons: [[{ text: t.book, data: "book" }], backToMenu()] });
+      break;
+    }
+
+    case "offers": {
+      const list = await deps.offers(lang);
+      out.push({
+        text: list.length ? `${t.offersTitle}\n\n${list.map((o) => t.offerLine(o)).join("\n\n")}` : t.noOffers,
+        buttons: [[{ text: t.book, data: "book" }], backToMenu()],
+      });
       break;
     }
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
@@ -12,10 +12,11 @@ import { clock, shortDate, somoni } from "@/lib/format";
 import { appointmentStatus, guestTag } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
 import type { GuestCardData } from "@/server/guests";
+import { adjustPoints } from "../loyalty/actions";
 import { saveGuest, type GuestForm } from "./actions";
 import s from "./guests.module.css";
 
-export function GuestCard({ guest, closeHref }: { guest: GuestCardData; closeHref: string }) {
+export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData; closeHref: string; isOwner: boolean }) {
   const fx = useFx();
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -79,6 +80,8 @@ export function GuestCard({ guest, closeHref }: { guest: GuestCardData; closeHre
         </div>
       </div>
 
+      {guest.bonus.enabled && <BonusBlock guest={guest} isOwner={isOwner} />}
+
       {editing ? (
         <div className={s.editGrid}>
           <Field label="Имя и фамилия" value={form.name} onChange={set("name")} error={errors.name} />
@@ -132,6 +135,64 @@ export function GuestCard({ guest, closeHref }: { guest: GuestCardData; closeHre
         ))}
       </div>
     </section>
+  );
+}
+
+const BONUS_KIND: Record<string, string> = { EARN: "за визит", SPEND: "оплата бонусами", BIRTHDAY: "день рождения", WELCOME: "приветственные", MANUAL: "вручную" };
+
+function BonusBlock({ guest, isOwner }: { guest: GuestCardData; isOwner: boolean }) {
+  const fx = useFx();
+  const router = useRouter();
+  const [delta, setDelta] = useState("");
+  const [note, setNote] = useState("");
+  const [pending, start] = useTransition();
+  const b = guest.bonus;
+  return (
+    <div className={s.bonus} aria-label="Бонусы">
+      <div className={s.bonusHead}>
+        <span>Бонусы</span>
+        <b>{b.balance}</b>
+        <small>
+          {b.tier.name} · {b.tier.percent}%{b.next ? ` · до «${b.next.name}» ${somoni(b.next.remaining)}` : ""}
+        </small>
+      </div>
+      {b.history.length > 0 && (
+        <div className={s.bonusHistory}>
+          {b.history.slice(0, 5).map((h) => (
+            <div key={h.id}>
+              <span>
+                {shortDate(new Date(h.at))} · {BONUS_KIND[h.kind] ?? h.kind}
+                {h.receipt ? ` · чек №${h.receipt}` : ""}
+                {h.note ? ` · ${h.note}` : ""}
+              </span>
+              <b className={h.delta < 0 ? s.minus : ""}>{h.delta > 0 ? `+${h.delta}` : h.delta}</b>
+            </div>
+          ))}
+        </div>
+      )}
+      {isOwner && (
+        <form
+          className={s.bonusAdjust}
+          onSubmit={(e) => {
+            e.preventDefault();
+            start(async () => {
+              const res = await adjustPoints(guest.id, Number(delta), note);
+              if (!res.ok) return fx.toast(res.error ?? "Не получилось", "Бонусы");
+              fx.toast(`Бонусы: ${Number(delta) > 0 ? "+" : ""}${delta}`, "Бонусы");
+              setDelta("");
+              setNote("");
+              router.refresh();
+            });
+          }}
+        >
+          <input aria-label="Бонусы вручную" placeholder="+100 или −50" value={delta} onChange={(e) => setDelta(e.target.value.replace(/[^\d-]/g, ""))} />
+          <input aria-label="Причина" placeholder="Причина" value={note} onChange={(e) => setNote(e.target.value)} />
+          <button type="submit" disabled={pending || !Number(delta)}>
+            Начислить
+          </button>
+        </form>
+      )}
+    </div>
   );
 }
 

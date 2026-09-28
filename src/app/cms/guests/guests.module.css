@@ -318,3 +318,79 @@ a.row:hover,
     width: 100%;
   }
 }
+
+/* Bonus points */
+.bonus {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--mj-sand);
+  border-left: 2px solid var(--mj-gold);
+}
+.bonusHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.bonusHead span {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+.bonusHead b {
+  font-family: var(--mj-serif);
+  font-size: 22px;
+}
+.bonusHead small {
+  font-size: 12.5px;
+  color: var(--mj-text-2);
+}
+.bonusHistory {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+  color: var(--mj-text-2);
+}
+.bonusHistory div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.bonusHistory b {
+  color: var(--mj-ink);
+}
+.minus {
+  color: #8c3a2b !important;
+}
+.bonusAdjust {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.bonusAdjust input {
+  border: 1px solid var(--mj-line);
+  background: var(--mj-paper);
+  padding: 6px 9px;
+  font-family: var(--mj-sans);
+  font-size: 13px;
+  min-width: 0;
+  flex: 1;
+  border-radius: 0;
+}
+.bonusAdjust input:first-child {
+  flex: 0 0 110px;
+}
+.bonusAdjust button {
+  border: 1px solid var(--mj-ink);
+  background: transparent;
+  padding: 0 12px;
+  font-family: var(--mj-sans);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}

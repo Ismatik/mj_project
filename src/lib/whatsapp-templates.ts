@@ -6,7 +6,7 @@ import { WHATSAPP_TEMPLATES, type MessageKind } from "./messages";
 export type MetaTemplate = {
   name: string;
   language: string;
-  category: "UTILITY" | "AUTHENTICATION";
+  category: "UTILITY" | "AUTHENTICATION" | "MARKETING";
   components: Record<string, unknown>[];
 };
 
@@ -15,6 +15,16 @@ export const META_TEMPLATE_LANGS = ["ru", "en"] as const;
 type MetaLang = (typeof META_TEMPLATE_LANGS)[number];
 
 const BODIES: Record<Exclude<MessageKind, "login-code" | "whatsapp-reply">, Record<MetaLang, { text: string; example: string[] }>> = {
+  birthday: {
+    ru: {
+      text: "Mavzunai Jovid: {{1}}, с днём рождения! Дарим вам {{2}} бонусов — ими можно оплатить до {{3}}% визита. Ждём вас в салоне на ул. Бухоро, 23/25.",
+      example: ["Марта", "100", "30"],
+    },
+    en: {
+      text: "Mavzunai Jovid: happy birthday, {{1}}! Here are {{2}} bonus points from us — use them for up to {{3}}% of a visit. See you at 23/25 Bukhoro St.",
+      example: ["Marta", "100", "30"],
+    },
+  },
   "booking-confirmation": {
     ru: {
       text: "Mavzunai Jovid: {{1}}, вы записаны — {{2}}, {{3}}, мастер {{4}}. Ждём вас по адресу: ул. Бухоро, 23/25, Душанбе. Если планы изменятся, просто ответьте на это сообщение.",
@@ -50,7 +60,7 @@ export function metaTemplates(): MetaTemplate[] {
     for (const kind of Object.keys(BODIES) as (keyof typeof BODIES)[]) {
       const t = WHATSAPP_TEMPLATES[kind]!;
       const b = BODIES[kind][lang];
-      out.push({ name: t.name, language: lang, category: "UTILITY", components: [{ type: "BODY", text: b.text, example: { body_text: [b.example] } }] });
+      out.push({ name: t.name, language: lang, category: t.category === "MARKETING" ? "MARKETING" : "UTILITY", components: [{ type: "BODY", text: b.text, example: { body_text: [b.example] } }] });
     }
     // Authentication templates have a text fixed by Meta ("{{1}} is your verification code") with a "copy code" button
     out.push({

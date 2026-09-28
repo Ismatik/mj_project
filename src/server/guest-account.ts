@@ -4,6 +4,7 @@ import { clock } from "@/lib/format";
 import { longDate } from "@/lib/i18n/format";
 import { asLang, type Lang } from "@/lib/i18n/locales";
 import { formatPhone } from "@/lib/phone";
+import { guestBonus } from "./loyalty/core";
 import { namerFor } from "./names";
 
 const CANCEL_LEAD_MS = 2 * 3600_000;
@@ -46,7 +47,9 @@ export async function getGuestAccount(guestId: string, lang: Lang = "ru") {
   const counts = new Map<string, { id: string; name: string; visits: number }>();
   for (const a of past) for (const s of a.staff) counts.set(s.staff.id, { id: s.staff.id, name: name("staff", s.staff.id, s.staff.name), visits: (counts.get(s.staff.id)?.visits ?? 0) + 1 });
 
+  const bonus = await guestBonus(db, guestId, lang);
   return {
+    bonus,
     profile: { name: guest.name, phone: formatPhone(guest.phone), telegram: guest.telegramChats.length > 0, lang: asLang(guest.lang) },
     favourite: guest.favouriteStaff?.active ? { id: guest.favouriteStaff.id, name: name("staff", guest.favouriteStaff.id, guest.favouriteStaff.name), title: guest.favouriteStaff.title } : null,
     upcoming: upcoming.map((a) => ({ ...view(a), canChange: a.startsAt.getTime() - now.getTime() >= CANCEL_LEAD_MS && !!a.serviceId })),

@@ -7,6 +7,8 @@ import { getCurrentUser } from "@/server/auth";
 import { localize } from "@/lib/i18n/content";
 import { getCurrentGuest } from "@/server/guest-auth";
 import { alternates, getLang } from "@/server/lang";
+import { db } from "@/lib/db";
+import { siteOffers } from "@/server/loyalty/core";
 import { getSiteMasters } from "@/server/masters";
 import { getOnlineMenu, type OnlineMenu } from "@/server/online-booking";
 import { getSiteContent, getSitePriceList } from "@/server/site";
@@ -45,13 +47,14 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const lang = await getLang();
   const raw = await getSiteContent(showDraft ? "draft" : "published");
   const content = localize(raw, lang);
-  const [prices, menu, masters, guest] = await Promise.all([
+  const today = todayYmd();
+  const [prices, menu, masters, guest, offers] = await Promise.all([
     getSitePriceList(showDraft ? content.serviceOverrides : {}, lang, content),
     getOnlineMenu(lang),
     getSiteMasters(content, lang),
     getCurrentGuest(),
+    siteOffers(db, today),
   ]);
-  const today = todayYmd();
 
   return (
     <Website
@@ -65,6 +68,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       guest={guest}
       preset={presetFrom(menu, service, master)}
       lang={lang}
+      offers={offers.booking.map((o) => ({ ...o, title: o.titles[lang] }))}
+      promos={offers.shown.map((o) => ({ id: o.id, title: o.titles[lang], description: o.descriptions[lang], kind: o.kind, value: o.value, code: o.code, endsOn: o.endsOn, startsOn: o.startsOn, serviceIds: o.serviceIds }))}
     />
   );
 }

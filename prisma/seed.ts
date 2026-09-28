@@ -30,6 +30,7 @@ function anchorDay(): Ymd {
 async function wipe() {
   await db.$transaction([
     db.outboxMessage.deleteMany(),
+    db.bonusTx.deleteMany(),
     db.giftRedemption.deleteMany(),
     db.payment.deleteMany(),
     db.giftCard.deleteMany(),
@@ -43,6 +44,7 @@ async function wipe() {
     db.dressBooking.deleteMany(),
     db.dress.deleteMany(),
     db.saleItem.deleteMany(),
+    db.promotion.deleteMany(),
     db.sale.deleteMany(),
     db.appointmentStaff.deleteMany(),
     db.appointment.deleteMany(),
@@ -321,6 +323,62 @@ async function main() {
     });
   }
 
+  // Promotions: an automatic autumn offer on skin care (shown on the site) and a promo code for all services
+  const ymdDate = (d: Ymd) => new Date(`${d}T00:00:00Z`);
+  await db.promotion.createMany({
+    data: [
+      {
+        title: "Осенний уход за кожей −20%",
+        titleTg: "Нигоҳубини тирамоҳии пӯст −20%",
+        titleEn: "Autumn skin care −20%",
+        description: "Уход за кожей со скидкой 20% — цена уже со скидкой при записи на сайте и на кассе.",
+        descriptionTg: "Нигоҳубини пӯст бо тахфифи 20% — нарх ҳангоми сабт дар сайт ва дар касса аллакай бо тахфиф аст.",
+        descriptionEn: "Skin care 20% off — the price is already reduced when you book on the website or pay at the salon.",
+        kind: "PERCENT",
+        value: 20,
+        serviceIds: [serviceId.skin!],
+        startsOn: ymdDate(addDays(today, -3)),
+        endsOn: ymdDate(addDays(today, 25)),
+        showOnSite: true,
+      },
+      {
+        title: "Промокод MJ10: −10% на всё",
+        titleTg: "Промокоди MJ10: −10% ба ҳама",
+        titleEn: "Promo code MJ10: 10% off everything",
+        description: "Введите MJ10 при записи на сайте или назовите на кассе.",
+        descriptionTg: "MJ10-ро ҳангоми сабт дар сайт ворид кунед ё дар касса гӯед.",
+        descriptionEn: "Enter MJ10 when booking online or mention it at reception.",
+        kind: "PERCENT",
+        value: 10,
+        serviceIds: [],
+        startsOn: ymdDate(addDays(today, -7)),
+        endsOn: ymdDate(addDays(today, 60)),
+        code: "MJ10",
+        usageLimit: 200,
+        showOnSite: true,
+      },
+    ],
+  });
+
+  // Bonus points: 5 % of every past receipt of a known guest (the "Классика" rate), a few already spent
+  const guestSales = await db.sale.findMany({ where: { guestId: { not: null } }, orderBy: { createdAt: "asc" } });
+  const balance: Record<string, number> = {};
+  for (const s of guestSales) {
+    const earned = Math.floor((s.paid * 5) / 100);
+    if (!earned) continue;
+    await db.sale.update({ where: { id: s.id }, data: { bonusEarned: earned } });
+    await db.bonusTx.create({ data: { guestId: s.guestId!, delta: earned, kind: "EARN", saleId: s.id, createdAt: s.createdAt } });
+    balance[s.guestId!] = (balance[s.guestId!] ?? 0) + earned;
+  }
+  for (const key of ["marta", "gulnora"]) {
+    const id = guestId[key]!;
+    const spend = Math.min(200, balance[id] ?? 0);
+    if (!spend) continue;
+    await db.bonusTx.create({ data: { guestId: id, delta: -spend, kind: "SPEND", note: "Оплата бонусами", createdAt: atSalonTime(addDays(today, -20), "13:00") } });
+    balance[id] -= spend;
+  }
+  for (const [id, b] of Object.entries(balance)) await db.guest.update({ where: { id }, data: { bonusBalance: b } });
+
   // Sign-in accounts (the same demo password for every role; change it after first sign-in)
   const password = process.env.SEED_OWNER_PASSWORD || "change-me-now";
   const hash = await hashPassword(password);
@@ -340,6 +398,7 @@ async function main() {
     appointments: await db.appointment.count(),
     sales: await db.sale.count(),
     dresses: await db.dress.count(),
+    promotions: await db.promotion.count(),
   };
   console.log("Done:", counts);
 }

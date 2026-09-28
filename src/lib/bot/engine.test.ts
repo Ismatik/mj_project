@@ -66,6 +66,8 @@ function makeDeps() {
     },
     staffCode: async () => "MJ-4821",
     formatWhen: (d) => d.toISOString(),
+    bonus: async () => ({ balance: 120, tier: "Серебро", percent: 7, maxSpendPercent: 30 }),
+    offers: async () => [{ title: "Осенний маникюр", description: "", label: "−20%", until: "31 октября 2026", code: null }],
   };
   return { deps, chats, booked, calls };
 }
@@ -83,7 +85,7 @@ describe("Telegram bot", () => {
   it("greets on /start with the main menu", async () => {
     const r = await send({ text: "/start" });
     expect(texts(r)).toContain("Здравствуйте, Зарина!");
-    expect(buttons(r).map((b) => b.data)).toEqual(["book", "my", "prices", "contacts", "lang"]);
+    expect(buttons(r).map((b) => b.data)).toEqual(["book", "my", "prices", "bonus", "offers", "contacts", "lang"]);
   });
 
   it("books a slot end to end, asking for the phone once", async () => {
@@ -177,7 +179,7 @@ describe("Telegram bot", () => {
   it("answers free text with the menu", async () => {
     const r = await send({ text: "привет" });
     expect(texts(r)).toContain("Я понимаю кнопки");
-    expect(buttons(r).length).toBe(5);
+    expect(buttons(r).length).toBe(7);
   });
 });
 
@@ -209,5 +211,15 @@ describe("Telegram bot languages", () => {
     const r = await handleUpdate({ chatId: "7", data: "t:10:00" }, deps);
     expect(r[0]!.askContact).toBe(true);
     expect(r[0]!.contactLabel).toBe("📱 Share my number");
+  });
+});
+
+describe("Telegram bot: bonus and offers", () => {
+  it("shows offers to anyone and points to a known guest", async () => {
+    const { deps } = makeDeps();
+    const offers = await handleUpdate({ chatId: "8", data: "offers" }, deps);
+    expect(texts(offers)).toContain("−20% — Осенний маникюр");
+    const ask = await handleUpdate({ chatId: "8", data: "bonus" }, deps);
+    expect(ask[0]!.askContact).toBe(true);
   });
 });

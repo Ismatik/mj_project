@@ -63,3 +63,8 @@ export function dayMonthYear(d: Date, lang: Lang): string {
   if (lang === "ru") return `${day} ${["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"][m]} ${ymd.slice(0, 4)}`;
   return `${day} ${MONTHS_LONG[lang][m]} ${ymd.slice(0, 4)}`;
 }
+
+/** "−20%" or "−50 c." for a promotion */
+export function offerLabel(o: { kind: "PERCENT" | "FIXED"; value: number }, lang: Lang): string {
+  return o.kind === "PERCENT" ? `−${o.value}%` : `−${somoni(o.value, lang)}`;
+}

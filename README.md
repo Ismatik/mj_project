@@ -106,7 +106,7 @@ Guests book, see, move and cancel their visits in Telegram; reception gets alert
 Guests without Telegram get their confirmation, reminders and sign-in codes in WhatsApp (Cloud API, `src/server/integrations/whatsapp-api.ts`).
 
 - Step-by-step setup in Meta (account, number, token, webhook, costs): **`docs/whatsapp-setup.md`**. The templates are prepared in `src/lib/whatsapp-templates.ts` and submitted for approval from CMS → Интеграции → Шаблоны сообщений → «Отправить шаблоны в Meta» (needs `WHATSAPP_WABA_ID`); their approval status shows there.
-- WhatsApp only lets a business write first with templates approved by Meta. Create them in WhatsApp Manager with the names and parameter order shown on the templates page (`mj_booking_confirmation`, `mj_reminder_day`, `mj_reminder_hours`, `mj_login_code` — the last one in the *Authentication* category). Tajik guests get the Russian template on WhatsApp unless Meta accepts Tajik.
+- WhatsApp only lets a business write first with templates approved by Meta. Create them in WhatsApp Manager with the names and parameter order shown on the templates page (`mj_booking_confirmation`, `mj_reminder_day`, `mj_reminder_hours`, `mj_birthday` — *Marketing*, `mj_login_code` — *Authentication*). Tajik guests get the Russian template on WhatsApp unless Meta accepts Tajik.
 - Webhook `https://SITE_DOMAIN/api/whatsapp/webhook`: verified with `WHATSAPP_VERIFY_TOKEN`, every request checked against `WHATSAPP_APP_SECRET`. It records delivery failures in the outbox, forwards guests' WhatsApp messages to reception (Telegram) and sends her a short auto-reply at most every 12 hours.
 - Going live: Meta Business verification and a Cloud API number; put `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` in `.env`; restart; set the webhook in Meta (field `messages`); CMS → Интеграции → WhatsApp → "Тест" (sends Meta's `hello_world` template) and "Живой".
 
@@ -116,7 +116,14 @@ Guests without Telegram get their confirmation, reminders and sign-in codes in W
 - **Gift certificates:** sold on the website (`/podarok`, in all three languages) or in CMS → **Сертификаты и оплаты**. Codes look like `MJ-XXXX-XXXX`, are valid 12 months and can be used in parts. At the till, type the code in the receipt: prepayment first, then the certificate, the rest with cash / card / QR. The certificate is an A5 PDF in MJ style with a QR code (`/api/gift/<token>/pdf`, fonts in `assets/fonts`). The QR opens `/sertifikat/<token>` with the balance.
 - **Payments:** `Payment` records prepayments and certificate sales. Until a bank is connected, online payments go through the **test checkout** (`/oplata/<id>`, no money charged). A bank driver later only has to call `markPaid` / `cancelPayment` (`src/server/payments/core.ts`).
 
+## Bonus points and promotions
+
+- **Points:** 1 point = 1 somoni. A guest earns a share of what she actually paid (cash, card, QR, online prepayment — not points or certificates) by her level over the last 12 months: Классика 5 %, Серебро 7 % from 5 000 c., Золото 10 % from 15 000 c. Points can pay up to 30 % of a receipt. On her birthday the worker adds 100 points and sends a greeting (`npm run birthdays` runs it by hand). All of this is set in CMS → **Бонусы и акции** (owner only). Every change is a line in the `BonusTx` ledger.
+- **At the till:** pick the guest from a booking or find her by phone; the receipt shows her points and "списать" up to the limit. Order: prepayment, certificate, points, then cash / card / QR. The owner can add or take points by hand in the guest card, with a reason.
+- **Promotions:** an offer without a code applies by itself to its services and dates — in online booking (old price struck through), in the bot and at the till. A promo code (e.g. `MJ10`) applies when typed in the booking form or at the till; it can have a usage limit. Offers marked "на сайте" appear in the website's «Акции» section and in the bot (✦ Акции), in all three languages.
+- Guests see their points, level and history in `/kabinet` and in the bot (🎁 Бонусы).
+
 ## Tests
 
-- `npm test` — unit tests (booking rules, free slots, formatting, access, content, translations, bot, message templates, WhatsApp payloads and webhook parsing).
-- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates (see `e2e/README.md`).
+- `npm test` — unit tests (booking rules, free slots, formatting, access, content, translations, bot, message templates, bonus points and promotions, WhatsApp payloads and webhook parsing).
+- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates, bonus points and promotions (see `e2e/README.md`).

@@ -4,8 +4,8 @@
 // a WhatsApp template name and the order of its {{1}}, {{2}}… parameters.
 import type { Lang } from "./i18n/locales";
 
-export type MessageKind = "booking-confirmation" | "reminder-day" | "reminder-hours" | "login-code" | "whatsapp-reply";
-export type MessageVars = Partial<Record<"name" | "service" | "when" | "time" | "master" | "address" | "code" | "link", string>>;
+export type MessageKind = "booking-confirmation" | "reminder-day" | "reminder-hours" | "login-code" | "whatsapp-reply" | "birthday";
+export type MessageVars = Partial<Record<"name" | "service" | "when" | "time" | "master" | "address" | "code" | "link" | "points" | "percent", string>>;
 export type Templates = Partial<Record<MessageKind, Partial<Record<Lang, string>>>>;
 
 export const MESSAGE_KINDS: { kind: MessageKind; title: string; hint: string; vars: (keyof MessageVars)[] }[] = [
@@ -13,6 +13,7 @@ export const MESSAGE_KINDS: { kind: MessageKind; title: string; hint: string; va
   { kind: "reminder-day", title: "Напоминание за день", hint: "За 20–26 часов до визита", vars: ["name", "service", "when", "time", "master", "address"] },
   { kind: "reminder-hours", title: "Напоминание в день визита", hint: "За 1–3 часа до визита", vars: ["name", "service", "time", "master", "address"] },
   { kind: "login-code", title: "Код входа в личный кабинет", hint: "Вход на сайте по номеру телефона", vars: ["code"] },
+  { kind: "birthday", title: "Поздравление с днём рождения", hint: "Утром в день рождения, вместе с подарочными бонусами", vars: ["name", "points", "percent"] },
   { kind: "whatsapp-reply", title: "Автоответ в WhatsApp", hint: "Когда гостья пишет в WhatsApp (не чаще раза в 12 часов); её сообщение уходит ресепшену", vars: ["name", "link"] },
 ];
 
@@ -37,6 +38,11 @@ export const DEFAULT_TEMPLATES: Record<MessageKind, Record<Lang, string>> = {
     tg: "Mavzunai Jovid: рамзи воридшавӣ ба кабинети шахсӣ — {code}. Онро ба касе нагӯед.",
     en: "Mavzunai Jovid: your sign-in code is {code}. Don't share it with anyone.",
   },
+  birthday: {
+    ru: "Mavzunai Jovid ✦ {name}, с днём рождения! Дарим вам {points} бонусов — ими можно оплатить до {percent}% визита. Ждём вас!",
+    tg: "Mavzunai Jovid ✦ {name}, зодрӯзатон муборак! Ба шумо {points} бонус тӯҳфа мекунем — бо онҳо то {percent}% ташрифро пардохт кардан мумкин аст. Шуморо интизорем!",
+    en: "Mavzunai Jovid ✦ Happy birthday, {name}! Here are {points} bonus points from us — use them for up to {percent}% of a visit. We look forward to seeing you!",
+  },
   "whatsapp-reply": {
     ru: "Mavzunai Jovid: спасибо за сообщение! Администратор ответит в рабочее время (Вт–Вс, 09:00–18:00). Запись: {link}",
     tg: "Mavzunai Jovid: ташаккур барои паём! Маъмур дар вақти корӣ (Сш–Яш, 09:00–18:00) ҷавоб медиҳад. Сабт: {link}",
@@ -46,7 +52,8 @@ export const DEFAULT_TEMPLATES: Record<MessageKind, Record<Lang, string>> = {
 
 /** WhatsApp templates to create in Meta Business Manager (same names in every language). The auto-reply needs none:
  * it answers within 24 hours of her message, when free text is allowed. */
-export const WHATSAPP_TEMPLATES: Partial<Record<MessageKind, { name: string; category: "UTILITY" | "AUTHENTICATION"; params: (keyof MessageVars)[] }>> = {
+export const WHATSAPP_TEMPLATES: Partial<Record<MessageKind, { name: string; category: "UTILITY" | "AUTHENTICATION" | "MARKETING"; params: (keyof MessageVars)[] }>> = {
+  birthday: { name: "mj_birthday", category: "MARKETING", params: ["name", "points", "percent"] },
   "booking-confirmation": { name: "mj_booking_confirmation", category: "UTILITY", params: ["name", "service", "when", "master"] },
   "reminder-day": { name: "mj_reminder_day", category: "UTILITY", params: ["when", "service", "master"] },
   "reminder-hours": { name: "mj_reminder_hours", category: "UTILITY", params: ["time", "service", "master"] },

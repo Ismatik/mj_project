@@ -22,7 +22,7 @@ const plural = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? "гостья" :
 
 // "Книга гостей" — design isCrm.
 export default async function GuestsPage({ searchParams }: PageProps<"/cms/guests">) {
-  await requirePage("guests", "/cms/guests");
+  const user = await requirePage("guests", "/cms/guests");
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q : "";
   const tag = (FILTERS.find((f) => f.key === sp.tag)?.key ?? "all") as GuestFilter;
@@ -43,7 +43,7 @@ export default async function GuestsPage({ searchParams }: PageProps<"/cms/guest
     <div>
       <PageHead title="Книга гостей" meta={`${book.total} ${plural(book.total)} · ${book.newThisMonth} новых в ${book.monthPrep}`} />
 
-      {card && <GuestCard key={card.id} guest={card} closeHref={href({})} />}
+      {card && <GuestCard key={card.id} guest={card} closeHref={href({})} isOwner={user.role === "OWNER"} />}
 
       <div className={s.toolbar}>
         <div className={s.filters} aria-label="Статус гостьи">

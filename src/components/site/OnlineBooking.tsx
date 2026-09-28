@@ -2,10 +2,12 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useFx } from "@/components/fx/FxProvider";
-import { bookOnline, getSlots, requestCallback, type OnlineBookingResult } from "@/app/site-actions";
+import { bookOnline, checkPromo, getSlots, requestCallback, type OnlineBookingResult } from "@/app/site-actions";
+import { loyaltyDict } from "@/lib/i18n/dict-loyalty";
+import { bestOffer, promoPrice, type PromoLike } from "@/lib/loyalty";
 import { dict } from "@/lib/i18n/dict";
 import { moneyDict } from "@/lib/i18n/dict-money";
-import { duration, MONTHS, somoni, WEEKDAYS } from "@/lib/i18n/format";
+import { duration, MONTHS, offerLabel, somoni, WEEKDAYS } from "@/lib/i18n/format";
 import { localePath, type Lang } from "@/lib/i18n/locales";
 import { normalizePhone } from "@/lib/phone";
 import { weekdayOf } from "@/lib/time";
@@ -13,6 +15,8 @@ import type { OnlineMenu } from "@/server/online-booking";
 import s from "./booking.module.css";
 
 type Done = Extract<OnlineBookingResult, { ok: true }>;
+/** Automatic offers shown in the form (the server applies them again when booking) */
+export type Offer = PromoLike & { title: string };
 /** Pre-selected service and master ("Записаться снова", a master's page) */
 export type BookingPreset = { serviceId?: string; staffId?: string | null };
 
@@ -27,6 +31,7 @@ export function OnlineBooking({
   preset,
   guest,
   lang,
+  offers = [],
 }: {
   menu: OnlineMenu;
   dates: string[];
@@ -34,7 +39,9 @@ export function OnlineBooking({
   preset?: BookingPreset;
   guest?: { name: string; phone: string; favouriteStaffId?: string | null } | null;
   lang: Lang;
+  offers?: Offer[];
 }) {
+  const lt = loyaltyDict(lang);
   const t = dict(lang);
   const b = t.booking;
   const m = moneyDict(lang).pay;
@@ -56,6 +63,15 @@ export function OnlineBooking({
   const [error, setError] = useState<{ field?: string; text: string } | null>(null);
   const [done, setDone] = useState<Done | null>(null);
   const [callback, setCallback] = useState<"closed" | "open" | "sent">("closed");
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [promo, setPromo] = useState<{ code: string; title: string; price: number; fullPrice: number } | null>(null);
+  const [promoError, setPromoError] = useState("");
+  /** Price on the chosen day after the best automatic offer */
+  const priceOn = (sv: { id: string; price: number }) => {
+    const o = bestOffer(offers, sv.id, sv.price, date);
+    return o ? { ...promoPrice(sv.price, o), offer: o } : null;
+  };
 
   const service = menu.flatMap((c) => c.services).find((x) => x.id === serviceId);
   const category = menu.find((c) => c.id === catId);
@@ -77,6 +93,8 @@ export function OnlineBooking({
     setSlots(null);
     setTime("");
     setError(null);
+    setPromo(null);
+    setPromoError("");
   };
 
   const nameError = name.trim().length < 2 ? t.errors.name : "";
@@ -91,7 +109,7 @@ export function OnlineBooking({
     if (preview) return setError({ text: b.preview });
     setSending(true);
     try {
-      const res = await bookOnline({ serviceId, staffId, date, time, name, phone, company });
+      const res = await bookOnline({ serviceId, staffId, date, time, name, phone, company, promoCode: promo?.code ?? null });
       if (!res.ok) {
         setError({ field: res.field, text: res.error });
         if (res.field === "slot") {
@@ -116,6 +134,7 @@ export function OnlineBooking({
         <div className={s.doneKicker}>{b.doneKicker}</div>
         <div className={s.doneTitle}>{b.doneTitle(done.summary.name)}</div>
         <p className={s.doneText}>{b.doneText(done.summary)}</p>
+        {done.promo && <p className={s.doneText}>{lt.promo.applied(done.promo.title, somoni(done.promo.price, lang), somoni(done.promo.fullPrice, lang))}</p>}
         {done.payment && (
           <>
             <p className={s.doneText}>
@@ -215,7 +234,17 @@ export function OnlineBooking({
             >
               <span className={s.serviceName}>{x.name}</span>
               <span className={s.serviceMeta}>
-                {duration(x.durationMin, lang)} · <b>{somoni(x.price, lang)}</b>
+                {duration(x.durationMin, lang)} ·{" "}
+                {(() => {
+                  const d = priceOn(x);
+                  return d ? (
+                    <>
+                      <s>{somoni(x.price, lang)}</s> <b>{somoni(d.price, lang)}</b> <em className={s.offerBadge}>{lt.offers.inBooking(offerLabel(d.offer, lang))}</em>
+                    </>
+                  ) : (
+                    <b>{somoni(x.price, lang)}</b>
+                  );
+                })()}
               </span>
             </button>
           ))}
@@ -301,6 +330,39 @@ export function OnlineBooking({
                 {floating("name", b.name, name, setName, nameError, "text", "given-name")}
                 {floating("phone", b.phone, phone, setPhone, phoneError, "tel", "tel")}
               </div>
+              {promo ? (
+                <div className={s.promoApplied} role="status">
+                  <span>{lt.promo.applied(promo.title, somoni(promo.price, lang), somoni(promo.fullPrice, lang))}</span>
+                  <button type="button" className={s.linkBtn} onClick={() => setPromo(null)}>
+                    {lt.promo.remove}
+                  </button>
+                </div>
+              ) : promoOpen ? (
+                <div className={s.promo}>
+                  <input aria-label={lt.promo.label} placeholder={lt.promo.label} value={promoInput} onChange={(e) => setPromoInput(e.target.value)} />
+                  <button
+                    type="button"
+                    disabled={!promoInput.trim()}
+                    onClick={async () => {
+                      setPromoError("");
+                      const res = await checkPromo(promoInput, serviceId, date);
+                      if (!res.ok) return setPromoError(res.error);
+                      setPromo({ code: promoInput, title: res.title, price: res.price, fullPrice: res.fullPrice });
+                    }}
+                  >
+                    {lt.promo.apply}
+                  </button>
+                  {promoError && (
+                    <div role="alert" className={s.error}>
+                      {promoError}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button type="button" className={s.linkBtn} onClick={() => setPromoOpen(true)}>
+                  {lt.promo.have}
+                </button>
+              )}
             </fieldset>
           )}
         </>
@@ -379,3 +441,5 @@ function Callback({
     </div>
   );
 }
+
+/** "−20%" or "−50 c." */

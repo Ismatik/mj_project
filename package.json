@@ -14,6 +14,7 @@
     "test": "vitest run",
     "typecheck": "next typegen && tsc --noEmit",
     "worker": "tsx worker/index.ts",
+    "birthdays": "tsx worker/birthdays.ts",
     "e2e": "node e2e/run-all.mjs"
   },
   "dependencies": {

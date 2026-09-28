@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { dict } from "@/lib/i18n/dict";
 import { moneyDict } from "@/lib/i18n/dict-money";
+import { loyaltyDict } from "@/lib/i18n/dict-loyalty";
 import { MONTHS, somoni, WEEKDAYS } from "@/lib/i18n/format";
 import { LANG_NAME, LANGS, localePath, type Lang } from "@/lib/i18n/locales";
 import { weekdayOf } from "@/lib/time";
@@ -92,6 +93,7 @@ export function Account({ account, dates, masters, botLink, lang }: { account: G
         </div>
 
         <aside className={s.side}>
+          {account.bonus.enabled && <BonusCard bonus={account.bonus} lang={lang} />}
           <Favourite favourite={favourite} visited={visitedMasters} masters={masters} lang={lang} />
           <div className={s.card}>
             <div className={s.cardLabel}>{t.reminders}</div>
@@ -281,6 +283,42 @@ function Favourite({ favourite, visited, masters, lang }: { favourite: GuestAcco
       <Link href={localePath(lang, "/mastera")} className={s.cardLink}>
         {t.allMasters}
       </Link>
+    </div>
+  );
+}
+
+function BonusCard({ bonus, lang }: { bonus: GuestAccount["bonus"]; lang: Lang }) {
+  const t = loyaltyDict(lang).bonus;
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={s.card} aria-label={t.title}>
+      <div className={s.cardLabel}>{t.title}</div>
+      <div className={s.points}>{t.points(bonus.balance)}</div>
+      <p className={s.cardText}>{t.tier(bonus.tier.name, bonus.tier.percent)}</p>
+      <p className={s.cardText}>{bonus.next ? t.next(bonus.next.name, somoni(bonus.next.remaining, lang), bonus.next.percent) : t.top}</p>
+      <p className={s.hint}>{t.how(bonus.maxSpendPercent)}</p>
+      {bonus.history.length > 0 ? (
+        <>
+          <button type="button" className={s.linkBtn} onClick={() => setOpen(!open)}>
+            {t.history}
+          </button>
+          {open && (
+            <ul className={s.bonusList}>
+              {bonus.history.map((h) => (
+                <li key={h.id}>
+                  <span>
+                    {t.kinds[h.kind] ?? h.kind}
+                    {h.receipt ? ` · ${t.receipt(h.receipt)}` : ""}
+                  </span>
+                  <b>{h.delta > 0 ? `+${h.delta}` : h.delta}</b>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      ) : (
+        <p className={s.hint}>{t.none}</p>
+      )}
     </div>
   );
 }

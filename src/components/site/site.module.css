@@ -1131,6 +1131,62 @@
   color: var(--mj-gold);
 }
 
+/* Offers */
+.offers {
+  max-width: 1100px;
+  margin: 44px auto 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px;
+}
+.offer {
+  background: var(--mj-paper);
+  border-top: 2px solid var(--mj-gold);
+  padding: 26px 26px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+.offerValue {
+  font-family: var(--mj-serif);
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1;
+}
+.offerTitle {
+  font-family: var(--mj-serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 6px 0 0;
+}
+.offerText {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--mj-text-2);
+  margin: 0;
+}
+.offerMeta {
+  font-size: 12px;
+  color: var(--mj-gold-deep);
+  letter-spacing: 0.04em;
+}
+.offerCode {
+  font-size: 13px;
+  border: 1px dashed var(--mj-gold);
+  padding: 6px 10px;
+}
+.offerCode b {
+  letter-spacing: 0.12em;
+}
+.offer .textLink {
+  margin-top: auto;
+  padding-top: 6px;
+}
+
 /* Gift certificate promo */
 .giftPromo {
   background: var(--mj-ink);

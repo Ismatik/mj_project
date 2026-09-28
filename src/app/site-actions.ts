@@ -7,9 +7,12 @@ import { formatPhone, normalizePhone } from "@/lib/phone";
 import { BOOKING_HORIZON_DAYS } from "@/lib/slots";
 import { addDays, isClosed, todayYmd } from "@/lib/time";
 import { dict } from "@/lib/i18n/dict";
+import { loyaltyDict } from "@/lib/i18n/dict-loyalty";
+import { normalizePromoCode, promoApplies, promoPrice } from "@/lib/loyalty";
 import { LANG_NAME, localePath, type Lang } from "@/lib/i18n/locales";
 import { getCurrentGuest } from "@/server/guest-auth";
 import { getLang } from "@/server/lang";
+import { promotionsBetween } from "@/server/loyalty/core";
 import { createGuestBooking, slotsFor } from "@/server/online-booking";
 import { tooManyAttempts } from "@/server/rate-limit";
 
@@ -37,9 +40,23 @@ export async function getSlots(serviceId: string, date: string, staffId?: string
   return slots.map((s) => ({ time: s.time, staffIds: s.staffIds }));
 }
 
-export type OnlineBookingInput = { serviceId: string; staffId?: string | null; date: string; time: string; name: string; phone: string; company?: string };
+export type OnlineBookingInput = {
+  serviceId: string;
+  staffId?: string | null;
+  date: string;
+  time: string;
+  name: string;
+  phone: string;
+  company?: string;
+  promoCode?: string | null;
+};
 export type OnlineBookingResult =
-  | { ok: true; summary: { name: string; service: string; master: string; when: string; phone: string }; payment?: { amount: number; payBy: string; url: string } }
+  | {
+      ok: true;
+      summary: { name: string; service: string; master: string; when: string; phone: string };
+      payment?: { amount: number; payBy: string; url: string };
+      promo?: { title: string; price: number; fullPrice: number };
+    }
   | { ok: false; field?: "name" | "phone" | "slot"; error: string };
 
 /**
@@ -67,7 +84,7 @@ export async function bookOnline(input: OnlineBookingInput): Promise<OnlineBooki
   // Signed in to her account with the same number → the booking goes to her guest card
   const guest = await getCurrentGuest();
   const guestId = guest && guest.phone === phone ? guest.id : undefined;
-  const result = await createGuestBooking({ serviceId: String(input.serviceId), staffId: wantedStaff, date, time, name, phone, source: "WEBSITE", guestId, lang });
+  const result = await createGuestBooking({ serviceId: String(input.serviceId), staffId: wantedStaff, date, time, name, phone, source: "WEBSITE", guestId, lang, promoCode: input.promoCode ? String(input.promoCode).slice(0, 40) : null });
   if (result.ok) {
     revalidatePath("/cms", "layout");
     if (guestId) revalidatePath("/kabinet");
@@ -76,6 +93,7 @@ export async function bookOnline(input: OnlineBookingInput): Promise<OnlineBooki
   return {
     ok: true,
     summary: result.summary,
+    ...(result.promo ? { promo: result.promo } : {}),
     ...(result.payment ? { payment: { amount: result.payment.amount, payBy: result.payment.payBy, url: localePath(lang, `/oplata/${result.payment.id}`) } } : {}),
   };
 }
@@ -99,4 +117,19 @@ export async function requestCallback(input: { name: string; phone: string; serv
   });
   revalidatePath("/cms", "layout");
   return { ok: true };
+}
+
+/** Public: does this promo code work for the service on that day, and what is the price then? */
+export async function checkPromo(code: string, serviceId: string, date: string): Promise<{ ok: true; title: string; price: number; fullPrice: number } | { ok: false; error: string }> {
+  const lang = await getLang();
+  const pe = loyaltyDict(lang).promo;
+  if (tooManyAttempts(`promo:${await clientIp()}`, 30, 3600_000)) return { ok: false, error: dict(lang).errors.tooMany };
+  const norm = normalizePromoCode(String(code ?? ""));
+  if (!norm || dateError(String(date), lang)) return { ok: false, error: pe.invalid };
+  const service = await db.service.findFirst({ where: { id: String(serviceId), active: true, showOnSite: true } });
+  if (!service) return { ok: false, error: pe.invalid };
+  const promo = (await promotionsBetween(db, String(date))).find((p) => p.code === norm);
+  if (!promo) return { ok: false, error: (await db.promotion.findUnique({ where: { code: norm } })) ? pe.invalid : pe.unknown };
+  if (!promoApplies(promo, service.id, String(date))) return { ok: false, error: pe.invalid };
+  return { ok: true, title: promo.titles[lang], price: promoPrice(service.price, promo).price, fullPrice: service.price };
 }

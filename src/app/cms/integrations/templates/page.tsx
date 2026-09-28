@@ -53,7 +53,7 @@ export default async function TemplatesPage() {
                 <tr key={`${t.name}-${t.language}`}>
                   <td>
                     <code>{t.name}</code>
-                    <div className={s.small}>{t.category === "AUTHENTICATION" ? "Authentication" : "Utility"}</div>
+                    <div className={s.small}>{t.category === "AUTHENTICATION" ? "Authentication" : t.category === "MARKETING" ? "Marketing" : "Utility"}</div>
                   </td>
                   <td>{t.language}</td>
                   <td className={s.waText}>{templatePreview(t)}</td>
