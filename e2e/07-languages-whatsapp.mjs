@@ -1,7 +1,7 @@
 // Russian / Tajik / English website, admin translations, message templates, bot language and the live WhatsApp driver.
 // Run against a freshly seeded app started with a stand-in for Meta's API (see e2e/README.md):
 //   WHATSAPP_TOKEN=test-token WHATSAPP_PHONE_ID=10001 WHATSAPP_APP_SECRET=test-app-secret WHATSAPP_VERIFY_TOKEN=test-verify
-//   WHATSAPP_API_BASE=http://127.0.0.1:3999 DEMO_LOGIN_CODES=1
+//   WHATSAPP_API_BASE=http://127.0.0.1:3999 WHATSAPP_WABA_ID=20002 DEMO_LOGIN_CODES=1
 import { createHmac } from 'node:crypto';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -17,13 +17,24 @@ mkdirSync(out, { recursive: true });
 
 // Stand-in for graph.facebook.com: records what the app sends
 const sent = [];
+const templates = [];
 const meta = createServer((req, res) => {
   let body = '';
   req.on('data', (c) => (body += c));
   req.on('end', () => {
     const json = JSON.parse(body || '{}');
-    sent.push({ url: req.url, auth: req.headers.authorization, json });
     res.setHeader('Content-Type', 'application/json');
+    // Message templates of the WhatsApp Business Account
+    if (req.url.includes('/message_templates')) {
+      if (req.method === 'GET') return res.end(JSON.stringify({ data: templates.map((t) => ({ name: t.name, language: t.language, status: 'PENDING', category: t.category })) }));
+      if (templates.some((t) => t.name === json.name && t.language === json.language)) {
+        res.statusCode = 400;
+        return res.end(JSON.stringify({ error: { message: 'Message template already exists', code: 100, error_subcode: 2388024 } }));
+      }
+      templates.push(json);
+      return res.end(JSON.stringify({ id: `tpl${templates.length}`, status: 'PENDING', category: json.category }));
+    }
+    sent.push({ url: req.url, auth: req.headers.authorization, json });
     res.end(JSON.stringify({ messaging_product: 'whatsapp', contacts: [{ wa_id: json.to }], messages: [{ id: `wamid.TEST${sent.length}` }] }));
   });
 });
@@ -137,6 +148,17 @@ try {
   await owner.click('button:has-text("Сохранить шаблоны")');
   await owner.waitForSelector('text=Шаблоны сохранены');
   check('template saved', (await owner.textContent('main')).includes('Marta, see you Wednesday'));
+
+  // WhatsApp templates go to Meta from the CMS; a second press finds them already there
+  await owner.click('button:has-text("Отправить шаблоны в Meta")');
+  await owner.waitForSelector('[role=status]:has-text("Готово")');
+  check('templates submitted to Meta', templates.length === 8 && (await owner.textContent('[role=status]:has-text("Готово")')).includes('отправлено 8'), String(templates.length));
+  check('auth template in Meta format', templates.some((t) => t.name === 'mj_login_code' && t.category === 'AUTHENTICATION' && t.language === 'ru'));
+  await owner.reload();
+  check('approval status shown', (await owner.$$('text=на проверке')).length === 8);
+  await owner.click('button:has-text("Отправить шаблоны в Meta")');
+  await owner.waitForSelector('[role=status]:has-text("уже были 8")');
+  check('resubmitting is harmless', templates.length === 8);
 
   await owner.goto(BASE + '/cms/integrations/telegram');
   await owner.click('button:has-text("Сбросить")').catch(() => {});

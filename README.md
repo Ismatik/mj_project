@@ -105,6 +105,7 @@ Guests book, see, move and cancel their visits in Telegram; reception gets alert
 
 Guests without Telegram get their confirmation, reminders and sign-in codes in WhatsApp (Cloud API, `src/server/integrations/whatsapp-api.ts`).
 
+- Step-by-step setup in Meta (account, number, token, webhook, costs): **`docs/whatsapp-setup.md`**. The templates are prepared in `src/lib/whatsapp-templates.ts` and submitted for approval from CMS → Интеграции → Шаблоны сообщений → «Отправить шаблоны в Meta» (needs `WHATSAPP_WABA_ID`); their approval status shows there.
 - WhatsApp only lets a business write first with templates approved by Meta. Create them in WhatsApp Manager with the names and parameter order shown on the templates page (`mj_booking_confirmation`, `mj_reminder_day`, `mj_reminder_hours`, `mj_login_code` — the last one in the *Authentication* category). Tajik guests get the Russian template on WhatsApp unless Meta accepts Tajik.
 - Webhook `https://SITE_DOMAIN/api/whatsapp/webhook`: verified with `WHATSAPP_VERIFY_TOKEN`, every request checked against `WHATSAPP_APP_SECRET`. It records delivery failures in the outbox, forwards guests' WhatsApp messages to reception (Telegram) and sends her a short auto-reply at most every 12 hours.
 - Going live: Meta Business verification and a Cloud API number; put `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` in `.env`; restart; set the webhook in Meta (field `messages`); CMS → Интеграции → WhatsApp → "Тест" (sends Meta's `hello_world` template) and "Живой".

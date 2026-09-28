@@ -98,3 +98,50 @@ export function parseWebhook(body: unknown): { statuses: WaStatus[]; messages: W
   }
   return { statuses, messages };
 }
+
+// ─── Message templates (WhatsApp Business Account) ────────────────────────────
+
+export type TemplateStatus = { name: string; language: string; status: string; category?: string; reason?: string };
+
+async function graph<T>(path: string, init?: { method?: string; body?: unknown }): Promise<{ ok: true; data: T } | { ok: false; error: string; code?: number; subcode?: number }> {
+  const token = process.env.WHATSAPP_TOKEN;
+  if (!token) return { ok: false, error: "WHATSAPP_TOKEN is not set" };
+  try {
+    const res = await fetch(`${apiBase()}/${apiVersion()}/${path}`, {
+      method: init?.method ?? "GET",
+      headers: { Authorization: `Bearer ${token}`, ...(init?.body ? { "Content-Type": "application/json" } : {}) },
+      body: init?.body ? JSON.stringify(init.body) : undefined,
+      signal: AbortSignal.timeout(15_000),
+    });
+    const json = (await res.json().catch(() => ({}))) as T & { error?: { message?: string; code?: number; error_subcode?: number; error_user_msg?: string } };
+    if (res.ok && !json.error) return { ok: true, data: json };
+    const e = json.error;
+    return { ok: false, error: e?.error_user_msg || e?.message || `HTTP ${res.status}`, code: e?.code, subcode: e?.error_subcode };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "network error" };
+  }
+}
+
+/** Submits one template for Meta's review. An existing template with the same name and language counts as done. */
+export async function waCreateTemplate(t: { name: string; language: string; category: string; components: unknown[] }): Promise<{ ok: boolean; status: string; error?: string }> {
+  const waba = process.env.WHATSAPP_WABA_ID;
+  if (!waba) return { ok: false, status: "ERROR", error: "WHATSAPP_WABA_ID is not set" };
+  const res = await graph<{ id: string; status: string }>(`${waba}/message_templates`, { method: "POST", body: t });
+  if (res.ok) return { ok: true, status: res.data.status ?? "PENDING" };
+  if (/already exists|существует/i.test(res.error) || res.subcode === 2388023 || res.subcode === 2388024) return { ok: true, status: "EXISTS" };
+  return { ok: false, status: "ERROR", error: res.error };
+}
+
+/** Review status of the account's templates (APPROVED, PENDING, REJECTED…). */
+export async function waListTemplates(): Promise<{ ok: true; templates: TemplateStatus[] } | { ok: false; error: string }> {
+  const waba = process.env.WHATSAPP_WABA_ID;
+  if (!waba) return { ok: false, error: "WHATSAPP_WABA_ID is not set" };
+  const res = await graph<{ data: { name: string; language: string; status: string; category?: string; rejected_reason?: string }[] }>(
+    `${waba}/message_templates?fields=name,language,status,category,rejected_reason&limit=200`,
+  );
+  if (!res.ok) return { ok: false, error: res.error };
+  return {
+    ok: true,
+    templates: res.data.data.map((t) => ({ name: t.name, language: t.language, status: t.status, category: t.category, reason: t.rejected_reason && t.rejected_reason !== "NONE" ? t.rejected_reason : undefined })),
+  };
+}

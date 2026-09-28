@@ -1,16 +1,25 @@
 import Link from "next/link";
 import { PageHead } from "@/components/ui/Headings";
 import { db } from "@/lib/db";
-import { DEFAULT_TEMPLATES, MESSAGE_KINDS, normalizeTemplates, WHATSAPP_LANG, WHATSAPP_TEMPLATES } from "@/lib/messages";
+import { DEFAULT_TEMPLATES, MESSAGE_KINDS, normalizeTemplates } from "@/lib/messages";
+import { metaTemplates, templatePreview } from "@/lib/whatsapp-templates";
 import { requirePage } from "@/server/auth";
 import { TEMPLATES_SETTING } from "@/server/integrations/guest-messages";
+import { waListTemplates } from "@/server/integrations/whatsapp-api";
+import { SubmitTemplates } from "./SubmitTemplates";
 import { TemplatesEditor } from "./TemplatesEditor";
 import s from "./templates.module.css";
+
+const STATUS_LABEL: Record<string, string> = { NONE: "не отправлен", PENDING: "на проверке", APPROVED: "одобрен ✓", REJECTED: "отклонён", PAUSED: "приостановлен", DISABLED: "отключён" };
 
 // Texts of messages to guests in Russian, Tajik and English.
 export default async function TemplatesPage() {
   await requirePage("integrations", "/cms/integrations/templates");
   const row = await db.setting.findUnique({ where: { key: TEMPLATES_SETTING } });
+  const configured = !!process.env.WHATSAPP_TOKEN && !!process.env.WHATSAPP_WABA_ID;
+  const listed = configured ? await waListTemplates() : null;
+  const statuses = listed?.ok ? listed.templates : [];
+  const listError = listed && !listed.ok ? listed.error : null;
   return (
     <div>
       <PageHead title="Шаблоны сообщений" meta="Подтверждения, напоминания и коды входа — на языке гостьи" />
@@ -20,41 +29,43 @@ export default async function TemplatesPage() {
       <TemplatesEditor kinds={MESSAGE_KINDS} defaults={DEFAULT_TEMPLATES} initial={normalizeTemplates(row?.value)} />
 
       <section className={s.wa} aria-labelledby="wa-title">
-        <h2 id="wa-title">Шаблоны для WhatsApp Business</h2>
+        <h2 id="wa-title">Шаблоны WhatsApp для Meta</h2>
         <p>
-          WhatsApp разрешает первым писать гостье только по шаблонам, одобренным Meta. Создайте их в WhatsApp Manager с этими названиями и тем же текстом, что выше,
-          заменив переменные на {"{{1}}"}, {"{{2}}"}… в указанном порядке. Пока шаблон не одобрен, сообщения в WhatsApp не уйдут — Telegram работает без шаблонов.
+          WhatsApp разрешает первым писать гостье только по шаблонам, одобренным Meta. Тексты ниже уже подготовлены в формате Meta (русский и английский;
+          таджикским гостьям в WhatsApp уходит русский вариант). Кнопка отправляет их на проверку — обычно она занимает от нескольких минут до суток. Пошаговая
+          инструкция — в <code>docs/whatsapp-setup.md</code>.
         </p>
+        <SubmitTemplates configured={configured} />
+        {listError && <p className={s.small}>Статус из Meta не получен: {listError}</p>}
         <table>
           <thead>
             <tr>
-              <th>Сообщение</th>
-              <th>Название шаблона</th>
-              <th>Категория</th>
-              <th>Параметры</th>
+              <th>Шаблон</th>
+              <th>Язык</th>
+              <th>Текст</th>
+              <th>Статус в Meta</th>
             </tr>
           </thead>
           <tbody>
-            {MESSAGE_KINDS.map(({ kind, title }) => {
-              const t = WHATSAPP_TEMPLATES[kind];
-              if (!t) return null;
+            {metaTemplates().map((t) => {
+              const st = statuses.find((x) => x.name === t.name && x.language === t.language);
               return (
-                <tr key={kind}>
-                  <td>{title}</td>
+                <tr key={`${t.name}-${t.language}`}>
                   <td>
                     <code>{t.name}</code>
+                    <div className={s.small}>{t.category === "AUTHENTICATION" ? "Authentication" : "Utility"}</div>
                   </td>
-                  <td>{t.category === "AUTHENTICATION" ? "Authentication (кнопка «Скопировать код»)" : "Utility"}</td>
-                  <td>{t.params.map((p, i) => `{{${i + 1}}} = {${p}}`).join(", ")}</td>
+                  <td>{t.language}</td>
+                  <td className={s.waText}>{templatePreview(t)}</td>
+                  <td>
+                    <span className={s[`st${st?.status ?? "NONE"}`] ?? s.stNONE}>{STATUS_LABEL[st?.status ?? "NONE"] ?? st?.status}</span>
+                    {st?.reason && <div className={s.small}>{st.reason}</div>}
+                  </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-        <p className={s.small}>
-          Языки шаблонов: русский ({WHATSAPP_LANG.ru}), английский ({WHATSAPP_LANG.en}). Таджикский в WhatsApp пока отправляется русским шаблоном; в Telegram, на сайте и в SMS —
-          по-таджикски.
-        </p>
       </section>
     </div>
   );

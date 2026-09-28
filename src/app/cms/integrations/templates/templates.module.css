@@ -143,3 +143,41 @@
     grid-template-columns: 1fr;
   }
 }
+.submit {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 14px 0 6px;
+}
+.waText {
+  max-width: 520px;
+  line-height: 1.5;
+}
+.stNONE,
+.stPENDING,
+.stAPPROVED,
+.stREJECTED,
+.stPAUSED,
+.stDISABLED {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  white-space: nowrap;
+  background: var(--mj-sand-2);
+  color: var(--mj-text-2);
+}
+.stAPPROVED {
+  background: var(--mj-ink);
+  color: var(--mj-cream);
+}
+.stPENDING {
+  background: var(--mj-gold);
+  color: var(--mj-ink);
+}
+.stREJECTED,
+.stDISABLED {
+  background: #8c3a2b;
+  color: var(--mj-cream);
+}
