@@ -6,6 +6,7 @@ import { safeNext } from "@/lib/access";
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { createSession, destroySession } from "@/server/auth";
+import { clientIp } from "@/server/client-ip";
 import { clearAttempts, tooManyAttempts } from "@/server/rate-limit";
 
 // Compared against when the login does not exist, so both cases take the same time.
@@ -20,7 +21,7 @@ export async function login(_prev: LoginState, form: FormData): Promise<LoginSta
 
   if (!loginName || !password) return { error: "Введите логин и пароль", login: loginName };
 
-  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  const ip = await clientIp();
   const key = `${ip}:${loginName}`;
   if (tooManyAttempts(key)) return { error: "Слишком много попыток. Попробуйте через 15 минут.", login: loginName };
 

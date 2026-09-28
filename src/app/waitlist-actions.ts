@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { dict } from "@/lib/i18n/dict";
@@ -12,10 +11,10 @@ import { addDays, isClosed, todayYmd } from "@/lib/time";
 import { isHhmm } from "@/lib/waitlist";
 import { getCurrentGuest } from "@/server/guest-auth";
 import { getLang } from "@/server/lang";
+import { clientIp } from "@/server/client-ip";
 import { tooManyAttempts } from "@/server/rate-limit";
 import { acceptOffer, declineOffer, joinWaitlist } from "@/server/waitlist/core";
 
-const ip = async () => (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
 
 export type JoinResult = { ok: true; message: string } | { ok: false; field?: "name" | "phone"; error: string };
 
@@ -25,7 +24,7 @@ export async function joinWaitlistOnline(input: { serviceId: string; staffId?: s
   const e = dict(lang).errors;
   const w = waitlistDict(lang);
   if (input.company) return { ok: false, error: e.generic };
-  if (tooManyAttempts(`waitlist:${await ip()}`, 6, 3600_000)) return { ok: false, error: e.tooMany };
+  if (tooManyAttempts(`waitlist:${await clientIp()}`, 6, 3600_000)) return { ok: false, error: e.tooMany };
   const name = String(input.name ?? "").trim().slice(0, 80);
   const phone = normalizePhone(String(input.phone ?? ""));
   if (name.length < 2) return { ok: false, field: "name", error: e.name };

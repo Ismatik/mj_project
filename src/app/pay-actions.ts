@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { dict } from "@/lib/i18n/dict";
@@ -12,9 +11,9 @@ import { normalizePhone } from "@/lib/phone";
 import { createGiftCard } from "@/server/gift-cards";
 import { getLang } from "@/server/lang";
 import { cancelPayment, markPaid } from "@/server/payments/core";
+import { clientIp } from "@/server/client-ip";
 import { tooManyAttempts } from "@/server/rate-limit";
 
-const ip = async () => (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
 
 export type BuyGiftInput = { amount: number; recipientName: string; message?: string; buyerName: string; buyerPhone: string; company?: string };
 
@@ -24,7 +23,7 @@ export async function buyGiftCard(input: BuyGiftInput): Promise<{ ok: true; url:
   const e = dict(lang).errors;
   const g = moneyDict(lang).gift;
   if (input.company) return { ok: false, error: e.generic }; // honeypot
-  if (tooManyAttempts(`gift:${await ip()}`, 10, 3600_000)) return { ok: false, error: e.tooMany };
+  if (tooManyAttempts(`gift:${await clientIp()}`, 10, 3600_000)) return { ok: false, error: e.tooMany };
   const amount = Math.round(Number(input.amount));
   if (!validGiftAmount(amount)) return { ok: false, field: "amount", error: g.errAmount(somoni(GIFT_MIN, lang), somoni(GIFT_MAX, lang)) };
   const recipientName = String(input.recipientName ?? "").trim().slice(0, 60);

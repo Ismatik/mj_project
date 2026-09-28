@@ -1,0 +1,24 @@
+# Home server / laptop without a public address: Cloudflare Tunnel instead of Caddy.
+# The laptop connects out to Cloudflare; visitors, Telegram and WhatsApp reach the site through it.
+# No open ports, no static IP, HTTPS by Cloudflare. Setup: docs/home-server.md
+#
+# Used together with docker-compose.yml — put this line in .env and plain `docker compose …` picks both up:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.tunnel.yml
+
+services:
+  web:
+    environment:
+      # Take the visitor's address from Cloudflare (for rate limits)
+      TRUST_CLOUDFLARE: "1"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env (docs/home-server.md)}
+    depends_on: [web]
+
+  # Caddy is not needed behind the tunnel: it only starts with `--profile caddy`
+  caddy:
+    profiles: ["caddy"]

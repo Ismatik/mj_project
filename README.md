@@ -31,6 +31,7 @@ docker compose run --rm migrate npx prisma db seed   # optional: demo data
 - The site is served by Caddy on ports 80/443 with automatic HTTPS for `SITE_DOMAIN`.
 - Database dumps are written daily to `./backups`.
 - Uploaded photos live in the `media` Docker volume.
+- **No public IP (a laptop or computer at home)?** Use a Cloudflare Tunnel instead of Caddy: `docker-compose.tunnel.yml`, step by step in **`docs/home-server.md`** (Arch Linux, keeping the laptop awake, off-site backups).
 
 ## Local development
 

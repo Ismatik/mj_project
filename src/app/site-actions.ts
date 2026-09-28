@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { formatPhone, normalizePhone } from "@/lib/phone";
@@ -14,13 +13,11 @@ import { getCurrentGuest } from "@/server/guest-auth";
 import { getLang } from "@/server/lang";
 import { promotionsBetween } from "@/server/loyalty/core";
 import { createGuestBooking, slotsFor } from "@/server/online-booking";
+import { clientIp } from "@/server/client-ip";
 import { tooManyAttempts } from "@/server/rate-limit";
 
 const ymdOk = (d: string) => /^\d{4}-\d{2}-\d{2}$/.test(d);
 
-async function clientIp() {
-  return (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
-}
 
 function dateError(date: string, lang: Lang = "ru"): string | null {
   const e = dict(lang).errors;
