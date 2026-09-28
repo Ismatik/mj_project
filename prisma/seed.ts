@@ -30,6 +30,10 @@ function anchorDay(): Ymd {
 async function wipe() {
   await db.$transaction([
     db.outboxMessage.deleteMany(),
+    db.cashShift.deleteMany(),
+    db.cashMovement.deleteMany(),
+    db.staffPayout.deleteMany(),
+    db.staffAdjustment.deleteMany(),
     db.bonusTx.deleteMany(),
     db.giftRedemption.deleteMany(),
     db.payment.deleteMany(),
@@ -68,7 +72,7 @@ async function main() {
   const staffId: Record<string, string> = {};
   for (const [i, s] of data.staff.entries()) {
     const row = await db.staff.create({
-      data: { name: s.name, title: s.title, workDays: [...s.workDays], commission: s.commission, sortOrder: i },
+      data: { name: s.name, title: s.title, workDays: [...s.workDays], commission: s.commission, salary: "salary" in s ? s.salary : 0, sortOrder: i },
     });
     staffId[s.key] = row.id;
   }
@@ -378,6 +382,73 @@ async function main() {
     balance[id] -= spend;
   }
   for (const [id, b] of Object.entries(balance)) await db.guest.update({ where: { id }, data: { bonusBalance: b } });
+
+  // Till: every past working day of the last five weeks was closed; 500 c. stays in the drawer overnight
+  const FLOAT = 500;
+  for (let back = 35; back >= 1; back--) {
+    const day = addDays(today, -back);
+    if (isClosed(day)) continue;
+    const range = { gte: atSalonTime(day), lt: atSalonTime(addDays(day, 1)) };
+    const [byMethod, agg] = await Promise.all([
+      db.sale.groupBy({ by: ["method"], where: { createdAt: range }, _sum: { paid: true } }),
+      db.sale.aggregate({ where: { createdAt: range }, _sum: { total: true }, _count: true }),
+    ]);
+    const paid = (m: string) => byMethod.find((x) => x.method === m)?._sum.paid ?? 0;
+    const cashOut = back === 8 ? 150 : 0;
+    if (cashOut) await db.cashMovement.create({ data: { day: new Date(`${day}T00:00:00Z`), amount: -cashOut, note: "Расходники: перчатки, салфетки", createdBy: "Ресепшен", createdAt: atSalonTime(day, "13:10") } });
+    const expected = FLOAT + paid("CASH") - cashOut;
+    const difference = back === 12 ? -20 : back === 5 ? 10 : 0;
+    const counted = expected + difference;
+    await db.cashShift.create({
+      data: {
+        day: new Date(`${day}T00:00:00Z`),
+        openingCash: FLOAT,
+        cashSales: paid("CASH"),
+        cardSales: paid("CARD"),
+        qrSales: paid("QR"),
+        cashIn: 0,
+        cashOut,
+        expectedCash: expected,
+        countedCash: counted,
+        difference,
+        handedOver: counted - FLOAT,
+        leftCash: FLOAT,
+        receipts: agg._count,
+        revenue: agg._sum.total ?? 0,
+        details: { deposits: 0, gifts: 0, bonus: 0, discounts: 0, giftSold: { cash: 0, card: 0, qr: 0 }, online: { deposits: 0, gifts: 0 }, byMaster: [], movements: [] },
+        note: difference < 0 ? "Не хватило на сдачу, разменяли у соседей" : null,
+        closedBy: "Ресепшен",
+        closedAt: atSalonTime(day, "18:10"),
+      },
+    });
+  }
+
+  // Payroll: last month paid in full by transfer (advance on the 15th, the rest on the 1st); this month an advance
+  const month = today.slice(0, 7);
+  const [py, pm] = month.split("-").map(Number) as [number, number];
+  const prevMonth = pm === 1 ? `${py - 1}-12` : `${py}-${String(pm - 1).padStart(2, "0")}`;
+  const prevRange = { gte: atSalonTime(`${prevMonth}-01`), lt: atSalonTime(`${month}-01`) };
+  const prevRevenue = await db.sale.groupBy({ by: ["staffId"], where: { createdAt: prevRange }, _sum: { total: true } });
+  for (const s of data.staff) {
+    if (!s.commission) continue;
+    const id = staffId[s.key]!;
+    const salary = "salary" in s ? s.salary : 0;
+    const earned = salary + Math.round(((prevRevenue.find((r) => r.staffId === id)?._sum.total ?? 0) * s.commission) / 100);
+    const advance = Math.min(1500, earned);
+    await db.staffPayout.createMany({
+      data: [
+        { staffId: id, month: prevMonth, amount: advance, method: "CARD", note: "аванс", paidBy: "Мавзуна", paidAt: atSalonTime(`${prevMonth}-15`, "17:00") },
+        ...(earned > advance ? [{ staffId: id, month: prevMonth, amount: earned - advance, method: "CARD" as const, note: "расчёт", paidBy: "Мавзуна", paidAt: atSalonTime(`${month}-01`, "17:00") }] : []),
+      ],
+    });
+    if (today >= `${month}-15`) await db.staffPayout.create({ data: { staffId: id, month, amount: 1000, method: "CARD", note: "аванс", paidBy: "Мавзуна", paidAt: atSalonTime(`${month}-15`, "17:00") } });
+  }
+  await db.staffAdjustment.createMany({
+    data: [
+      { staffId: staffId.mira!, month, amount: 300, note: "Лучшие отзывы месяца", createdBy: "Мавзуна" },
+      { staffId: staffId.dario!, month, amount: -100, note: "Опоздание", createdBy: "Мавзуна" },
+    ],
+  });
 
   // Sign-in accounts (the same demo password for every role; change it after first sign-in)
   const password = process.env.SEED_OWNER_PASSWORD || "change-me-now";

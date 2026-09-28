@@ -3,11 +3,11 @@
 
 export const staff = [
   // name, title, working weekdays (0 = Mon), commission %
-  { key: "mavzuna", name: "Мавзуна", title: "Владелица · стилист", workDays: [1, 2, 3, 4, 5], commission: 100 },
+  { key: "mavzuna", name: "Мавзуна", title: "Владелица · стилист", workDays: [1, 2, 3, 4, 5], commission: 0 },
   { key: "ines", name: "Инес", title: "Колорист", workDays: [1, 2, 3, 4, 5, 6], commission: 40 },
   { key: "mira", name: "Мира", title: "Брови · ресницы · макияж", workDays: [1, 2, 4, 5, 6], commission: 40 },
   { key: "petra", name: "Петра", title: "Ногтевой сервис", workDays: [1, 2, 3, 4, 5], commission: 40 },
-  { key: "dario", name: "Дарио", title: "Парикмахер", workDays: [2, 3, 4, 5, 6], commission: 40 },
+  { key: "dario", name: "Дарио", title: "Парикмахер", workDays: [2, 3, 4, 5, 6], commission: 35, salary: 1000 },
 ] as const;
 
 export type StaffKey = (typeof staff)[number]["key"];

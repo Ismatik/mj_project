@@ -52,14 +52,14 @@ Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
 
 | Login | Role | Sees |
 |---|---|---|
-| `mavzuna` | owner | all 9 CMS sections, site admin |
-| `reception` | reception | everything except analytics and settings; can book |
-| `mira` | master | calendar (own bookings), services, staff schedule |
+| `mavzuna` | owner | all 14 CMS sections, site admin |
+| `reception` | reception | day-to-day pages (till with shift close, guests, calendar, services, rental, certificates, staff); no analytics, reports, payroll, bonus rules or settings; can book |
+| `mira` | master | calendar (own bookings), services, staff schedule, her own pay |
 | `content` | content manager | site admin only |
 
 ## Demo data
 
-`prisma/seed.ts` rebuilds the database around today's date in Dushanbe: the team, services and prices, guests with visit history, this week's calendar, 60 days of sales (the last 14 days follow the dashboard chart in the design), dresses, reminders, website texts, photos and reviews. Mondays are the day off. Prices are in somoni.
+`prisma/seed.ts` rebuilds the database around today's date in Dushanbe: the team, services and prices, guests with visit history, this week's calendar, 60 days of sales (the last 14 days follow the dashboard chart in the design), dresses, reminders, website texts, photos and reviews, two promotions and guests' bonus points, closed shifts for the last five weeks, last month's payroll paid out and this month's advances. Mondays are the day off. Prices are in somoni.
 
 ## Website and site admin
 
@@ -123,7 +123,13 @@ Guests without Telegram get their confirmation, reminders and sign-in codes in W
 - **Promotions:** an offer without a code applies by itself to its services and dates — in online booking (old price struck through), in the bot and at the till. A promo code (e.g. `MJ10`) applies when typed in the booking form or at the till; it can have a usage limit. Offers marked "на сайте" appear in the website's «Акции» section and in the bot (✦ Акции), in all three languages.
 - Guests see their points, level and history in `/kabinet` and in the bot (🎁 Бонусы).
 
+## Payroll, shift close and reports
+
+- **Закрытие смены** (Ресепшен и касса → «Закрытие смены», `/cms/pos/shift`): the day's money by cash / card / QR, prepayments, certificates and points used, cash put in or taken out (with a reason), and the cash expected in the drawer: what the previous shift left + cash taken today + put in − taken out (salary paid from the till included). Reception counts the drawer, says how much goes to the owner, and closes the day. The difference (shortfall or surplus) is kept, and the staff Telegram chat is told about it. The Z-report is a PDF. Once a day is closed, its cash can't change; the till warns if an earlier day with receipts wasn't closed (`?day=YYYY-MM-DD` closes it).
+- **Зарплата** (`/cms/payroll`, owner; a master sees only her own row): per month, for each master, the services she did and their value after discounts, her commission (percent set per master), fixed monthly pay, bonuses and fines with a reason, and payments. Pay = fixed pay + commission + bonuses − fines; the balance is what's left to pay. A payment is either cash from the till (it shows in that day's shift) or a transfer. Excel and PDF.
+- **Отчёты** (`/cms/reports`, owner): any period (presets: today, yesterday, this week, this month, last month, this year). The Excel workbook has a sheet each for the summary, every receipt, services, masters, revenue by day, payments outside receipts (online prepayments, certificates) and shifts. The PDF has the same in print form, with page numbers. Excel files are written by `src/server/reports/xlsx.ts` (no extra dependency); PDFs use the MJ fonts (`src/server/pdf/report.ts`).
+
 ## Tests
 
-- `npm test` — unit tests (booking rules, free slots, formatting, access, content, translations, bot, message templates, bonus points and promotions, WhatsApp payloads and webhook parsing).
-- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates, bonus points and promotions (see `e2e/README.md`).
+- `npm test` — unit tests (booking rules, free slots, formatting, access, content, translations, bot, message templates, bonus points and promotions, payroll and the till's cash count, the Excel writer, WhatsApp payloads and webhook parsing).
+- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates, bonus points and promotions, payroll, shift close and reports (see `e2e/README.md`).

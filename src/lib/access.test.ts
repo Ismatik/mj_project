@@ -3,7 +3,7 @@ import { canOpen, canUseCms, canUseSiteAdmin, homeFor, navFor, safeNext } from "
 
 describe("access", () => {
   it("gives the owner every CMS page and the site admin", () => {
-    expect(navFor("OWNER").flatMap((g) => g.items)).toHaveLength(12);
+    expect(navFor("OWNER").flatMap((g) => g.items)).toHaveLength(14);
     expect(canUseSiteAdmin("OWNER")).toBe(true);
   });
 
@@ -16,9 +16,9 @@ describe("access", () => {
     expect(canUseSiteAdmin("RECEPTION")).toBe(false);
   });
 
-  it("gives masters only schedule and menu pages", () => {
+  it("gives masters only schedule, menu and their own pay", () => {
     const pages = navFor("MASTER").flatMap((g) => g.items.map((i) => i.id));
-    expect(pages).toEqual(["calendar", "services", "staff"]);
+    expect(pages).toEqual(["calendar", "services", "staff", "payroll"]);
     expect(homeFor("MASTER")).toBe("/cms/calendar");
   });
 

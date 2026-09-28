@@ -12,6 +12,8 @@ export type CmsPageId =
   | "certificates"
   | "loyalty"
   | "staff"
+  | "payroll"
+  | "reports"
   | "analytics"
   | "settings"
   | "integrations";
@@ -27,8 +29,10 @@ export const CMS_PAGES: CmsPage[] = [
   { id: "rental", label: "Прокат платьев", path: "/cms/rental", group: "Услуги", roles: ["OWNER", "RECEPTION"] },
   { id: "certificates", label: "Сертификаты и оплаты", path: "/cms/certificates", group: "Услуги", roles: ["OWNER", "RECEPTION"] },
   { id: "staff", label: "Мастера и график", path: "/cms/staff", group: "Команда", roles: ["OWNER", "RECEPTION", "MASTER"] },
+  { id: "payroll", label: "Зарплата", path: "/cms/payroll", group: "Команда", roles: ["OWNER", "MASTER"] },
   { id: "loyalty", label: "Бонусы и акции", path: "/cms/loyalty", group: "Развитие", roles: ["OWNER"] },
   { id: "analytics", label: "Аналитика", path: "/cms/analytics", group: "Развитие", roles: ["OWNER"] },
+  { id: "reports", label: "Отчёты", path: "/cms/reports", group: "Развитие", roles: ["OWNER"] },
   { id: "settings", label: "Настройки", path: "/cms/settings", group: "Развитие", roles: ["OWNER"] },
   { id: "integrations", label: "Интеграции", path: "/cms/integrations", group: "Развитие", roles: ["OWNER"] },
 ];

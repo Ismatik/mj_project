@@ -44,7 +44,7 @@ const navLabels = (p) => p.$$eval('aside nav a', (as) => as.map((a) => a.querySe
   check('entry loader shows after login', await p.isVisible('text=Открываем салон…'));
   await p.waitForTimeout(2600);
   check('welcome param removed', !p.url().includes('welcome'));
-  check('owner sees 12 pages', (await navLabels(p)).length === 12, (await navLabels(p)).join(', '));
+  check('owner sees 14 pages', (await navLabels(p)).length === 14, (await navLabels(p)).join(', '));
   await p.goto(`${BASE}/cms`); await p.waitForTimeout(1500);
   await p.screenshot({ path: `${out}/dashboard.png`, fullPage: true });
 
@@ -140,7 +140,7 @@ const navLabels = (p) => p.$$eval('aside nav a', (as) => as.map((a) => a.querySe
   const { ctx, p } = await loginAs('mira');
   check('master lands on calendar', new URL(p.url()).pathname === '/cms/calendar');
   const labels = await navLabels(p);
-  check('master sees calendar, services, staff', labels.join('|') === 'Календарь записей|Меню услуг и цены|Мастера и график', labels.join(', '));
+  check('master sees calendar, services, staff, own pay', labels.join('|') === 'Календарь записей|Меню услуг и цены|Мастера и график|Зарплата', labels.join(', '));
   check('master has no booking button', !(await p.isVisible('button:has-text("+ Новая запись")')));
   const r = await p.request.get(`${BASE}/api/cms/search?q=Марта`);
   const j = await r.json();

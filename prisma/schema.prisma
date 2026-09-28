@@ -50,6 +50,8 @@ model Staff {
   /// Working weekdays, 0 = Monday … 6 = Sunday
   workDays    Int[]
   commission  Int      @default(40) /// percent of service revenue
+  /// Fixed monthly pay on top of the commission (0 = commission only)
+  salary      Int      @default(0)
   sortOrder   Int      @default(0)
   active      Boolean  @default(true)
   user        User?
@@ -57,6 +59,8 @@ model Staff {
   sales       Sale[]
   services    Service[] @relation("ServiceStaff")
   favouriteOf Guest[]   @relation("FavouriteMaster")
+  adjustments StaffAdjustment[]
+  payouts     StaffPayout[]
 }
 
 model ServiceCategory {
@@ -529,4 +533,79 @@ model Promotion {
   createdAt     DateTime      @default(now())
   appointments  Appointment[]
   saleItems     SaleItem[]
+}
+
+// ─── Payroll and the till ────────────────────────────────
+
+/// A bonus (+) or a fine (−) for a master in a month
+model StaffAdjustment {
+  id        String   @id @default(cuid())
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  staffId   String
+  /// "YYYY-MM"
+  month     String
+  amount    Int
+  note      String
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  @@index([staffId, month])
+}
+
+/// Money paid to a master for a month: an advance or the final payment
+model StaffPayout {
+  id        String        @id @default(cuid())
+  staff     Staff         @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  staffId   String
+  month     String
+  amount    Int
+  /// CASH taken from the till (counted in that day's shift), CARD = bank transfer
+  method    PaymentMethod
+  note      String?
+  paidBy    String?
+  paidAt    DateTime      @default(now())
+  movement  CashMovement?
+
+  @@index([staffId, month])
+}
+
+/// Cash put into (+) or taken out of (−) the till during the day, not from a receipt
+model CashMovement {
+  id            String       @id @default(cuid())
+  /// Salon calendar day
+  day           DateTime     @db.Date
+  amount        Int
+  note          String
+  payout        StaffPayout? @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  payoutId      String?      @unique
+  createdBy     String?
+  createdAt     DateTime     @default(now())
+
+  @@index([day])
+}
+
+/// End-of-day shift close: the day's totals as they were when it was closed, and the cash count
+model CashShift {
+  id           String   @id @default(cuid())
+  day          DateTime @unique @db.Date
+  openingCash  Int
+  cashSales    Int
+  cardSales    Int
+  qrSales      Int
+  cashIn       Int
+  cashOut      Int
+  expectedCash Int
+  countedCash  Int
+  difference   Int
+  /// Taken from the drawer at closing (handed to the owner / bank)
+  handedOver   Int
+  /// Left in the drawer for tomorrow
+  leftCash     Int
+  receipts     Int
+  revenue      Int
+  /// Breakdown kept for the Z-report (prepayments, certificates, points, discounts, by master)
+  details      Json
+  note         String?
+  closedBy     String
+  closedAt     DateTime @default(now())
 }
