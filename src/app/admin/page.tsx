@@ -16,7 +16,7 @@ export default async function AdminPage() {
     <AdminApp
       draft={docs.draft}
       published={docs.published}
-      services={services.map((x) => ({ id: x.id, name: x.name, price: x.price, durationMin: x.durationMin, showOnSite: x.showOnSite, category: x.category.name }))}
+      services={services.map((x) => ({ id: x.id, name: x.name, price: x.price, durationMin: x.durationMin, showOnSite: x.showOnSite, category: x.category.name, categoryId: x.category.id }))}
       staff={team.staff}
       categories={team.categories}
       user={{ name: user.name, roleLabel: ROLE_LABEL[user.role], isOwner: user.role === "OWNER" }}

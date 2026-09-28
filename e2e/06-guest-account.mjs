@@ -98,7 +98,7 @@ try {
   const acc = await g.textContent('main');
   check('account: upcoming booking', acc.includes('Окрашивание') && acc.includes('Подтверждена'));
   check('account: visit history with rebook', (await g.$$('a:has-text("Записаться снова")')).length > 3);
-  const navName = await g.textContent('nav a[href="/kabinet"]');
+  const navName = await g.textContent('nav a[href="/kabinet"]:has(svg)');
   check('nav shows the guest', navName.includes('Гульнора'), navName);
   await g.screenshot({ path: out + '/kabinet-account.png', fullPage: true });
 

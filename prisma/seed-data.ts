@@ -209,3 +209,58 @@ export const settings: Record<string, string> = {
 // Website texts, photos and reviews: DEFAULT_CONTENT in src/lib/site-content.ts
 
 export const integrations = ["telegram", "whatsapp", "sms", "payments"];
+
+/** Tajik and English names and master profiles for the website (drafts for the salon to review in /admin). */
+export const translations = {
+  categories: {
+    hair: { tg: "Мӯй", en: "Hair" },
+    nails: { tg: "Нохун", en: "Nails" },
+    brows: { tg: "Абрӯ ва мижгон", en: "Brows & lashes" },
+    skin: { tg: "Нигоҳубини пӯст", en: "Skin care" },
+    spa: { tg: "Спа", en: "Spa" },
+    makeup: { tg: "Ороиш ва симо", en: "Makeup & looks" },
+  } as Record<string, { tg: string; en: string }>,
+  services: {
+    cut: { tg: "Мӯйсаргирӣ + ороиш", en: "Haircut & styling" },
+    color: { tg: "Рангкунии якранга", en: "Single-tone colour" },
+    balayage: { tg: "Балаяж / шатуш", en: "Balayage / ombré" },
+    bridalHair: { tg: "Мӯйороии арӯсӣ", en: "Bridal hairstyle" },
+    gel: { tg: "Маникюр, гел-лак", en: "Manicure, gel polish" },
+    pedi: { tg: "Педикюр", en: "Pedicure" },
+    nailArt: { tg: "Тарҳ (барои як нохун)", en: "Nail art (per nail)" },
+    brows: { tg: "Меъмории абрӯ", en: "Brow design" },
+    lashes: { tg: "Ламинатсияи мижгон", en: "Lash lamination" },
+    skin: { tg: "Нигоҳубини пӯст", en: "Skin care" },
+    spaHands: { tg: "Спа-нигоҳубини даст", en: "Spa hand care" },
+    dayMakeup: { tg: "Ороиши рӯзона", en: "Day makeup" },
+    eveMakeup: { tg: "Ороиши шомгоҳӣ", en: "Evening makeup" },
+    bridal: { tg: "Ороиши пурраи арӯсӣ", en: "Complete bridal look" },
+    trial: { tg: "Ороиши озмоишӣ", en: "Trial look" },
+  } as Record<string, { tg: string; en: string }>,
+  staff: {
+    mavzuna: {
+      en: { name: "Mavzuna", specialty: "Owner · stylist", bio: "Founder of Mavzunai Jovid and a stylist. She chooses a look to suit your character and features, and does bridal hairstyles and cuts. Guests value her honest advice — she'll tell you herself what suits you." },
+      tg: { specialty: "Соҳиби салон · стилист", bio: "Асосгузори Mavzunai Jovid ва стилист. Ороишро мувофиқи хислат ва симои шумо интихоб мекунад, мӯйороии арӯсӣ ва мӯйсаргирӣ мекунад. Меҳмонон маслиҳати самимии ӯро қадр мекунанд — худаш мегӯяд, ки маҳз ба шумо чӣ мувофиқ аст." },
+    },
+    ines: {
+      en: { name: "Ines", specialty: "Colourist", bio: "Colourist: single-tone colour, balayage and ombré, skin care. She matches the shade to your skin tone and protects your length." },
+      tg: { specialty: "Колорист", bio: "Колорист: рангкунии якранга, балаяж ва шатуш, нигоҳубини пӯст. Рангро мувофиқи ранги пӯст интихоб мекунад ва дарозии мӯйро нигоҳ медорад." },
+    },
+    mira: {
+      en: { name: "Mira", specialty: "Brows · lashes · makeup", bio: "Brows, lashes and makeup — from everyday to bridal. Brow design to your facial proportions, lash lamination and bridal trial looks." },
+      tg: { specialty: "Абрӯ · мижгон · ороиш", bio: "Абрӯ, мижгон ва ороиш — аз рӯзона то арӯсӣ. Меъмории абрӯ мувофиқи таносуби рӯй, ламинатсияи мижгон ва ороишҳои озмоишии арӯсӣ." },
+    },
+    petra: {
+      en: { name: "Petra", specialty: "Nail technician", bio: "Nails: gel manicure, pedicure, nude and bold designs. Sterile tools and careful cuticle work." },
+      tg: { specialty: "Устои нохун", bio: "Хизматрасонии нохун: маникюр бо гел-лак, педикюр, тарҳҳои нарм ва ҷасур. Асбобҳои стерилӣ ва кори бодиққат бо кутикула." },
+    },
+    dario: {
+      en: { name: "Dario", specialty: "Hairdresser", bio: "Hairdresser: cuts, styling and bridal hairstyles for brides and their guests." },
+      tg: { specialty: "Сартарош", bio: "Сартарош: мӯйсаргирӣ, ороиши мӯй ва мӯйороии арӯсӣ барои арӯсон ва меҳмонони тӯй." },
+    },
+  } as Record<string, Record<"tg" | "en", { name?: string; specialty: string; bio: string }>>,
+  captions: {
+    mavzuna0: { tg: "Ороиши мӯй барои шом", en: "Evening styling" },
+    mira0: { tg: "Ороиши пурраи арӯсӣ", en: "Complete bridal look" },
+  } as Record<string, { tg: string; en: string }>,
+};

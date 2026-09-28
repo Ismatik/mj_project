@@ -22,9 +22,3 @@ export function pickCodeChannel(chatIds: string[], modes: Record<CodeChannel, Mo
   if (modes.sms) return { channel: "sms" };
   return null;
 }
-
-export const CHANNEL_WHERE: Record<CodeChannel, string> = {
-  telegram: "в Telegram-бот салона",
-  whatsapp: "в WhatsApp",
-  sms: "по SMS",
-};

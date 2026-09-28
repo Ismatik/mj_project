@@ -1,5 +1,7 @@
 // Everything the site admin edits. Stored as JSON in SiteDocument ("draft" / "published").
 // Defaults are the texts of design/Mavzunai Jovid Website Main.dc.html.
+import { normalizeTranslations, type Translations } from "./i18n/content";
+import { DEFAULT_TRANSLATIONS } from "./i18n/default-translations";
 import { normalizeMasters, type MasterProfile } from "./masters";
 
 export type SitePhoto = { url: string; credit?: string; creditUrl?: string };
@@ -33,6 +35,8 @@ export type SiteContent = {
   masters: Record<string, MasterProfile>;
   /** Pending "на сайте" changes from the admin, applied to Service.showOnSite on publish. */
   serviceOverrides: Record<string, boolean>;
+  /** Tajik and English: only translated texts and names; the rest falls back to Russian */
+  i18n: Translations;
 };
 
 export const DEFAULT_CONTENT: SiteContent = {
@@ -152,6 +156,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
   masters: {},
   serviceOverrides: {},
+  i18n: DEFAULT_TRANSLATIONS,
 };
 
 type Json = unknown;
@@ -174,6 +179,7 @@ export function normalizeContent(raw: Json, base: Json = DEFAULT_CONTENT): SiteC
   };
   const out = merge(base, raw) as SiteContent;
   out.masters = normalizeMasters(isObj(raw) ? raw.masters : undefined);
+  out.i18n = normalizeTranslations(isObj(raw) ? raw.i18n : undefined, DEFAULT_TRANSLATIONS);
   return out;
 }
 

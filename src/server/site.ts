@@ -1,6 +1,8 @@
 import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
+import { nameIn } from "@/lib/i18n/content";
+import type { Lang } from "@/lib/i18n/locales";
 import { DEFAULT_CONTENT, normalizeContent, type SiteContent } from "@/lib/site-content";
 
 type DocId = "draft" | "published";
@@ -32,21 +34,22 @@ export async function writeSiteContent(id: DocId, content: SiteContent, by: stri
  * Services shown on the website price list: the CMS menu filtered by "на сайте".
  * `overrides` (the admin's unpublished changes) are applied for the draft preview.
  */
-export async function getSitePriceList(overrides: Record<string, boolean> = {}) {
+export async function getSitePriceList(overrides: Record<string, boolean> = {}, lang: Lang = "ru", c?: SiteContent) {
+  const name = (kind: "services" | "categories", id: string, fallback: string) => (c ? nameIn(c, lang, kind, id, fallback) : fallback);
   const categories = await db.serviceCategory.findMany({
     orderBy: { sortOrder: "asc" },
     include: { services: { where: { active: true }, orderBy: { sortOrder: "asc" } } },
   });
   return categories
-    .map((c) => ({
-      id: c.id,
-      name: c.name,
-      icon: c.icon,
-      services: c.services
+    .map((cat) => ({
+      id: cat.id,
+      name: name("categories", cat.id, cat.name),
+      icon: cat.icon,
+      services: cat.services
         .filter((s) => overrides[s.id] ?? s.showOnSite)
-        .map((s) => ({ id: s.id, name: s.name, durationMin: s.durationMin, price: s.price })),
+        .map((s) => ({ id: s.id, name: name("services", s.id, s.name), durationMin: s.durationMin, price: s.price })),
     }))
-    .filter((c) => c.services.length);
+    .filter((cat) => cat.services.length);
 }
 
 /** All active services with their website flag, for the admin's "Услуги и цены". */
@@ -54,6 +57,6 @@ export async function getServicesForAdmin() {
   return db.service.findMany({
     where: { active: true },
     orderBy: [{ category: { sortOrder: "asc" } }, { sortOrder: "asc" }],
-    select: { id: true, name: true, price: true, durationMin: true, showOnSite: true, category: { select: { name: true } } },
+    select: { id: true, name: true, price: true, durationMin: true, showOnSite: true, category: { select: { id: true, name: true } } },
   });
 }

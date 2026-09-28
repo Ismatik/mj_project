@@ -4,19 +4,25 @@ import { canUseSiteAdmin } from "@/lib/access";
 import { bookableDates } from "@/lib/slots";
 import { addDays, todayYmd } from "@/lib/time";
 import { getCurrentUser } from "@/server/auth";
+import { localize } from "@/lib/i18n/content";
 import { getCurrentGuest } from "@/server/guest-auth";
+import { alternates, getLang } from "@/server/lang";
 import { getSiteMasters } from "@/server/masters";
 import { getOnlineMenu, type OnlineMenu } from "@/server/online-booking";
 import { getSiteContent, getSitePriceList } from "@/server/site";
 
 export const dynamic = "force-dynamic";
 
+const OG_LOCALE = { ru: "ru_RU", tg: "tg_TJ", en: "en_US" } as const;
+
 export async function generateMetadata(): Promise<Metadata> {
-  const c = await getSiteContent("published");
+  const lang = await getLang();
+  const c = localize(await getSiteContent("published"), lang);
   return {
     title: c.seo.title,
     description: c.seo.description,
-    openGraph: { title: c.seo.title, description: c.seo.description, type: "website", locale: "ru_RU", images: [c.photos.hero.url] },
+    alternates: alternates(lang, "/"),
+    openGraph: { title: c.seo.title, description: c.seo.description, type: "website", locale: OG_LOCALE[lang], images: [c.photos.hero.url] },
   };
 }
 
@@ -36,11 +42,13 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
     const user = await getCurrentUser();
     showDraft = !!user && canUseSiteAdmin(user.role);
   }
-  const content = await getSiteContent(showDraft ? "draft" : "published");
+  const lang = await getLang();
+  const raw = await getSiteContent(showDraft ? "draft" : "published");
+  const content = localize(raw, lang);
   const [prices, menu, masters, guest] = await Promise.all([
-    getSitePriceList(showDraft ? content.serviceOverrides : {}),
-    getOnlineMenu(),
-    getSiteMasters(content),
+    getSitePriceList(showDraft ? content.serviceOverrides : {}, lang, content),
+    getOnlineMenu(lang),
+    getSiteMasters(content, lang),
     getCurrentGuest(),
   ]);
   const today = todayYmd();
@@ -56,6 +64,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       masters={masters}
       guest={guest}
       preset={presetFrom(menu, service, master)}
+      lang={lang}
     />
   );
 }

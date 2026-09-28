@@ -3,6 +3,8 @@
 
 import { useState } from "react";
 import { useFx } from "@/components/fx/FxProvider";
+import type { Names } from "@/lib/i18n/content";
+import { LANG_NAME, type Lang } from "@/lib/i18n/locales";
 import { EMPTY_PROFILE, masterSlugs, slugify, type MasterProfile } from "@/lib/masters";
 import type { SiteContent } from "@/lib/site-content";
 import { Box, editor, Head, Text, upload } from "./sections";
@@ -11,10 +13,19 @@ import s from "./admin.module.css";
 export type AdminStaff = { id: string; name: string; title: string; mainCategory: string };
 export type AdminCategory = { slug: string; name: string };
 
-type Props = { c: SiteContent; onChange: (c: SiteContent) => void; staff: AdminStaff[]; categories: AdminCategory[] };
+type Props = {
+  c: SiteContent;
+  onChange: (c: SiteContent) => void;
+  staff: AdminStaff[];
+  categories: AdminCategory[];
+  /** Tajik / English: only names, specialty, bio and captions are edited */
+  translating?: Lang | null;
+  names?: Names;
+  onName?: (kind: keyof Names, id: string, v: string) => void;
+};
 
 // ── Мастера и портфолио ────────────────────────────────────
-export function MastersSection({ c, onChange, staff, categories }: Props) {
+export function MastersSection({ c, onChange, staff, categories, translating, names, onName }: Props) {
   const edit = editor(c, onChange);
   const slugs = masterSlugs(staff, c.masters);
   /** Edits one master's profile (created on first edit). */
@@ -42,11 +53,84 @@ export function MastersSection({ c, onChange, staff, categories }: Props) {
           </div>
         </Box>
 
-        {staff.map((m) => (
-          <MasterEditor key={m.id} m={m} slug={slugs.get(m.id)!} p={c.masters[m.id] ?? EMPTY_PROFILE} categories={categories} onEdit={(fn) => editMaster(m.id, fn)} />
-        ))}
+        {staff.map((m) =>
+          translating && names && onName ? (
+            <MasterTranslation
+              key={m.id}
+              m={m}
+              lang={translating}
+              p={c.masters[m.id]}
+              name={names.staff[m.id] ?? ""}
+              onName={(v) => onName("staff", m.id, v)}
+              onEdit={(fn) => c.masters[m.id] && editMaster(m.id, fn)}
+            />
+          ) : (
+            <MasterEditor key={m.id} m={m} slug={slugs.get(m.id)!} p={c.masters[m.id] ?? EMPTY_PROFILE} categories={categories} onEdit={(fn) => editMaster(m.id, fn)} />
+          ),
+        )}
       </div>
     </>
+  );
+}
+
+/** Name (e.g. in Latin letters for English), specialty, bio and portfolio captions in another language. */
+function MasterTranslation({
+  m,
+  lang,
+  p,
+  name,
+  onName,
+  onEdit,
+}: {
+  m: AdminStaff;
+  lang: Lang;
+  p?: MasterProfile;
+  name: string;
+  onName: (v: string) => void;
+  onEdit: (fn: (p: MasterProfile) => void) => void;
+}) {
+  return (
+    <section className={s.master} aria-label={`Мастер ${m.name} — ${LANG_NAME[lang]}`}>
+      <div className={s.masterHead}>
+        <div className={s.masterAvatar}>{p?.photo?.url ? <img src={p.photo.url} alt="" /> : <span>{m.name[0]}</span>}</div>
+        <div className={s.masterWho}>
+          <div className={s.reviewAuthor}>{m.name}</div>
+          <div className={s.small}>{m.title}</div>
+        </div>
+      </div>
+      <div className={s.masterFields}>
+        <div className={s.two}>
+          <label className={s.fieldLabel}>
+            Имя на сайте
+            <input className={s.input} placeholder={m.name} value={name} onChange={(e) => onName(e.target.value)} />
+          </label>
+          <label className={s.fieldLabel}>
+            Специализация
+            <input className={s.input} placeholder={m.title} value={p?.specialty ?? ""} disabled={!p} onChange={(e) => onEdit((d) => void (d.specialty = e.target.value))} />
+          </label>
+        </div>
+        <label className={s.fieldLabel}>
+          О мастере
+          <textarea className={s.textarea} rows={4} value={p?.bio ?? ""} disabled={!p} onChange={(e) => onEdit((d) => void (d.bio = e.target.value))} />
+        </label>
+        {!p && <span className={s.small}>Сначала заполните профиль на русской вкладке.</span>}
+        {p && p.portfolio.length > 0 && (
+          <div className={s.works}>
+            {p.portfolio.map((w, i) => (
+              <div key={w.id} className={s.workCard}>
+                <img src={w.url} alt="" />
+                <input
+                  aria-label={`Подпись к фото ${i + 1}: ${m.name}`}
+                  className={s.input}
+                  value={w.caption}
+                  onChange={(e) => onEdit((d) => void (d.portfolio[i]!.caption = e.target.value))}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

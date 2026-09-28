@@ -1,24 +1,30 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import type { Lang } from "../i18n/locales";
 import { handleUpdate, type BotDeps, type BotGuest, type BotReply, type BotState } from "./engine";
 
 // In-memory stand-in for the database
 function makeDeps() {
-  const chats = new Map<string, { state: BotState; guestId?: string; isStaff: boolean }>();
+  const chats = new Map<string, { state: BotState; guestId?: string; isStaff: boolean; lang?: Lang }>();
   const guests: BotGuest[] = [{ id: "g-marta", name: "Марта Каримова", phone: "+992935012214" }];
   const booked: { id: string; guestId: string; serviceId: string; staffId: string | null; date: string; time: string; status: string }[] = [];
   const calls: string[] = [];
   const deps: BotDeps = {
     async getChat(id) {
       const c = chats.get(id) ?? { state: {}, isStaff: false };
-      return { state: c.state, isStaff: c.isStaff, guest: guests.find((g) => g.id === c.guestId) ?? null };
+      return { state: c.state, isStaff: c.isStaff, guest: guests.find((g) => g.id === c.guestId) ?? null, lang: c.lang ?? null };
     },
     async saveChat(id, patch) {
       const c = chats.get(id) ?? { state: {}, isStaff: false };
-      chats.set(id, { ...c, ...(patch.state ? { state: patch.state } : {}), ...(patch.guestId ? { guestId: patch.guestId } : {}), ...(patch.isStaff ? { isStaff: true } : {}) });
+      chats.set(id, { ...c, ...(patch.state ? { state: patch.state } : {}), ...(patch.guestId ? { guestId: patch.guestId } : {}), ...(patch.isStaff ? { isStaff: true } : {}), ...(patch.lang ? { lang: patch.lang } : {}) });
     },
-    async menu() {
+    async menu(lang) {
+      const en = lang === "en";
       return [
-        { id: "cat-brows", name: "Брови и ресницы", services: [{ id: "svc-lash", name: "Ламинирование ресниц", durationMin: 60, price: 340, staff: [{ id: "mira", name: "Мира" }] }] },
+        {
+          id: "cat-brows",
+          name: en ? "Brows & lashes" : "Брови и ресницы",
+          services: [{ id: "svc-lash", name: en ? "Lash lamination" : "Ламинирование ресниц", durationMin: 60, price: 340, staff: [{ id: "mira", name: en ? "Mira" : "Мира" }] }],
+        },
       ];
     },
     dates: () => ["2026-09-29", "2026-09-30", "2026-10-01"],
@@ -77,7 +83,7 @@ describe("Telegram bot", () => {
   it("greets on /start with the main menu", async () => {
     const r = await send({ text: "/start" });
     expect(texts(r)).toContain("Здравствуйте, Зарина!");
-    expect(buttons(r).map((b) => b.data)).toEqual(["book", "my", "prices", "contacts"]);
+    expect(buttons(r).map((b) => b.data)).toEqual(["book", "my", "prices", "contacts", "lang"]);
   });
 
   it("books a slot end to end, asking for the phone once", async () => {
@@ -171,6 +177,37 @@ describe("Telegram bot", () => {
   it("answers free text with the menu", async () => {
     const r = await send({ text: "привет" });
     expect(texts(r)).toContain("Я понимаю кнопки");
-    expect(buttons(r).length).toBe(4);
+    expect(buttons(r).length).toBe(5);
+  });
+});
+
+describe("Telegram bot languages", () => {
+  it("takes the language from the Telegram app and remembers it", async () => {
+    const { deps, chats } = makeDeps();
+    const r = await handleUpdate({ chatId: "5", text: "/start", firstName: "Anna", languageCode: "en-GB" }, deps);
+    expect(texts(r)).toContain("Hello, Anna!");
+    expect(buttons(r).map((b) => b.text)).toContain("✦ Book");
+    expect(chats.get("5")!.lang).toBe("en");
+    const later = await handleUpdate({ chatId: "5", data: "book" }, deps);
+    expect(buttons(later).map((b) => b.text)).toContain("Brows & lashes");
+  });
+
+  it("switches language from the menu", async () => {
+    const { deps, chats } = makeDeps();
+    await handleUpdate({ chatId: "6", text: "/start" }, deps);
+    const pick = await handleUpdate({ chatId: "6", data: "lang" }, deps);
+    expect(buttons(pick).map((b) => b.data)).toEqual(["lang:ru", "lang:tg", "lang:en", "menu"]);
+    const r = await handleUpdate({ chatId: "6", data: "lang:tg" }, deps);
+    expect(texts(r)).toContain("тоҷикӣ");
+    expect(buttons(r).map((b) => b.text)).toContain("✦ Сабт шудан");
+    expect(chats.get("6")!.lang).toBe("tg");
+  });
+
+  it("asks for the phone with a translated button", async () => {
+    const { deps } = makeDeps();
+    for (const data of ["lang:en", "book", "c:cat-brows", "s:svc-lash", "m:any", "d:2026-09-30"]) await handleUpdate({ chatId: "7", data }, deps);
+    const r = await handleUpdate({ chatId: "7", data: "t:10:00" }, deps);
+    expect(r[0]!.askContact).toBe(true);
+    expect(r[0]!.contactLabel).toBe("📱 Share my number");
   });
 });

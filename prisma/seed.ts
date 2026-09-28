@@ -1,7 +1,7 @@
 // Demo data for local runs and staging. Wipes the database and rebuilds it around "today" in Dushanbe.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, type PaymentMethod } from "../src/generated/prisma/client";
+import { PrismaClient, type PaymentMethod, type Prisma } from "../src/generated/prisma/client";
 import { clock } from "../src/lib/format";
 import { hashPassword } from "../src/lib/password";
 import { addDays, atSalonTime, isClosed, mondayOf, todayYmd, weekdayOf, type Ymd } from "../src/lib/time";
@@ -30,6 +30,7 @@ async function wipe() {
   await db.$transaction([
     db.outboxMessage.deleteMany(),
     db.loginCode.deleteMany(),
+    db.telegramChat.deleteMany(),
     db.integration.deleteMany(),
     db.siteDocument.deleteMany(),
     db.bookingRequest.deleteMany(),
@@ -70,10 +71,12 @@ async function main() {
 
   // Services
   const serviceId: Record<string, string> = {};
+  const categoryId: Record<string, string> = {};
   const servicePrice: Record<string, number> = {};
   const serviceMin: Record<string, number> = {};
   for (const [ci, c] of data.categories.entries()) {
     const cat = await db.serviceCategory.create({ data: { slug: c.slug, name: c.name, icon: c.icon, sortOrder: ci } });
+    categoryId[c.slug] = cat.id;
     for (const [si, s] of data.services.filter((x) => x.cat === c.slug).entries()) {
       const row = await db.service.create({
         data: {
@@ -252,7 +255,25 @@ async function main() {
       portfolio: (p.works ?? []).map((w, i) => ({ id: `${key}${i}`, ...w })),
     };
   }
-  const content = { ...DEFAULT_CONTENT, masters };
+  // Tajik and English: names of categories, services and masters, master profiles and captions
+  const i18n = structuredClone(DEFAULT_CONTENT.i18n);
+  for (const lang of ["tg", "en"] as const) {
+    const names = { services: {} as Record<string, string>, categories: {} as Record<string, string>, staff: {} as Record<string, string> };
+    for (const c of data.categories) names.categories[categoryId[c.slug]!] = data.translations.categories[c.slug]![lang];
+    for (const sv of data.services) names.services[serviceId[sv.key]!] = data.translations.services[sv.key]![lang];
+    const mastersOv: Record<string, unknown> = {};
+    for (const [key, t] of Object.entries(data.translations.staff)) {
+      const id = staffId[key]!;
+      if (t[lang].name) names.staff[id] = t[lang].name!;
+      mastersOv[id] = {
+        specialty: t[lang].specialty,
+        bio: t[lang].bio,
+        portfolio: masters[id]!.portfolio.map((w) => ({ id: w.id, caption: data.translations.captions[w.id]?.[lang] ?? "" })),
+      };
+    }
+    i18n[lang] = { ...i18n[lang], names, masters: mastersOv };
+  }
+  const content = { ...DEFAULT_CONTENT, masters, i18n } as unknown as Prisma.InputJsonValue;
   await db.siteDocument.createMany({
     data: [
       { id: "draft", data: content },

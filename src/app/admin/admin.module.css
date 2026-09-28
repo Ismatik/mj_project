@@ -553,3 +553,39 @@
   opacity: 0.35;
   cursor: default;
 }
+
+/* Language of the texts being edited */
+.langTabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--mj-line);
+}
+.langTabs button {
+  background: transparent;
+  border: 1px solid var(--mj-line);
+  padding: 7px 14px;
+  font-family: var(--mj-sans);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  color: var(--mj-text-2);
+}
+.langTabs button.langOn {
+  background: var(--mj-ink);
+  border-color: var(--mj-ink);
+  color: var(--mj-cream);
+}
+.langTabs .small {
+  margin-left: 8px;
+}
+.nameRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 14px;
+  align-items: center;
+  padding: 4px 0;
+}

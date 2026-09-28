@@ -25,10 +25,13 @@ export const INTEGRATIONS: IntegrationInfo[] = [
   {
     key: "whatsapp",
     title: "WhatsApp",
-    purpose: "Подтверждение записи гостье, напоминания за 24 и 2 часа, коды входа в личный кабинет, просьба об отзыве.",
-    envKeys: ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_ID"],
-    goLive: "Верификация Meta Business, номер WhatsApp Business API и одобренные шаблоны сообщений.",
+    purpose:
+      "Подтверждение записи, напоминания за 24 и 2 часа и коды входа — гостьям без Telegram. Сообщения гостей в WhatsApp пересылаются ресепшену, гостья получает автоответ.",
+    envKeys: ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_ID", "WHATSAPP_APP_SECRET", "WHATSAPP_VERIFY_TOKEN"],
+    goLive:
+      "Верификация Meta Business и номер в WhatsApp Cloud API; одобренные шаблоны (см. «Шаблоны сообщений»); ключи в .env; в Meta указать webhook https://ДОМЕН/api/whatsapp/webhook с тем же WHATSAPP_VERIFY_TOKEN и подписаться на messages. Затем «Живой».",
     liveIn: "R2",
+    liveReady: true,
   },
   {
     key: "sms",

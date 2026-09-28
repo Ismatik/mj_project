@@ -98,7 +98,7 @@ export function BotSimulator() {
         <div className={s.contact}>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} aria-label="Номер, которым поделиться" />
           <button type="button" disabled={pending} onClick={() => send({ contactPhone: phone }, `📱 ${phone}`)}>
-            📱 Поделиться номером
+            {lastBot?.reply.contactLabel ?? "📱 Поделиться номером"}
           </button>
         </div>
       )}

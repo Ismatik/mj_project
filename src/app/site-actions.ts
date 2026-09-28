@@ -6,7 +6,10 @@ import { db } from "@/lib/db";
 import { formatPhone, normalizePhone } from "@/lib/phone";
 import { BOOKING_HORIZON_DAYS } from "@/lib/slots";
 import { addDays, isClosed, todayYmd } from "@/lib/time";
+import { dict } from "@/lib/i18n/dict";
+import { LANG_NAME, type Lang } from "@/lib/i18n/locales";
 import { getCurrentGuest } from "@/server/guest-auth";
+import { getLang } from "@/server/lang";
 import { createGuestBooking, slotsFor } from "@/server/online-booking";
 import { tooManyAttempts } from "@/server/rate-limit";
 
@@ -16,12 +19,13 @@ async function clientIp() {
   return (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
 }
 
-function dateError(date: string): string | null {
+function dateError(date: string, lang: Lang = "ru"): string | null {
+  const e = dict(lang).errors;
   const today = todayYmd();
-  if (!ymdOk(date)) return "Выберите дату";
-  if (date < today) return "Эта дата уже прошла";
-  if (date > addDays(today, BOOKING_HORIZON_DAYS)) return "Онлайн-запись открыта на месяц вперёд";
-  if (isClosed(date)) return "По понедельникам мы отдыхаем";
+  if (!ymdOk(date)) return e.pickDate;
+  if (date < today) return e.pastDate;
+  if (date > addDays(today, BOOKING_HORIZON_DAYS)) return e.horizon;
+  if (isClosed(date)) return e.monday;
   return null;
 }
 
@@ -43,25 +47,27 @@ export type OnlineBookingResult =
  * so two visitors can't take the same time. The booking lands in the CMS calendar as "Ожидание".
  */
 export async function bookOnline(input: OnlineBookingInput): Promise<OnlineBookingResult> {
-  if (input.company) return { ok: false, error: "Не получилось" }; // honeypot
+  const lang = await getLang();
+  const e = dict(lang).errors;
+  if (input.company) return { ok: false, error: e.generic }; // honeypot
   if (tooManyAttempts(`book:${await clientIp()}`, 6, 60 * 60 * 1000)) {
-    return { ok: false, error: "Слишком много записей подряд. Позвоните нам или напишите в WhatsApp." };
+    return { ok: false, error: e.tooManyBookings };
   }
   const name = String(input.name ?? "").trim().slice(0, 80);
   const phone = normalizePhone(String(input.phone ?? ""));
-  if (name.length < 2) return { ok: false, field: "name", error: "Как к вам обращаться?" };
-  if (!phone) return { ok: false, field: "phone", error: "Нужно 9 цифр, например 98 103 11 11" };
+  if (name.length < 2) return { ok: false, field: "name", error: e.name };
+  if (!phone) return { ok: false, field: "phone", error: e.phone };
   const date = String(input.date ?? "");
   const time = String(input.time ?? "");
-  const de = dateError(date);
+  const de = dateError(date, lang);
   if (de) return { ok: false, field: "slot", error: de };
-  if (!/^\d{2}:\d{2}$/.test(time)) return { ok: false, field: "slot", error: "Выберите время" };
+  if (!/^\d{2}:\d{2}$/.test(time)) return { ok: false, field: "slot", error: e.pickTime };
   const wantedStaff = input.staffId ? String(input.staffId) : null;
 
   // Signed in to her account with the same number → the booking goes to her guest card
   const guest = await getCurrentGuest();
   const guestId = guest && guest.phone === phone ? guest.id : undefined;
-  const result = await createGuestBooking({ serviceId: String(input.serviceId), staffId: wantedStaff, date, time, name, phone, source: "WEBSITE", guestId });
+  const result = await createGuestBooking({ serviceId: String(input.serviceId), staffId: wantedStaff, date, time, name, phone, source: "WEBSITE", guestId, lang });
   if (result.ok) {
     revalidatePath("/cms", "layout");
     if (guestId) revalidatePath("/kabinet");
@@ -71,18 +77,20 @@ export async function bookOnline(input: OnlineBookingInput): Promise<OnlineBooki
 
 /** Public: "перезвоните мне" when no time suits. Goes to the CMS dashboard as a website request. */
 export async function requestCallback(input: { name: string; phone: string; service: string; date?: string; company?: string }): Promise<{ ok: boolean; error?: string }> {
+  const lang = await getLang();
+  const e = dict(lang).errors;
   if (input.company) return { ok: true };
-  if (tooManyAttempts(`callback:${await clientIp()}`, 5, 60 * 60 * 1000)) return { ok: false, error: "Слишком много заявок подряд. Позвоните нам." };
+  if (tooManyAttempts(`callback:${await clientIp()}`, 5, 60 * 60 * 1000)) return { ok: false, error: e.tooManyCallbacks };
   const name = String(input.name ?? "").trim().slice(0, 80);
   const phone = normalizePhone(String(input.phone ?? ""));
-  if (name.length < 2) return { ok: false, error: "Как к вам обращаться?" };
-  if (!phone) return { ok: false, error: "Нужно 9 цифр, например 98 103 11 11" };
+  if (name.length < 2) return { ok: false, error: e.name };
+  if (!phone) return { ok: false, error: e.phone };
   const date = input.date && !dateError(input.date) ? input.date : todayYmd();
   const service = String(input.service || "Консультация").slice(0, 80);
   const guest = await db.guest.findUnique({ where: { phone } });
   const req = await db.bookingRequest.create({ data: { name, phone, service, date: new Date(`${date}T00:00:00Z`), guestId: guest?.id } });
   await db.outboxMessage.create({
-    data: { channel: "telegram", to: "reception", body: `Перезвонить: ${name}, ${formatPhone(phone)} — ${service}`, meta: { kind: "site-request", requestId: req.id } },
+    data: { channel: "telegram", to: "reception", body: `Перезвонить: ${name}, ${formatPhone(phone)} — ${service}${lang === "ru" ? "" : ` · говорит: ${LANG_NAME[lang]}`}`, meta: { kind: "site-request", requestId: req.id } },
   });
   revalidatePath("/cms", "layout");
   return { ok: true };

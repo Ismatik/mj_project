@@ -1,0 +1,145 @@
+.back {
+  margin: -10px 0 22px;
+  font-size: 13px;
+}
+.back a {
+  color: var(--mj-gold-deep);
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.card {
+  background: var(--mj-paper);
+  border: 1px solid var(--mj-line);
+  border-top: 2px solid var(--mj-gold);
+  padding: 18px 20px 20px;
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.head h2 {
+  font-family: var(--mj-serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+.head span {
+  font-size: 12.5px;
+  color: var(--mj-text-2);
+}
+.vars {
+  margin-left: auto;
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px !important;
+  color: var(--mj-gold-deep) !important;
+}
+.langs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lang {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+.lang em {
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--mj-text-2);
+}
+.field textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--mj-line);
+  background: var(--mj-cream);
+  padding: 10px 12px;
+  font-family: var(--mj-sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--mj-ink);
+  border-radius: 0;
+  outline: none;
+}
+.field textarea:focus {
+  border-color: var(--mj-ink);
+}
+.field textarea::placeholder {
+  color: var(--mj-text-muted);
+}
+.preview {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--mj-text-2);
+  background: var(--mj-sand);
+  padding: 8px 10px;
+  border-left: 2px solid var(--mj-gold);
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.small {
+  font-size: 12px;
+  color: var(--mj-text-2);
+}
+.wa {
+  margin-top: 36px;
+  max-width: 1100px;
+}
+.wa h2 {
+  font-family: var(--mj-serif);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 0 0 10px;
+}
+.wa p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--mj-text-2);
+}
+.wa table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 12px 0;
+}
+.wa th,
+.wa td {
+  text-align: left;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--mj-line);
+  vertical-align: top;
+}
+.wa th {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+  font-weight: 500;
+}
+.wa code {
+  font-size: 12.5px;
+}
+@media (max-width: 1100px) {
+  .langs {
+    grid-template-columns: 1fr;
+  }
+}

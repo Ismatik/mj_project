@@ -88,7 +88,7 @@ Start Meta Business verification during R1 so WhatsApp is ready for R2.
 |---|---|---|
 | 1 | Telegram bot (booking, my bookings with reschedule/cancel, prices, contacts), CMS simulator, reception alerts via `/staff`, reminders 24 h / 2 h, live webhook ready for the token | done |
 | 2 | Guest account on the website (sign-in by code via Telegram / WhatsApp / SMS; visits, move, cancel, rebook, favourite master), masters and portfolio pages with admin editing | done |
-| 3 | WhatsApp live driver, RU / TJ / EN for website, bot and message templates | |
+| 3 | WhatsApp live driver (templates, delivery statuses, guest messages to reception, auto-reply), RU / TJ / EN for website, admin, bot and editable message templates | done |
 
 - Telegram bot live (booking, reschedule, cancel, bonus balance, reminders, staff alerts).
 - WhatsApp live as second channel.
@@ -121,6 +121,8 @@ Total: about 14 weeks for one developer.
 |---|---|
 | Now | VPS and domain; Telegram bot token from @BotFather |
 | Now | Portraits, short bios and portfolio photos of each master (uploaded in /admin → «Мастера и портфолио»); real team names |
+| Before launch | Native-speaker review of the Tajik (and English) texts in /admin and CMS → Шаблоны сообщений |
+| During R2 live | WhatsApp templates submitted for approval in Meta (names on the templates page) |
 | During R1 | Meta Business verification, WhatsApp Business number |
 | Before R3 live | Bank acquiring contract; SMS sender name if SMS is used |
 

@@ -72,10 +72,10 @@ try {
   await o.p.click('button:has-text("Доставить сейчас")'); await o.p.waitForSelector('text=/Обработано сообщений|Очередь пуста/');
   await o.p.waitForTimeout(600);
   check('mock delivery marks sent', (await o.p.textContent('main')).includes('Отправлено · мок'));
-  await o.p.locator('article', { hasText: 'WhatsApp' }).locator('button:has-text("Живой")').click();
-  await o.p.waitForSelector('text=/Живое подключение WhatsApp появится в R2/');
+  await o.p.click('[aria-label="SMS: режим"] button:has-text("Живой")');
+  await o.p.waitForSelector('text=/Живое подключение SMS появится в R2/');
   check('live mode refused until connected', true);
-  await o.p.locator('article', { hasText: 'Telegram' }).locator('button:has-text("Тест")').click();
+  await o.p.locator('article:has([aria-label="Telegram: режим"])').locator('button:has-text("Тест")').click();
   await o.p.waitForSelector('text=Тестовое сообщение в очереди');
   check('test message queued', true);
   await o.p.screenshot({ path: out + '/integrations.png', fullPage: true });

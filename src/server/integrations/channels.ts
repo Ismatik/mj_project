@@ -1,12 +1,15 @@
 // Messaging connectors. Every channel has a mock driver (records the message as sent) and a live driver.
-// Live drivers are added per release: Telegram (R2 Sprint 1), WhatsApp later in R2, SMS when a gateway contract exists.
+// Live drivers: Telegram (R2 Sprint 1), WhatsApp Cloud API (R2 Sprint 3); SMS when a gateway contract exists.
 import { sendText, telegramConfigured } from "./telegram-api";
+import { waSend, whatsappConfigured, type WaTemplate } from "./whatsapp-api";
 
 export type ChannelKey = "telegram" | "whatsapp" | "sms";
-export type DeliveryResult = { ok: true } | { ok: false; error: string };
+/** externalId: the provider's message id (WhatsApp "wamid"), for delivery statuses */
+export type DeliveryResult = { ok: true; externalId?: string } | { ok: false; error: string };
+export type OutgoingMeta = { template?: WaTemplate } | null | undefined;
 
 export interface MessageChannel {
-  send(to: string, body: string): Promise<DeliveryResult>;
+  send(to: string, body: string, meta?: OutgoingMeta): Promise<DeliveryResult>;
 }
 
 /** Mock mode: nothing leaves the server; the message stays visible in the CMS outbox as "sent". */
@@ -23,6 +26,13 @@ const liveChannels: Partial<Record<ChannelKey, MessageChannel>> = {
       if (!telegramConfigured()) return { ok: false, error: "TELEGRAM_BOT_TOKEN / TELEGRAM_WEBHOOK_SECRET are not set" };
       const res = await sendText(to, body);
       return res.ok ? { ok: true } : { ok: false, error: res.description ?? "Telegram error" };
+    },
+  },
+  whatsapp: {
+    async send(to, body, meta) {
+      if (!whatsappConfigured()) return { ok: false, error: "WHATSAPP_TOKEN / WHATSAPP_PHONE_ID are not set" };
+      const res = await waSend(to, body, meta?.template);
+      return res.ok ? { ok: true, externalId: res.id } : { ok: false, error: res.error };
     },
   },
 };

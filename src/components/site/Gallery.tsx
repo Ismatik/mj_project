@@ -3,6 +3,8 @@
 
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { dict } from "@/lib/i18n/dict";
+import { localePath, type Lang } from "@/lib/i18n/locales";
 import s from "./site.module.css";
 
 export type GalleryWork = { id: string; url: string; caption: string; category: string; master?: { name: string; slug: string } };
@@ -12,11 +14,14 @@ export function Gallery({
   works,
   categories = [],
   masters = [],
+  lang,
 }: {
   works: GalleryWork[];
   categories?: { slug: string; name: string }[];
   masters?: { slug: string; name: string }[];
+  lang: Lang;
 }) {
+  const t = dict(lang).gallery;
   const [cat, setCat] = useState("");
   const [master, setMaster] = useState("");
   const [open, setOpen] = useState<number | null>(null);
@@ -43,9 +48,9 @@ export function Gallery({
       {(categories.length > 1 || masters.length > 1) && (
         <div className={s.filters}>
           {categories.length > 1 && (
-            <div className={s.filterRow} role="group" aria-label="Направление">
+            <div className={s.filterRow} role="group" aria-label={t.category}>
               <button type="button" aria-pressed={!cat} onClick={() => setCat("")}>
-                Все работы
+                {t.allWorks}
               </button>
               {categories.map((c) => (
                 <button key={c.slug} type="button" aria-pressed={cat === c.slug} onClick={() => setCat(c.slug)}>
@@ -55,9 +60,9 @@ export function Gallery({
             </div>
           )}
           {masters.length > 1 && (
-            <div className={s.filterRow} role="group" aria-label="Мастер">
+            <div className={s.filterRow} role="group" aria-label={t.master}>
               <button type="button" aria-pressed={!master} onClick={() => setMaster("")}>
-                Все мастера
+                {t.allMasters}
               </button>
               {masters.map((m) => (
                 <button key={m.slug} type="button" aria-pressed={master === m.slug} onClick={() => setMaster(m.slug)}>
@@ -70,12 +75,12 @@ export function Gallery({
       )}
 
       {shown.length === 0 ? (
-        <p className={s.emptyNote}>Здесь скоро появятся работы — мы как раз фотографируем.</p>
+        <p className={s.emptyNote}>{t.empty}</p>
       ) : (
         <ul className={s.gallery}>
           {shown.map((w, i) => (
             <li key={w.id}>
-              <button type="button" className={s.work} onClick={() => setOpen(i)} aria-label={`Открыть фото: ${w.caption || "работа"}`}>
+              <button type="button" className={s.work} onClick={() => setOpen(i)} aria-label={t.open(w.caption)}>
                 <img src={w.url} alt={w.caption} loading="lazy" decoding="async" />
                 {(w.caption || w.master) && (
                   <span className={s.workCaption}>
@@ -90,15 +95,15 @@ export function Gallery({
       )}
 
       {current && (
-        <div className={s.viewer} role="dialog" aria-modal="true" aria-label={current.caption || "Фото работы"} onClick={() => setOpen(null)}>
-          <button type="button" className={s.viewerClose} aria-label="Закрыть" onClick={() => setOpen(null)}>
+        <div className={s.viewer} role="dialog" aria-modal="true" aria-label={current.caption || t.photo} onClick={() => setOpen(null)}>
+          <button type="button" className={s.viewerClose} aria-label={t.close} onClick={() => setOpen(null)}>
             <X size={26} strokeWidth={1.3} />
           </button>
           {shown.length > 1 && (
             <button
               type="button"
               className={`${s.viewerNav} ${s.viewerPrev}`}
-              aria-label="Предыдущее фото"
+              aria-label={t.prev}
               onClick={(e) => {
                 e.stopPropagation();
                 setOpen((open! - 1 + shown.length) % shown.length);
@@ -114,7 +119,7 @@ export function Gallery({
               {current.master && (
                 <>
                   {" · "}
-                  <a href={`/mastera/${current.master.slug}`}>{current.master.name}</a>
+                  <a href={localePath(lang, `/mastera/${current.master.slug}`)}>{current.master.name}</a>
                 </>
               )}
               <span>
@@ -126,7 +131,7 @@ export function Gallery({
             <button
               type="button"
               className={`${s.viewerNav} ${s.viewerNext}`}
-              aria-label="Следующее фото"
+              aria-label={t.next}
               onClick={(e) => {
                 e.stopPropagation();
                 setOpen((open! + 1) % shown.length);

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PageHead, SectionHead } from "@/components/ui/Headings";
 import { Tag } from "@/components/ui/Tag";
 import { db } from "@/lib/db";
@@ -14,6 +15,8 @@ const STATUS = {
   QUEUED: { label: "В очереди", tone: "pending" },
   FAILED: { label: "Ошибка", tone: "chair" },
 } as const;
+
+const metaOf = (v: unknown) => (v && typeof v === "object" ? (v as { lang?: string; template?: { name: string } }) : {});
 
 // "Интеграции" — connectors in mock or live mode, and the outbox of every message the system sends.
 export default async function IntegrationsPage({ searchParams }: PageProps<"/cms/integrations">) {
@@ -35,6 +38,9 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
         <b>Вход гостей в личный кабинет.</b> Код уходит в Telegram-бот, если гостья им пользуется, иначе — в WhatsApp или по SMS. Пока канал в режиме «мок», код
         показывается гостье прямо на экране: на сервере это включается переменной DEMO_LOGIN_CODES=1 (для демо и staging). Без неё вход откроется, когда канал
         станет «Живым». Отправленные коды в «Исходящих» скрываются.
+        <br />
+        <b>Языки.</b> Гостьи получают сообщения на своём языке (русский, таджикский, английский) — тексты правятся в{" "}
+        <Link href="/cms/integrations/templates">шаблонах сообщений</Link>.
       </p>
       <div className={s.grid}>
         {INTEGRATIONS.map((info) => {
@@ -97,6 +103,8 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
               <span className={s.msgMain}>
                 <span className={s.msgTo}>
                   {CHANNEL_LABEL[m.channel] ?? m.channel} → {m.to === "reception" ? "ресепшен" : m.to}
+                  {metaOf(m.meta).lang && metaOf(m.meta).lang !== "ru" ? ` · ${String(metaOf(m.meta).lang).toUpperCase()}` : ""}
+                  {metaOf(m.meta).template ? ` · шаблон ${metaOf(m.meta).template!.name}` : ""}
                 </span>
                 <span className={s.msgBody}>{m.body}</span>
                 {m.error && <span className={s.msgError}>{m.error}</span>}

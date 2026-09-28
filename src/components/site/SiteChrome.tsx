@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { UserRound } from "lucide-react";
 import type { ReactNode } from "react";
+import { dict } from "@/lib/i18n/dict";
+import { LANG_CODE, LANG_LABEL, LANG_NAME, LANGS, localePath, type Lang } from "@/lib/i18n/locales";
 import { instagramLink, telLink, whatsappLink, type SiteContent } from "@/lib/site-content";
 import { SiteEffects } from "./SiteEffects";
 import s from "./site.module.css";
@@ -20,22 +22,38 @@ export function Mono({ size, color }: { size: number; color: string }) {
 }
 
 const LINKS = [
-  { href: "/#uslugi", label: "Услуги", id: "services" },
-  { href: "/mastera", label: "Мастера", id: "masters" },
-  { href: "/portfolio", label: "Портфолио", id: "portfolio" },
-  { href: "/#nevesta", label: "Невестам", id: "bridal" },
-  { href: "/#otzyvy", label: "Отзывы", id: "reviews" },
-  { href: "/#kontakty", label: "Контакты", id: "contacts" },
+  { href: "/#uslugi", id: "services" },
+  { href: "/mastera", id: "masters" },
+  { href: "/portfolio", id: "portfolio" },
+  { href: "/#nevesta", id: "bridal" },
+  { href: "/#otzyvy", id: "reviews" },
+  { href: "/#kontakty", id: "contacts" },
 ] as const;
 export type NavId = (typeof LINKS)[number]["id"] | "account" | "home";
 
 export type NavGuest = { name: string } | null;
 
-export function SiteNav({ guest, current = "home", bookHref = "/#zapis" }: { guest: NavGuest; current?: NavId; bookHref?: string }) {
-  const first = guest?.name.split(" ")[0];
+/** Рус · Тоҷ · Eng — full page loads, so the whole page (and <html lang>) switches */
+function LangSwitch({ lang, path, className, short }: { lang: Lang; path: string; className: string; short?: boolean }) {
+  const t = dict(lang);
   return (
-    <nav className={s.nav} aria-label="Главное меню">
-      <Link href="/" className={s.brand} aria-label="Mavzunai Jovid — на главную">
+    <div className={className} role="group" aria-label={t.nav.language}>
+      {LANGS.map((l) => (
+        <a key={l} href={localePath(l, path)} hrefLang={l} lang={l} aria-current={l === lang ? "true" : undefined} title={LANG_NAME[l]}>
+          {short ? LANG_CODE[l] : LANG_LABEL[l]}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+export function SiteNav({ guest, lang, path, current = "home", bookHref }: { guest: NavGuest; lang: Lang; path: string; current?: NavId; bookHref?: string }) {
+  const t = dict(lang);
+  const first = guest?.name.split(" ")[0];
+  const href = (p: string) => localePath(lang, p);
+  return (
+    <nav className={s.nav} aria-label={t.nav.main} data-lang={lang}>
+      <Link href={href("/")} className={s.brand} aria-label={t.nav.home}>
         <Mono size={40} color="var(--mj-ink)" />
         <div className={s.brandText}>
           <div className={s.brandName}>Mavzunai Jovid</div>
@@ -44,38 +62,41 @@ export function SiteNav({ guest, current = "home", bookHref = "/#zapis" }: { gue
       </Link>
       <div className={s.navLinks}>
         {LINKS.map((l) => (
-          <Link key={l.id} href={l.href} aria-current={current === l.id ? "page" : undefined}>
-            {l.label}
+          <Link key={l.id} href={href(l.href)} aria-current={current === l.id ? "page" : undefined}>
+            {t.nav[l.id]}
           </Link>
         ))}
       </div>
-      <Link href="/kabinet" className={s.navAccount} aria-current={current === "account" ? "page" : undefined} title={guest ? "Личный кабинет" : "Войти в личный кабинет"}>
+      <LangSwitch lang={lang} path={path} className={s.langSwitch} short />
+      <Link href={href("/kabinet")} className={s.navAccount} aria-current={current === "account" ? "page" : undefined} title={t.nav.account}>
         <UserRound size={17} strokeWidth={1.5} aria-hidden="true" />
-        <span>{first ?? "Войти"}</span>
+        <span>{first ?? t.nav.signIn}</span>
       </Link>
-      <a href={bookHref} className={s.btnInk}>
-        Записаться
+      <a href={bookHref ?? href("/#zapis")} className={s.btnInk}>
+        {t.nav.book}
       </a>
       <details className={s.menu}>
-        <summary aria-label="Меню">
+        <summary aria-label={t.nav.menu}>
           <span />
           <span />
           <span />
         </summary>
         <div className={s.menuPanel}>
           {LINKS.map((l) => (
-            <Link key={l.id} href={l.href} aria-current={current === l.id ? "page" : undefined}>
-              {l.label}
+            <Link key={l.id} href={href(l.href)} aria-current={current === l.id ? "page" : undefined}>
+              {t.nav[l.id]}
             </Link>
           ))}
-          <Link href="/kabinet">{guest ? `Кабинет · ${first}` : "Личный кабинет"}</Link>
+          <Link href={href("/kabinet")}>{guest ? t.nav.accountOf(first!) : t.nav.account}</Link>
+          <LangSwitch lang={lang} path={path} className={s.menuLangs} />
         </div>
       </details>
     </nav>
   );
 }
 
-export function SiteFooter({ c, year }: { c: SiteContent; year: string }) {
+export function SiteFooter({ c, year, lang }: { c: SiteContent; year: string; lang: Lang }) {
+  const t = dict(lang);
   return (
     <footer id="kontakty" className={s.footer}>
       <div className={s.footerGrid}>
@@ -87,11 +108,11 @@ export function SiteFooter({ c, year }: { c: SiteContent; year: string }) {
           <p className={s.footerText}>
             Gallery of Beauty MJ.
             <br />
-            Салон красоты и свадебный зал.
+            {t.footer.about}
           </p>
         </div>
         <div className={s.footerCol}>
-          <div className={s.footerLabel}>Контакты</div>
+          <div className={s.footerLabel}>{t.footer.contacts}</div>
           <div>
             <a href={telLink(c.contacts)}>{c.contacts.phone}</a>
           </div>
@@ -109,7 +130,7 @@ export function SiteFooter({ c, year }: { c: SiteContent; year: string }) {
           ))}
         </div>
         <div className={s.footerCol}>
-          <div className={s.footerLabel}>Адрес и часы</div>
+          <div className={s.footerLabel}>{t.footer.address}</div>
           <div>{c.contacts.address}</div>
           <div>{c.contacts.district}</div>
           <div>{c.contacts.hours}</div>
@@ -118,20 +139,38 @@ export function SiteFooter({ c, year }: { c: SiteContent; year: string }) {
       </div>
       <div className={s.footerBottom}>
         <span>© {year} Mavzunai Jovid</span>
-        <span>Душанбе · Таджикистан</span>
+        <span>{t.footer.city}</span>
       </div>
     </footer>
   );
 }
 
 /** Inner website pages (masters, portfolio, account): same nav and footer as the home page, no intro loader. */
-export function SitePage({ c, guest, current, year, bookHref, children }: { c: SiteContent; guest: NavGuest; current: NavId; year: string; bookHref?: string; children: ReactNode }) {
+export function SitePage({
+  c,
+  guest,
+  lang,
+  path,
+  current,
+  year,
+  bookHref,
+  children,
+}: {
+  c: SiteContent;
+  guest: NavGuest;
+  lang: Lang;
+  path: string;
+  current: NavId;
+  year: string;
+  bookHref?: string;
+  children: ReactNode;
+}) {
   return (
     <div className={s.site}>
       <SiteEffects intro={false} />
-      <SiteNav guest={guest} current={current} bookHref={bookHref} />
+      <SiteNav guest={guest} lang={lang} path={path} current={current} bookHref={bookHref} />
       <main>{children}</main>
-      <SiteFooter c={c} year={year} />
+      <SiteFooter c={c} year={year} lang={lang} />
     </div>
   );
 }

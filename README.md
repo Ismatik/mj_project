@@ -10,7 +10,7 @@ Website, website admin and salon CMS for **Mavzunai Jovid — Gallery of Beauty 
 Next.js 16 (App Router, TypeScript) · PostgreSQL 16 + Prisma 7 · pg-boss worker · Caddy (HTTPS) · Docker Compose.
 
 ```
-src/app/            routes: / · /mastera · /portfolio · /kabinet · /login · /cms/* · /admin · /styleguide (owner only)
+src/app/            routes: / · /mastera · /portfolio · /kabinet (also under /tj and /en) · /login · /cms/* · /admin · /styleguide (owner only)
 src/components/fx/  effects: MJ nail loader, toasts, count-up, skeleton, sparkles
 src/components/ui/  shared components: buttons, tags, headings, stat cards, bars, fields, monogram
 src/lib/            formatting (somoni, dates in Dushanbe time), passwords, db client
@@ -81,7 +81,7 @@ While the channel is in mock mode the code is shown on screen. That is always on
 
 ## Integrations
 
-Telegram, WhatsApp, SMS and payments each run in `MOCK` or `LIVE` mode, managed on `/cms/integrations` (owner only). In mock mode messages are recorded in the outbox and marked as sent without leaving the server; the worker delivers the queue every minute, or use "Доставить сейчас". Live drivers arrive with R2 (Telegram, WhatsApp, SMS) and R3 (payments). API keys belong in `.env` only — the page shows whether they are set, never their values.
+Telegram, WhatsApp, SMS and payments each run in `MOCK` or `LIVE` mode, managed on `/cms/integrations` (owner only). In mock mode messages are recorded in the outbox and marked as sent without leaving the server; the worker delivers the queue every minute, or use "Доставить сейчас". Live drivers: Telegram and WhatsApp (R2); SMS once a gateway is contracted; payments in R3. API keys belong in `.env` only — the page shows whether they are set, never their values.
 
 ## Telegram bot
 
@@ -91,7 +91,25 @@ Guests book, see, move and cancel their visits in Telegram; reception gets alert
 - Staff link a chat for reception alerts by sending the bot `/staff CODE` (the code is on `/cms/integrations`).
 - Going live: create the bot with @BotFather, put `TELEGRAM_BOT_TOKEN` and a long random `TELEGRAM_WEBHOOK_SECRET` in `.env`, restart, then CMS → Интеграции → Telegram → "Подключить webhook" and switch to "Живой". Requires the public HTTPS domain in `SITE_DOMAIN`.
 
+- The bot speaks Russian, Tajik and English: the language comes from the Telegram app on first contact and can be changed with "🌐 Язык · Забон · Language" or `/lang`. It also becomes the language of that guest's reminders.
+
+## Languages (RU / TJ / EN)
+
+- The website is in Russian at `/`, Tajik at `/tj/…` and English at `/en/…` (the proxy rewrites the prefix and passes the language on; pages carry `hreflang` alternates and `<html lang>`). The switch in the header keeps the current page.
+- Interface texts (buttons, forms, errors, the account) are in `src/lib/i18n/dict.ts`; bot phrases in `src/lib/bot/texts.ts`.
+- Texts the salon edits are translated in `/admin` with the **Русский / Тоҷикӣ / English** tabs: section texts, service and category names, masters (name, specialty, bio, photo captions), review texts, address and hours, SEO. Only differences from Russian are stored; anything left untranslated shows in Russian.
+- Messages to guests (booking confirmation, reminders, sign-in code, WhatsApp auto-reply) go in the guest's language — the one she last used on the website or in the bot, or set in her account. Their texts are edited per language in CMS → Интеграции → **Шаблоны сообщений**. Reception alerts stay in Russian and mention the guest's language.
+- The Tajik and English texts are drafts: have a native speaker review them in the admin before launch.
+
+## WhatsApp
+
+Guests without Telegram get their confirmation, reminders and sign-in codes in WhatsApp (Cloud API, `src/server/integrations/whatsapp-api.ts`).
+
+- WhatsApp only lets a business write first with templates approved by Meta. Create them in WhatsApp Manager with the names and parameter order shown on the templates page (`mj_booking_confirmation`, `mj_reminder_day`, `mj_reminder_hours`, `mj_login_code` — the last one in the *Authentication* category). Tajik guests get the Russian template on WhatsApp unless Meta accepts Tajik.
+- Webhook `https://SITE_DOMAIN/api/whatsapp/webhook`: verified with `WHATSAPP_VERIFY_TOKEN`, every request checked against `WHATSAPP_APP_SECRET`. It records delivery failures in the outbox, forwards guests' WhatsApp messages to reception (Telegram) and sends her a short auto-reply at most every 12 hours.
+- Going live: Meta Business verification and a Cloud API number; put `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` in `.env`; restart; set the webhook in Meta (field `messages`); CMS → Интеграции → WhatsApp → "Тест" (sends Meta's `hello_world` template) and "Живой".
+
 ## Tests
 
-- `npm test` — unit tests (booking rules, free slots, formatting, access, content).
-- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot and guest account (see `e2e/README.md`).
+- `npm test` — unit tests (booking rules, free slots, formatting, access, content, translations, bot, message templates, WhatsApp payloads and webhook parsing).
+- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp (see `e2e/README.md`).

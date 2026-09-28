@@ -3,7 +3,11 @@ import { createHash, randomBytes, randomInt, timingSafeEqual } from "node:crypto
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { db } from "@/lib/db";
-import { CHANNEL_WHERE, CODE_MAX_ATTEMPTS, CODE_RESEND_SECONDS, CODE_TTL_MIN, CODES_PER_HOUR, pickCodeChannel, type CodeChannel } from "@/lib/guest-code";
+import { dict } from "@/lib/i18n/dict";
+import type { Lang } from "@/lib/i18n/locales";
+import { messageText, WHATSAPP_LANG, WHATSAPP_TEMPLATES } from "@/lib/messages";
+import { CODE_MAX_ATTEMPTS, CODE_RESEND_SECONDS, CODE_TTL_MIN, CODES_PER_HOUR, pickCodeChannel, type CodeChannel } from "@/lib/guest-code";
+import { messageContext } from "./integrations/guest-messages";
 import { deliverNow } from "./integrations/outbox";
 
 // Guest accounts on the website: phone number → one-time code → session cookie (separate from staff sessions).
@@ -34,15 +38,16 @@ export type SendCodeResult =
 const demoCodesAllowed = () => process.env.NODE_ENV !== "production" || process.env.DEMO_LOGIN_CODES === "1";
 
 /** Sends a 4-digit code. In mock mode nothing leaves the server, so the code is returned to be shown on screen. */
-export async function sendLoginCode(phone: string): Promise<SendCodeResult> {
+export async function sendLoginCode(phone: string, pageLang: Lang = "ru"): Promise<SendCodeResult> {
+  const e = dict(pageLang).errors;
   const now = Date.now();
   const recent = await db.loginCode.findMany({ where: { phone, createdAt: { gte: new Date(now - 3600_000) } }, orderBy: { createdAt: "desc" } });
   const last = recent[0];
   if (last && now - last.createdAt.getTime() < CODE_RESEND_SECONDS * 1000) {
     const resendIn = Math.ceil((CODE_RESEND_SECONDS * 1000 - (now - last.createdAt.getTime())) / 1000);
-    return { ok: false, error: `Код уже отправлен. Новый можно запросить через ${resendIn} с.`, resendIn };
+    return { ok: false, error: e.codeWait(resendIn), resendIn };
   }
-  if (recent.length >= CODES_PER_HOUR) return { ok: false, error: "Слишком много кодов за час. Попробуйте позже или позвоните нам." };
+  if (recent.length >= CODES_PER_HOUR) return { ok: false, error: e.codePerHour };
 
   const [guest, integrations] = await Promise.all([
     db.guest.findUnique({ where: { phone }, include: { telegramChats: { where: { isStaff: false }, orderBy: { updatedAt: "desc" }, select: { id: true } } } }),
@@ -55,44 +60,55 @@ export async function sendLoginCode(phone: string): Promise<SendCodeResult> {
   const modes = { telegram: modeOf("telegram"), whatsapp: modeOf("whatsapp"), sms: modeOf("sms") };
   const route = pickCodeChannel(guest?.telegramChats.map((c) => c.id) ?? [], modes);
   const mock = !!route && modes[route.channel] === "MOCK";
-  if (!route || (mock && !demoCodesAllowed())) return { ok: false, error: "Вход в кабинет скоро заработает. Пока записаться и изменить запись можно по телефону или в WhatsApp." };
+  if (!route || (mock && !demoCodesAllowed())) return { ok: false, error: e.codeUnavailable };
 
   const code = String(randomInt(0, 10000)).padStart(4, "0");
   await db.loginCode.create({
     data: { phone, codeHash: codeHash(phone, code), channel: route.channel, expiresAt: new Date(now + CODE_TTL_MIN * 60_000) },
   });
+  // The code comes in the language of the page she's on
+  const { templates } = await messageContext(db);
+  const wa = WHATSAPP_TEMPLATES["login-code"]!;
   const msg = await db.outboxMessage.create({
     data: {
       channel: route.channel,
       to: route.to ?? phone,
-      body: `Mavzunai Jovid: код для входа в личный кабинет — ${code}. Никому его не сообщайте.`,
-      meta: { kind: "login-code", secret: code },
+      body: messageText("login-code", pageLang, { code }, templates),
+      meta: {
+        kind: "login-code",
+        lang: pageLang,
+        secret: code,
+        ...(route.channel === "whatsapp" ? { template: { name: wa.name, lang: WHATSAPP_LANG[pageLang], params: [code], auth: true } } : {}),
+      },
     },
   });
   const status = await deliverNow(db, msg.id);
-  if (status === "FAILED") return { ok: false, error: "Не удалось отправить код. Попробуйте ещё раз или позвоните нам." };
-  return { ok: true, channel: route.channel, where: CHANNEL_WHERE[route.channel], resendIn: CODE_RESEND_SECONDS, ...(mock ? { demoCode: code } : {}) };
+  if (status === "FAILED") return { ok: false, error: e.codeSendFailed };
+  return { ok: true, channel: route.channel, where: dict(pageLang).codeWhere[route.channel], resendIn: CODE_RESEND_SECONDS, ...(mock ? { demoCode: code } : {}) };
 }
 
 export type VerifyResult = { ok: true } | { ok: false; error: string; needName?: boolean };
 
 /** Checks the latest code for the phone; on success signs the guest in (a new guest is created with the given name). */
-export async function verifyLoginCode(phone: string, code: string, name?: string): Promise<VerifyResult> {
+export async function verifyLoginCode(phone: string, code: string, name: string | undefined, lang: Lang = "ru"): Promise<VerifyResult> {
+  const e = dict(lang).errors;
   const row = await db.loginCode.findFirst({ where: { phone, usedAt: null }, orderBy: { createdAt: "desc" } });
-  if (!row || row.expiresAt < new Date()) return { ok: false, error: "Код устарел — запросите новый" };
-  if (row.attempts >= CODE_MAX_ATTEMPTS) return { ok: false, error: "Слишком много попыток — запросите новый код" };
+  if (!row || row.expiresAt < new Date()) return { ok: false, error: e.codeExpired };
+  if (row.attempts >= CODE_MAX_ATTEMPTS) return { ok: false, error: e.codeAttempts };
   const a = Buffer.from(row.codeHash);
   const b = Buffer.from(codeHash(phone, code));
   if (a.length !== b.length || !timingSafeEqual(a, b)) {
     await db.loginCode.update({ where: { id: row.id }, data: { attempts: { increment: 1 } } });
     const left = CODE_MAX_ATTEMPTS - row.attempts - 1;
-    return { ok: false, error: left > 0 ? `Неверный код. Осталось попыток: ${left}` : "Неверный код. Запросите новый" };
+    return { ok: false, error: e.codeWrong(left) };
   }
   let guest = await db.guest.findUnique({ where: { phone } });
   if (!guest) {
     const clean = (name ?? "").trim().slice(0, 80);
-    if (clean.length < 2) return { ok: false, error: "Как к вам обращаться?", needName: true };
-    guest = await db.guest.create({ data: { name: clean, phone, tag: "NEW" } });
+    if (clean.length < 2) return { ok: false, error: e.name, needName: true };
+    guest = await db.guest.create({ data: { name: clean, phone, tag: "NEW", lang } });
+  } else if (guest.lang !== lang) {
+    guest = await db.guest.update({ where: { id: guest.id }, data: { lang } });
   }
   await db.loginCode.update({ where: { id: row.id }, data: { usedAt: new Date() } });
 

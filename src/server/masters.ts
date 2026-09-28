@@ -1,10 +1,13 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { nameIn } from "@/lib/i18n/content";
+import type { Lang } from "@/lib/i18n/locales";
 import { EMPTY_PROFILE, masterSlugs, type PortfolioItem } from "@/lib/masters";
 import type { SiteContent } from "@/lib/site-content";
 
-/** Masters shown on the website: active staff with the profile from the site content (hidden ones left out). */
-export async function getSiteMasters(c: SiteContent) {
+/** Masters shown on the website: active staff with the profile from the site content (hidden ones left out).
+ * `c` should already be localized (see localize()); names of masters and services are translated here. */
+export async function getSiteMasters(c: SiteContent, lang: Lang = "ru") {
   const staff = await db.staff.findMany({
     where: { active: true },
     orderBy: { sortOrder: "asc" },
@@ -12,7 +15,7 @@ export async function getSiteMasters(c: SiteContent) {
       services: {
         where: { active: true, showOnSite: true },
         orderBy: [{ category: { sortOrder: "asc" } }, { sortOrder: "asc" }],
-        include: { category: { select: { slug: true, name: true } } },
+        include: { category: { select: { id: true, slug: true, name: true } } },
       },
     },
   });
@@ -23,13 +26,19 @@ export async function getSiteMasters(c: SiteContent) {
       return {
         id: m.id,
         slug: slugs.get(m.id)!,
-        name: m.name,
+        name: nameIn(c, lang, "staff", m.id, m.name),
         title: p.specialty || m.title,
         bio: p.bio,
         photo: p.photo,
         visible: p.visible,
         portfolio: p.portfolio,
-        services: m.services.map((s) => ({ id: s.id, name: s.name, price: s.price, durationMin: s.durationMin, category: s.category.name })),
+        services: m.services.map((s) => ({
+          id: s.id,
+          name: nameIn(c, lang, "services", s.id, s.name),
+          price: s.price,
+          durationMin: s.durationMin,
+          category: nameIn(c, lang, "categories", s.category.id, s.category.name),
+        })),
       };
     })
     .filter((m) => m.visible);
@@ -39,8 +48,12 @@ export type SiteMaster = Awaited<ReturnType<typeof getSiteMasters>>[number];
 export type PortfolioWork = PortfolioItem & { master: { name: string; slug: string } };
 
 /** All works of visible masters, newest first per master, and the categories that have works. */
-export async function getPortfolio(c: SiteContent) {
-  const [masters, categories] = await Promise.all([getSiteMasters(c), db.serviceCategory.findMany({ orderBy: { sortOrder: "asc" }, select: { slug: true, name: true } })]);
+export async function getPortfolio(c: SiteContent, lang: Lang = "ru") {
+  const [masters, rawCategories] = await Promise.all([
+    getSiteMasters(c, lang),
+    db.serviceCategory.findMany({ orderBy: { sortOrder: "asc" }, select: { id: true, slug: true, name: true } }),
+  ]);
+  const categories = rawCategories.map((x) => ({ slug: x.slug, name: nameIn(c, lang, "categories", x.id, x.name) }));
   const works: PortfolioWork[] = masters.flatMap((m) => m.portfolio.map((w) => ({ ...w, master: { name: m.name, slug: m.slug } })));
   const used = new Set(works.map((w) => w.category));
   return { works, categories: categories.filter((x) => used.has(x.slug)), masters };

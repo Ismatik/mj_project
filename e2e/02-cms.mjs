@@ -112,7 +112,7 @@ try {
   await lola.locator('input[inputmode=numeric]').fill('2');
   await lola.locator('button:has-text("Забронировать")').click();
   await p.waitForSelector('text=/Платье «Лола»: бронь/');
-  check('dress booked', await lola.locator('text=/Бронь/').isVisible());
+  check('dress booked', await lola.locator('text=/Бронь/').first().waitFor({ timeout: 5000 }).then(() => true, () => false));
   await lola.locator('button:has-text("Забронировать")').click();
   await lola.locator('input[type=date]').fill(d);
   await lola.locator('button:has-text("Забронировать")').last().click();

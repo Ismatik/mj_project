@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { useFx } from "@/components/fx/FxProvider";
+import { dict } from "@/lib/i18n/dict";
+import type { Lang } from "@/lib/i18n/locales";
 import { normalizePhone } from "@/lib/phone";
 import { confirmCode, requestCode } from "./actions";
 import s from "./kabinet.module.css";
@@ -10,7 +12,9 @@ import s from "./kabinet.module.css";
 type Sent = { where: string; demoCode?: string };
 
 /** Phone → 4-digit code (→ name, for a first visit). */
-export function SignIn() {
+export function SignIn({ lang }: { lang: Lang }) {
+  const t = dict(lang).signIn;
+  const err = dict(lang).errors;
   const fx = useFx();
   const router = useRouter();
   const [phone, setPhone] = useState("");
@@ -35,7 +39,7 @@ export function SignIn() {
   const send = (e?: FormEvent) => {
     e?.preventDefault();
     setError("");
-    if (!normalizePhone(phone)) return setError("Нужно 9 цифр, например 98 103 11 11");
+    if (!normalizePhone(phone)) return setError(err.phone);
     start(async () => {
       const res = await requestCode(phone);
       if (!res.ok) {
@@ -54,14 +58,14 @@ export function SignIn() {
   const verify = (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!/^\d{4}$/.test(code)) return setError("Код — 4 цифры");
+    if (!/^\d{4}$/.test(code)) return setError(err.codeFormat);
     start(async () => {
       const res = await confirmCode(phone, code, needName ? name : undefined);
       if (!res.ok) {
         if (res.needName) setNeedName(true);
         return setError(needName || !res.needName ? res.error : "");
       }
-      fx.toast("Добро пожаловать в личный кабинет", "MJ");
+      fx.toast(t.welcome, "MJ");
       router.refresh();
     });
   };
@@ -69,41 +73,41 @@ export function SignIn() {
   return (
     <section className={s.signIn} aria-labelledby="signin-title">
       <div className={s.signInCard}>
-        <div className={s.kicker}>Личный кабинет</div>
+        <div className={s.kicker}>{t.kicker}</div>
         <h1 id="signin-title" className={s.title}>
-          Ваши записи — в одном месте
+          {t.title}
         </h1>
         <div className={s.rule} />
-        <p className={s.lead}>Смотрите и переносите записи, записывайтесь снова в одно касание и отмечайте любимого мастера. Вход — по коду, без пароля.</p>
+        <p className={s.lead}>{t.lead}</p>
 
         {!sent ? (
           <form onSubmit={send} noValidate className={s.form}>
             <label className={s.label}>
-              Номер телефона
+              {t.phone}
               <span className={s.phoneRow}>
                 <span className={s.prefix}>+992</span>
                 <input name="phone" type="tel" inputMode="tel" autoComplete="tel-national" placeholder="98 103 11 11" value={phone} onChange={(e) => setPhone(e.target.value)} autoFocus />
               </span>
             </label>
             <button type="submit" className={s.primary} disabled={pending}>
-              {pending ? "Отправляем…" : "Получить код"}
+              {pending ? t.sending : t.getCode}
             </button>
           </form>
         ) : (
           <form onSubmit={verify} noValidate className={s.form}>
             <p className={s.sentNote} role="status">
-              Код отправлен {sent.where} на номер +992 {phone.replace(/^\+?992/, "").trim()}.{" "}
+              {t.sent(sent.where, phone.replace(/^\+?992/, "").trim())}{" "}
               <button type="button" className={s.linkBtn} onClick={() => (setSent(null), setNeedName(false), setError(""))}>
-                Изменить номер
+                {t.changePhone}
               </button>
             </p>
             {sent.demoCode && (
               <div className={s.demo}>
-                Демо-режим: сообщения пока не уходят гостям. Ваш код — <b>{sent.demoCode}</b>
+                {t.demo} <b>{sent.demoCode}</b>
               </div>
             )}
             <label className={s.label}>
-              Код из сообщения
+              {t.code}
               <input
                 ref={codeRef}
                 name="code"
@@ -117,16 +121,16 @@ export function SignIn() {
             </label>
             {needName && (
               <label className={s.label}>
-                Как к вам обращаться?
+                {t.askName}
                 <input name="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
-                <span className={s.hint}>Вы у нас впервые — создадим карточку гостьи.</span>
+                <span className={s.hint}>{t.newGuest}</span>
               </label>
             )}
             <button type="submit" className={s.primary} disabled={pending || code.length !== 4}>
-              {pending ? "Проверяем…" : "Войти"}
+              {pending ? t.checking : t.enter}
             </button>
             <button type="button" className={s.linkBtn} disabled={pending || wait > 0} onClick={() => send()}>
-              {wait > 0 ? `Отправить код ещё раз через ${wait} с` : "Отправить код ещё раз"}
+              {wait > 0 ? t.resendIn(wait) : t.resend}
             </button>
           </form>
         )}
@@ -136,7 +140,7 @@ export function SignIn() {
           </div>
         )}
         <p className={s.small}>
-          Код приходит в Telegram-бот салона, если вы им пользуетесь, иначе — в WhatsApp или по SMS.
+          {t.note}
         </p>
       </div>
     </section>

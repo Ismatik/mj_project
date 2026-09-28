@@ -1,7 +1,7 @@
 // Outbox delivery shared by the background worker and the CMS "Доставить сейчас" button.
 // No "server-only" import: the worker (plain Node) uses this file too.
 import type { OutboxMessage, PrismaClient } from "@/generated/prisma/client";
-import { channelFor, type ChannelKey } from "./channels";
+import { channelFor, type ChannelKey, type DeliveryResult, type OutgoingMeta } from "./channels";
 
 type Modes = Map<string, "MOCK" | "LIVE" | null>;
 
@@ -15,7 +15,7 @@ async function deliver(db: PrismaClient, msg: OutboxMessage, modeOf: Modes): Pro
   const mode = modeOf.get(msg.channel);
   if (!mode) return false; // channel switched off — stays queued
   const channel = channelFor(msg.channel as ChannelKey, mode);
-  let result: { ok: true } | { ok: false; error: string };
+  let result: DeliveryResult;
   if (mode === "LIVE" && msg.channel === "telegram" && msg.to === "reception") {
     // Reception alerts go to every chat linked with "/staff CODE"
     const staff = await db.telegramChat.findMany({ where: { isStaff: true, NOT: { id: { startsWith: "sim-" } } }, select: { id: true } });
@@ -27,11 +27,19 @@ async function deliver(db: PrismaClient, msg: OutboxMessage, modeOf: Modes): Pro
   } else if (mode === "LIVE" && msg.channel === "telegram" && msg.to.startsWith("sim-")) {
     result = { ok: true }; // simulator chats never leave the server
   } else {
-    result = await channel.send(msg.to, msg.body);
+    result = await channel.send(msg.to, msg.body, msg.meta as OutgoingMeta);
   }
   // A sign-in code that really left the server is masked, so it can't be read from the CMS outbox.
   const meta = (msg.meta ?? {}) as { secret?: string | null };
-  const masked = result.ok && mode === "LIVE" && meta.secret ? { body: msg.body.replaceAll(meta.secret, "••••"), meta: { ...meta, secret: null } } : {};
+  const externalId = result.ok ? result.externalId : undefined;
+  const hideSecret = result.ok && mode === "LIVE" && !!meta.secret;
+  const masked =
+    hideSecret || externalId
+      ? {
+          ...(hideSecret ? { body: msg.body.replaceAll(meta.secret!, "••••") } : {}),
+          meta: { ...meta, ...(hideSecret ? { secret: null } : {}), ...(externalId ? { wamid: externalId } : {}) },
+        }
+      : {};
   await db.outboxMessage.update({
     where: { id: msg.id },
     data: result.ok

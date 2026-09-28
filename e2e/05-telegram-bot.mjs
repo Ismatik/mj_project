@@ -30,7 +30,7 @@ try {
   check('staff code shown on integrations', /^MJ-\d{4}$/.test(code), code);
 
   // Live mode needs keys
-  await p.locator('article', { hasText: 'Telegram' }).locator('button:has-text("Живой")').click();
+  await p.click('[aria-label="Telegram: режим"] button:has-text("Живой")');
   await p.waitForSelector('text=/Сначала добавьте TELEGRAM_BOT_TOKEN/');
   check('live mode refused without keys', true);
 

@@ -519,3 +519,8 @@
     padding: 44px 16px 64px;
   }
 }
+.chip[aria-pressed="true"] {
+  background: var(--mj-ink);
+  border-color: var(--mj-ink);
+  color: var(--mj-cream);
+}

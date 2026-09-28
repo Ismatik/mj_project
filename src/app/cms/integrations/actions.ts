@@ -40,9 +40,10 @@ export async function setIntegrationMode(key: string, mode: "MOCK" | "LIVE"): Pr
 export async function sendTestMessage(channel: "telegram" | "whatsapp" | "sms") {
   await requireOwner();
   if (!["telegram", "whatsapp", "sms"].includes(channel)) throw new Error("Неизвестный канал");
-  await db.outboxMessage.create({
-    data: { channel, to: channel === "telegram" ? "reception" : "+992981031111", body: "Тестовое сообщение из CMS Mavzunai Jovid ✦", meta: { kind: "test" } },
-  });
+  // WhatsApp can only write first with an approved template: Meta's built-in "hello_world" works on every new account
+  const to = channel === "telegram" ? "reception" : process.env.WHATSAPP_TEST_TO || "+992981031111";
+  const meta = channel === "whatsapp" ? { kind: "test", template: { name: "hello_world", lang: "en_US", params: [] } } : { kind: "test" };
+  await db.outboxMessage.create({ data: { channel, to, body: "Тестовое сообщение из CMS Mavzunai Jovid ✦", meta } });
   revalidatePath("/cms/integrations");
 }
 

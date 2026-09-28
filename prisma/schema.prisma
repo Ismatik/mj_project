@@ -112,6 +112,8 @@ model Guest {
   favouriteStaff   Staff?  @relation("FavouriteMaster", fields: [favouriteStaffId], references: [id], onDelete: SetNull)
   favouriteStaffId String?
   sessions      GuestSession[]
+  /// Language of messages to her: ru | tg | en (last used on the website or in the bot)
+  lang          String         @default("ru")
 }
 
 /// Website account session of a guest (signed in with a code sent to her phone).
@@ -319,6 +321,8 @@ model TelegramChat {
   /// Conversation state of the bot (current step and choices)
   state     Json     @default("{}")
   isStaff   Boolean  @default(false)
+  /// Bot language chosen by the guest (null = not chosen yet, taken from Telegram)
+  lang      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

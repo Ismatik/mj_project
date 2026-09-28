@@ -5,6 +5,8 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { Button } from "@/components/ui/Button";
 import { Monogram } from "@/components/ui/Monogram";
+import { diffOverlay, localize, type Names, type Overlay } from "@/lib/i18n/content";
+import { LANG_NAME, LANGS, localePath, type Lang } from "@/lib/i18n/locales";
 import type { SiteContent } from "@/lib/site-content";
 import { logout } from "../login/actions";
 import { discardDraft, publishSite, saveDraft } from "./actions";
@@ -35,6 +37,7 @@ export function AdminApp(props: {
 }) {
   const fx = useFx();
   const [section, setSection] = useState<SectionId>("texts");
+  const [editLang, setEditLang] = useState<Lang>("ru");
   const [draft, setDraft] = useState(props.draft);
   const [published, setPublished] = useState(props.published);
   const [saving, setSaving] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -77,6 +80,24 @@ export function AdminApp(props: {
     setDraft(next);
   };
 
+  // Tajik / English: sections edit the translated view; what differs from Russian is stored as the overlay
+  const translating = editLang === "ru" ? null : editLang;
+  const view = translating ? localize(draft, translating) : draft;
+  const change = (next: SiteContent) => {
+    if (!translating) return update(next);
+    const ov = (diffOverlay(next, draft) ?? {}) as Overlay;
+    update({ ...draft, i18n: { ...draft.i18n, [translating]: { ...ov, names: draft.i18n[translating].names } } });
+  };
+  const setName = (kind: keyof Names, id: string, value: string) => {
+    if (!translating) return;
+    const ov = draft.i18n[translating];
+    const names = structuredClone(ov.names ?? { services: {}, categories: {}, staff: {} });
+    if (value.trim()) names[kind][id] = value;
+    else delete names[kind][id];
+    update({ ...draft, i18n: { ...draft.i18n, [translating]: { ...ov, names } } });
+  };
+  const names = translating ? draft.i18n[translating].names : undefined;
+
   const publish = () =>
     start(async () => {
       await saveDraft(draft);
@@ -116,7 +137,7 @@ export function AdminApp(props: {
             Сбросить
           </button>
         )}
-        <a href="/?preview=1" target="_blank" rel="noopener noreferrer" className={s.headLink}>
+        <a href={localePath(editLang, "/?preview=1")} target="_blank" rel="noopener noreferrer" className={s.headLink}>
           Предпросмотр
         </a>
         <Button variant="outlineGold" size="sm" onClick={() => window.open("/", "_blank", "noopener")}>
@@ -156,13 +177,24 @@ export function AdminApp(props: {
         </nav>
 
         <main className={s.main}>
-          {section === "texts" && <TextsSection c={draft} onChange={update} />}
-          {section === "prices" && <ServicesSection c={draft} services={props.services} onChange={update} />}
-          {section === "photos" && <PhotosSection c={draft} onChange={update} />}
-          {section === "masters" && <MastersSection c={draft} onChange={update} staff={props.staff} categories={props.categories} />}
-          {section === "reviews" && <ReviewsSection c={draft} onChange={update} />}
-          {section === "contacts" && <ContactsSection c={draft} onChange={update} />}
-          {section === "seo" && <SeoSection c={draft} onChange={update} />}
+          <div className={s.langTabs} role="tablist" aria-label="Язык сайта">
+            {LANGS.map((l) => (
+              <button key={l} type="button" role="tab" aria-selected={editLang === l} className={editLang === l ? s.langOn : ""} onClick={() => setEditLang(l)}>
+                {LANG_NAME[l]}
+              </button>
+            ))}
+            {translating && <span className={s.small}>Перевод: пустое поле или текст как на русском — на сайте будет русский вариант.</span>}
+          </div>
+          {section === "texts" && <TextsSection c={view} onChange={change} />}
+          {section === "prices" && <ServicesSection c={view} services={props.services} onChange={change} names={names} onName={setName} />}
+          {section === "photos" &&
+            (translating ? <p className={s.lead}>Фотографии общие для всех языков — меняйте их на русской вкладке.</p> : <PhotosSection c={draft} onChange={update} />)}
+          {section === "masters" && (
+            <MastersSection c={view} onChange={change} staff={props.staff} categories={props.categories} translating={translating} names={names} onName={setName} />
+          )}
+          {section === "reviews" && <ReviewsSection c={view} onChange={change} translating={!!translating} />}
+          {section === "contacts" && <ContactsSection c={view} onChange={change} translating={!!translating} />}
+          {section === "seo" && <SeoSection c={view} onChange={change} />}
         </main>
       </div>
     </div>

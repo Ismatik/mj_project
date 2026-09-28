@@ -6,11 +6,14 @@ import { OnlineBooking } from "@/components/site/OnlineBooking";
 import { Photo } from "@/components/site/Photo";
 import { SitePage } from "@/components/site/SiteChrome";
 import s from "@/components/site/site.module.css";
-import { duration } from "@/lib/duration";
-import { somoni } from "@/lib/format";
+import { localize } from "@/lib/i18n/content";
+import { dict } from "@/lib/i18n/dict";
+import { duration, somoni } from "@/lib/i18n/format";
+import { localePath } from "@/lib/i18n/locales";
 import { bookableDates } from "@/lib/slots";
 import { addDays, todayYmd } from "@/lib/time";
 import { getCurrentGuest } from "@/server/guest-auth";
+import { alternates, getLang } from "@/server/lang";
 import { getSiteMasters } from "@/server/masters";
 import { getOnlineMenu } from "@/server/online-booking";
 import { getSiteContent } from "@/server/site";
@@ -19,25 +22,29 @@ import { FavouriteButton } from "./FavouriteButton";
 export const dynamic = "force-dynamic";
 
 async function findMaster(slug: string) {
-  const c = await getSiteContent("published");
-  const masters = await getSiteMasters(c);
-  return { c, master: masters.find((m) => m.slug === slug) };
+  const lang = await getLang();
+  const c = localize(await getSiteContent("published"), lang);
+  const masters = await getSiteMasters(c, lang);
+  return { c, lang, master: masters.find((m) => m.slug === slug) };
 }
 
 export async function generateMetadata({ params }: PageProps<"/mastera/[slug]">): Promise<Metadata> {
-  const { master } = await findMaster((await params).slug);
-  if (!master) return { title: "Мастер не найден — Mavzunai Jovid" };
+  const { master, lang } = await findMaster((await params).slug);
+  const t = dict(lang);
+  if (!master) return { title: `${t.masters.notFound} — Mavzunai Jovid` };
   return {
     title: `${master.name} — ${master.title} · Mavzunai Jovid`,
-    description: master.bio.slice(0, 160) || `${master.name}, ${master.title}. Запись онлайн в салон Mavzunai Jovid, Душанбе.`,
+    description: master.bio.slice(0, 160) || t.masters.metaDescription(master.name, master.title),
+    alternates: alternates(lang, `/mastera/${master.slug}`),
     openGraph: master.photo?.url ? { images: [master.photo.url] } : undefined,
   };
 }
 
 export default async function MasterPage({ params }: PageProps<"/mastera/[slug]">) {
-  const { c, master } = await findMaster((await params).slug);
+  const { c, lang, master } = await findMaster((await params).slug);
   if (!master) notFound();
-  const [menu, guest] = await Promise.all([getOnlineMenu(), getCurrentGuest()]);
+  const t = dict(lang);
+  const [menu, guest] = await Promise.all([getOnlineMenu(lang), getCurrentGuest()]);
   const favourite = guest?.favouriteStaffId === master.id;
   // Booking with this master only
   const ownMenu = menu
@@ -51,7 +58,7 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
   for (const sv of master.services) byCategory.set(sv.category, [...(byCategory.get(sv.category) ?? []), sv]);
 
   return (
-    <SitePage c={c} guest={guest} current="masters" year={today.slice(0, 4)} bookHref="#zapis">
+    <SitePage c={c} guest={guest} lang={lang} path={`/mastera/${master.slug}`} current="masters" year={today.slice(0, 4)} bookHref="#zapis">
       <section className={s.masterHero} aria-labelledby="master-name">
         <div className={`${s.photoBox} ${s.masterHeroPhoto}`}>
           {master.photo?.url ? (
@@ -63,8 +70,8 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
           )}
         </div>
         <div className={s.masterHeroText}>
-          <Link href="/mastera" className={s.backLink}>
-            ← Все мастера
+          <Link href={localePath(lang, "/mastera")} className={s.backLink}>
+            {t.masters.back}
           </Link>
           <div data-reveal className={s.kickerLight}>
             {master.title}
@@ -81,10 +88,10 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
           <div className={s.heroCtas}>
             {ownMenu.length > 0 && (
               <a href="#zapis" className={s.btnCream}>
-                Записаться к мастеру
+                {t.masters.bookWith}
               </a>
             )}
-            {guest && <FavouriteButton staffId={master.id} initial={favourite} />}
+            {guest && <FavouriteButton staffId={master.id} initial={favourite} lang={lang} />}
           </div>
         </div>
       </section>
@@ -92,7 +99,7 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
       {master.services.length > 0 && (
         <section className={s.light} aria-labelledby="master-services">
           <h2 id="master-services" data-reveal className={`${s.h2} ${s.center}`}>
-            Услуги и цены
+            {t.masters.services}
           </h2>
           <div className={s.rule} />
           <div className={s.prices}>
@@ -102,9 +109,9 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
                 {list.map((sv) => (
                   <div key={sv.id} className={s.priceRow}>
                     <span>{sv.name}</span>
-                    <small>{duration(sv.durationMin)}</small>
+                    <small>{duration(sv.durationMin, lang)}</small>
                     <span className={s.dots} aria-hidden="true" />
-                    <span className={s.priceValue}>{somoni(sv.price)}</span>
+                    <span className={s.priceValue}>{somoni(sv.price, lang)}</span>
                   </div>
                 ))}
               </div>
@@ -115,11 +122,11 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
 
       <section className={s.portfolioSection} aria-labelledby="master-works">
         <h2 id="master-works" data-reveal className={`${s.h2} ${s.center}`}>
-          Работы мастера
+          {t.masters.works}
         </h2>
         <div className={s.rule} />
         <div className={s.galleryWrap}>
-          <Gallery works={master.portfolio} />
+          <Gallery works={master.portfolio} lang={lang} />
         </div>
       </section>
 
@@ -127,11 +134,11 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
         <section id="zapis" className={s.booking} aria-labelledby="booking-title">
           <div className={s.bookingInner}>
             <h2 id="booking-title" data-reveal className={`${s.h2} ${s.center}`}>
-              Запись к мастеру {master.name}
+              {t.masters.bookingTitle(master.name)}
             </h2>
             <div className={s.rule} />
-            <p className={s.bookingIntro}>Выберите услугу и свободное время — запись сразу попадёт в наш календарь.</p>
-            <OnlineBooking menu={ownMenu} dates={bookableDates(today, 14, addDays)} preset={{ staffId: master.id }} guest={guest} />
+            <p className={s.bookingIntro}>{t.masters.bookingIntro}</p>
+            <OnlineBooking menu={ownMenu} dates={bookableDates(today, 14, addDays)} preset={{ staffId: master.id }} guest={guest} lang={lang} />
           </div>
         </section>
       )}

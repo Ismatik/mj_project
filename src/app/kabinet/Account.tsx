@@ -4,37 +4,39 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useFx } from "@/components/fx/FxProvider";
-import { somoni } from "@/lib/format";
-import { weekdayOf, WEEKDAYS_SHORT } from "@/lib/time";
+import { dict } from "@/lib/i18n/dict";
+import { MONTHS, somoni, WEEKDAYS } from "@/lib/i18n/format";
+import { LANG_NAME, LANGS, localePath, type Lang } from "@/lib/i18n/locales";
+import { weekdayOf } from "@/lib/time";
 import type { GuestAccount } from "@/server/guest-account";
-import { cancelMyBooking, rescheduleMyBooking, rescheduleSlots, setFavouriteMaster, signOut } from "./actions";
+import { cancelMyBooking, rescheduleMyBooking, rescheduleSlots, setFavouriteMaster, setMessageLanguage, signOut } from "./actions";
 import s from "./kabinet.module.css";
-
-const MONTHS = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
-const STATUS: Record<string, string> = { PENDING: "Ждёт подтверждения", CONFIRMED: "Подтверждена" };
-
-const rebookHref = (r: { serviceId: string; staffId: string | null }) => `/?service=${r.serviceId}${r.staffId ? `&master=${r.staffId}` : ""}#zapis`;
 
 const HISTORY_SHOWN = 5;
 
-export function Account({ account, dates, slugOf, botLink }: { account: GuestAccount; dates: string[]; slugOf: Record<string, string>; botLink: string | null }) {
+export type MasterInfo = Record<string, { slug: string; title: string }>;
+
+export function Account({ account, dates, masters, botLink, lang }: { account: GuestAccount; dates: string[]; masters: MasterInfo; botLink: string | null; lang: Lang }) {
+  const t = dict(lang).account;
   const { profile, upcoming, past, favourite, visitedMasters } = account;
   const [allHistory, setAllHistory] = useState(false);
-  const first = profile.name.split(" ")[0];
+  const first = profile.name.split(" ")[0]!;
+  const rebookHref = (r: { serviceId: string; staffId: string | null }) => localePath(lang, `/?service=${r.serviceId}${r.staffId ? `&master=${r.staffId}` : ""}#zapis`);
+
   return (
     <section className={s.account} aria-labelledby="account-title">
       <header className={s.accountHead}>
         <div>
-          <div className={s.kicker}>Личный кабинет</div>
+          <div className={s.kicker}>{t.kicker}</div>
           <h1 id="account-title" className={s.title}>
-            Здравствуйте, {first}
+            {t.hello(first)}
           </h1>
           <div className={s.rule} />
           <div className={s.phone}>{profile.phone}</div>
         </div>
         <form action={signOut}>
           <button type="submit" className={s.linkBtn}>
-            Выйти
+            {t.signOut}
           </button>
         </form>
       </header>
@@ -42,26 +44,26 @@ export function Account({ account, dates, slugOf, botLink }: { account: GuestAcc
       <div className={s.grid}>
         <div className={s.mainCol}>
           <div className={s.blockHead}>
-            <h2 className={s.h2}>Предстоящие записи</h2>
-            <Link href="/#zapis" className={s.primarySmall}>
-              + Записаться
+            <h2 className={s.h2}>{t.upcoming}</h2>
+            <Link href={localePath(lang, "/#zapis")} className={s.primarySmall}>
+              {t.book}
             </Link>
           </div>
           {upcoming.length === 0 ? (
-            <p className={s.empty}>Пока записей нет. Выберите услугу и удобное время — это займёт минуту.</p>
+            <p className={s.empty}>{t.noUpcoming}</p>
           ) : (
             <ul className={s.list}>
               {upcoming.map((a) => (
-                <Upcoming key={a.id} a={a} dates={dates} />
+                <Upcoming key={a.id} a={a} dates={dates} lang={lang} />
               ))}
             </ul>
           )}
 
           <h2 className={s.h2} style={{ marginTop: 48 }}>
-            История визитов
+            {t.history}
           </h2>
           {past.length === 0 ? (
-            <p className={s.empty}>Здесь появятся ваши визиты в салон.</p>
+            <p className={s.empty}>{t.noHistory}</p>
           ) : (
             <ul className={s.history}>
               {(allHistory ? past : past.slice(0, HISTORY_SHOWN)).map((a) => (
@@ -69,12 +71,12 @@ export function Account({ account, dates, slugOf, botLink }: { account: GuestAcc
                   <div>
                     <div className={s.itemTitle}>{a.service}</div>
                     <div className={s.itemMeta}>
-                      {a.date} · {a.masters.map((m) => m.name).join(" + ")} · {somoni(a.price)}
+                      {a.date} · {a.masters.map((m) => m.name).join(" + ")} · {somoni(a.price, lang)}
                     </div>
                   </div>
                   {a.rebook && (
                     <Link className={s.ghostSmall} href={rebookHref(a.rebook)}>
-                      Записаться снова
+                      {t.rebook}
                     </Link>
                   )}
                 </li>
@@ -83,38 +85,36 @@ export function Account({ account, dates, slugOf, botLink }: { account: GuestAcc
           )}
           {past.length > HISTORY_SHOWN && (
             <button type="button" className={`${s.linkBtn} ${s.more}`} onClick={() => setAllHistory(!allHistory)}>
-              {allHistory ? "Свернуть" : `Показать все визиты (${past.length})`}
+              {allHistory ? t.collapse : t.showAll(past.length)}
             </button>
           )}
         </div>
 
         <aside className={s.side}>
-          <Favourite favourite={favourite} visited={visitedMasters} slugOf={slugOf} />
+          <Favourite favourite={favourite} visited={visitedMasters} masters={masters} lang={lang} />
           <div className={s.card}>
-            <div className={s.cardLabel}>Напоминания</div>
-            {profile.telegram ? (
-              <p className={s.cardText}>Telegram подключён: напоминания о визитах и коды для входа приходят в бот салона.</p>
-            ) : (
-              <p className={s.cardText}>
-                Подключите Telegram-бот салона — напоминания о визите за день и за два часа, запись и перенос прямо в чате.
-                {botLink && (
-                  <>
-                    {" "}
-                    <a href={botLink} target="_blank" rel="noopener noreferrer">
-                      Открыть бота →
-                    </a>
-                  </>
-                )}
-              </p>
-            )}
+            <div className={s.cardLabel}>{t.reminders}</div>
+            <p className={s.cardText}>
+              {profile.telegram ? t.telegramOn : t.telegramOff}
+              {!profile.telegram && botLink && (
+                <>
+                  {" "}
+                  <a href={botLink} target="_blank" rel="noopener noreferrer">
+                    {t.openBot}
+                  </a>
+                </>
+              )}
+            </p>
           </div>
+          <MessageLanguage current={profile.lang} lang={lang} />
         </aside>
       </div>
     </section>
   );
 }
 
-function Upcoming({ a, dates }: { a: GuestAccount["upcoming"][number]; dates: string[] }) {
+function Upcoming({ a, dates, lang }: { a: GuestAccount["upcoming"][number]; dates: string[]; lang: Lang }) {
+  const t = dict(lang).account;
   const fx = useFx();
   const router = useRouter();
   const [mode, setMode] = useState<"view" | "move" | "cancel">("view");
@@ -135,11 +135,11 @@ function Upcoming({ a, dates }: { a: GuestAccount["upcoming"][number]; dates: st
     start(async () => {
       const res = await rescheduleMyBooking(a.id, date, time);
       if (!res.ok) {
-        setError(res.error ?? "Не получилось");
+        setError(res.error ?? dict(lang).errors.generic);
         setTimes(await rescheduleSlots(a.id, date));
         return;
       }
-      fx.toast(`Запись перенесена: ${res.when}`, "MJ");
+      fx.toast(t.moved(res.when ?? ""), "MJ");
       setMode("view");
       router.refresh();
     });
@@ -147,8 +147,8 @@ function Upcoming({ a, dates }: { a: GuestAccount["upcoming"][number]; dates: st
   const cancel = () =>
     start(async () => {
       const res = await cancelMyBooking(a.id);
-      if (!res.ok) return setError(res.error ?? "Не получилось");
-      fx.toast("Запись отменена", "MJ");
+      if (!res.ok) return setError(res.error ?? dict(lang).errors.generic);
+      fx.toast(t.cancelled, "MJ");
       router.refresh();
     });
 
@@ -161,60 +161,60 @@ function Upcoming({ a, dates }: { a: GuestAccount["upcoming"][number]; dates: st
       <div className={s.itemBody}>
         <div className={s.itemTitle}>{a.service}</div>
         <div className={s.itemMeta}>
-          {a.masters.map((m) => m.name).join(" + ")} · {somoni(a.price)}
+          {a.masters.map((m) => m.name).join(" + ")} · {somoni(a.price, lang)}
         </div>
-        <span className={`${s.status} ${a.status === "CONFIRMED" ? s.statusOk : ""}`}>{STATUS[a.status]}</span>
+        <span className={`${s.status} ${a.status === "CONFIRMED" ? s.statusOk : ""}`}>{t.status[a.status]}</span>
 
         {mode === "view" &&
           (a.canChange ? (
             <div className={s.actions}>
               <button type="button" className={s.ghostSmall} onClick={() => setMode("move")}>
-                Перенести
+                {t.move}
               </button>
               <button type="button" className={s.linkBtn} onClick={() => setMode("cancel")}>
-                Отменить
+                {t.cancel}
               </button>
             </div>
           ) : (
-            <p className={s.hint}>До визита меньше двух часов — изменить запись можно по телефону.</p>
+            <p className={s.hint}>{t.tooLate}</p>
           ))}
 
         {mode === "cancel" && (
           <div className={s.confirm}>
-            <span>Отменить запись?</span>
+            <span>{t.cancelAsk}</span>
             <button type="button" className={s.dangerSmall} disabled={pending} onClick={cancel}>
-              Да, отменить
+              {t.cancelYes}
             </button>
             <button type="button" className={s.linkBtn} onClick={() => setMode("view")}>
-              Оставить
+              {t.keep}
             </button>
           </div>
         )}
 
         {mode === "move" && (
           <div className={s.move}>
-            <div className={s.moveLabel}>Новый день</div>
+            <div className={s.moveLabel}>{t.newDay}</div>
             <div className={s.dates}>
               {dates.map((d) => (
                 <button key={d} type="button" aria-pressed={d === date} className={s.date} onClick={() => pickDate(d)}>
-                  <small>{WEEKDAYS_SHORT[weekdayOf(d)]}</small>
+                  <small>{WEEKDAYS[lang][weekdayOf(d)]}</small>
                   <b>{Number(d.slice(8))}</b>
-                  <small>{MONTHS[Number(d.slice(5, 7)) - 1]}</small>
+                  <small>{MONTHS[lang][Number(d.slice(5, 7)) - 1]}</small>
                 </button>
               ))}
             </div>
             {date && (
               <>
-                <div className={s.moveLabel}>Время — тот же мастер</div>
+                <div className={s.moveLabel}>{t.sameMaster}</div>
                 {times === null ? (
-                  <div className={s.hint}>Ищем свободное время…</div>
+                  <div className={s.hint}>{t.searching}</div>
                 ) : times.length === 0 ? (
-                  <div className={s.hint}>На этот день у мастера всё занято — выберите другой.</div>
+                  <div className={s.hint}>{t.busy}</div>
                 ) : (
                   <div className={s.times}>
-                    {times.map((t) => (
-                      <button key={t} type="button" className={s.time} disabled={pending} onClick={() => move(t)}>
-                        {t}
+                    {times.map((x) => (
+                      <button key={x} type="button" className={s.time} disabled={pending} onClick={() => move(x)}>
+                        {x}
                       </button>
                     ))}
                   </div>
@@ -222,7 +222,7 @@ function Upcoming({ a, dates }: { a: GuestAccount["upcoming"][number]; dates: st
               </>
             )}
             <button type="button" className={s.linkBtn} onClick={() => (setMode("view"), setDate(""), setTimes(null))}>
-              Не переносить
+              {t.dontMove}
             </button>
           </div>
         )}
@@ -236,7 +236,8 @@ function Upcoming({ a, dates }: { a: GuestAccount["upcoming"][number]; dates: st
   );
 }
 
-function Favourite({ favourite, visited, slugOf }: { favourite: GuestAccount["favourite"]; visited: GuestAccount["visitedMasters"]; slugOf: Record<string, string> }) {
+function Favourite({ favourite, visited, masters, lang }: { favourite: GuestAccount["favourite"]; visited: GuestAccount["visitedMasters"]; masters: MasterInfo; lang: Lang }) {
+  const t = dict(lang).account;
   const router = useRouter();
   const [pending, start] = useTransition();
   const set = (id: string | null) =>
@@ -244,22 +245,21 @@ function Favourite({ favourite, visited, slugOf }: { favourite: GuestAccount["fa
       await setFavouriteMaster(id);
       router.refresh();
     });
-  const others = visited.filter((m) => m.id !== favourite?.id && slugOf[m.id]);
+  const others = visited.filter((m) => m.id !== favourite?.id && masters[m.id]);
+  const fav = favourite ? masters[favourite.id] : undefined;
   return (
     <div className={s.card}>
-      <div className={s.cardLabel}>Любимый мастер</div>
+      <div className={s.cardLabel}>{t.favourite}</div>
       {favourite ? (
         <>
-          <div className={s.favName}>
-            ★ {slugOf[favourite.id] ? <a href={`/mastera/${slugOf[favourite.id]}`}>{favourite.name}</a> : favourite.name}
-          </div>
-          <div className={s.itemMeta}>{favourite.title}</div>
+          <div className={s.favName}>★ {fav ? <Link href={localePath(lang, `/mastera/${fav.slug}`)}>{favourite.name}</Link> : favourite.name}</div>
+          <div className={s.itemMeta}>{fav?.title ?? favourite.title}</div>
           <button type="button" className={s.linkBtn} disabled={pending} onClick={() => set(null)}>
-            Убрать
+            {t.remove}
           </button>
         </>
       ) : (
-        <p className={s.cardText}>Отметьте мастера — при онлайн-записи он будет первым в списке.</p>
+        <p className={s.cardText}>{t.favouriteHint}</p>
       )}
       {others.length > 0 && (
         <div className={s.chips}>
@@ -270,9 +270,41 @@ function Favourite({ favourite, visited, slugOf }: { favourite: GuestAccount["fa
           ))}
         </div>
       )}
-      <Link href="/mastera" className={s.cardLink}>
-        Все мастера →
+      <Link href={localePath(lang, "/mastera")} className={s.cardLink}>
+        {t.allMasters}
       </Link>
+    </div>
+  );
+}
+
+function MessageLanguage({ current, lang }: { current: Lang; lang: Lang }) {
+  const t = dict(lang).account;
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  return (
+    <div className={s.card}>
+      <div className={s.cardLabel}>{t.language}</div>
+      <p className={s.cardText}>{t.languageHint}</p>
+      <div className={s.chips} role="group" aria-label={t.language}>
+        {LANGS.map((l) => (
+          <button
+            key={l}
+            type="button"
+            lang={l}
+            className={s.chip}
+            aria-pressed={l === current}
+            disabled={pending}
+            onClick={() =>
+              start(async () => {
+                await setMessageLanguage(l);
+                router.refresh();
+              })
+            }
+          >
+            {LANG_NAME[l]}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

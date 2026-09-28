@@ -25,7 +25,7 @@ export async function tgCall<T = unknown>(method: string, body: Record<string, u
 /** Converts an engine reply to Telegram's reply_markup. */
 export function replyMarkup(r: BotReply): Record<string, unknown> | undefined {
   if (r.askContact) {
-    return { keyboard: [[{ text: "📱 Поделиться номером", request_contact: true }]], resize_keyboard: true, one_time_keyboard: true };
+    return { keyboard: [[{ text: r.contactLabel ?? "📱 Поделиться номером", request_contact: true }]], resize_keyboard: true, one_time_keyboard: true };
   }
   if (r.buttons?.length) return { inline_keyboard: r.buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))) };
   if (r.removeKeyboard) return { remove_keyboard: true };
@@ -59,18 +59,24 @@ export async function getMe() {
 
 /** Telegram update → engine input. Returns null for updates the bot ignores. */
 export type TgUpdate = {
-  message?: { chat: { id: number; type: string }; from?: { first_name?: string; username?: string }; text?: string; contact?: { phone_number: string; user_id?: number } };
-  callback_query?: { id: string; data?: string; from: { id: number; first_name?: string; username?: string }; message?: { chat: { id: number; type: string } } };
+  message?: { chat: { id: number; type: string }; from?: { first_name?: string; username?: string; language_code?: string }; text?: string; contact?: { phone_number: string; user_id?: number } };
+  callback_query?: { id: string; data?: string; from: { id: number; first_name?: string; username?: string; language_code?: string }; message?: { chat: { id: number; type: string } } };
 };
 
 export function toBotUpdate(u: TgUpdate) {
   if (u.callback_query?.message) {
     const q = u.callback_query;
-    return { callbackId: q.id, update: { chatId: String(q.message!.chat.id), firstName: q.from.first_name, username: q.from.username, data: q.data } };
+    return {
+      callbackId: q.id,
+      update: { chatId: String(q.message!.chat.id), firstName: q.from.first_name, username: q.from.username, data: q.data, languageCode: q.from.language_code },
+    };
   }
   const m = u.message;
   if (!m || m.chat.type !== "private") return null;
   // Only accept the sender's own contact, not a forwarded one
   const contact = m.contact && (!m.contact.user_id || String(m.contact.user_id) === String(m.chat.id)) ? m.contact.phone_number : undefined;
-  return { callbackId: null, update: { chatId: String(m.chat.id), firstName: m.from?.first_name, username: m.from?.username, text: m.text, contactPhone: contact } };
+  return {
+    callbackId: null,
+    update: { chatId: String(m.chat.id), firstName: m.from?.first_name, username: m.from?.username, text: m.text, contactPhone: contact, languageCode: m.from?.language_code },
+  };
 }

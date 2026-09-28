@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Brush, Crown, Droplet, Eye, Hand, Scissors, Sparkles, type LucideIcon } from "lucide-react";
-import { duration } from "@/lib/duration";
-import { somoni } from "@/lib/format";
+import { dict } from "@/lib/i18n/dict";
+import { duration, somoni } from "@/lib/i18n/format";
+import { localePath, type Lang } from "@/lib/i18n/locales";
 import { whatsappLink, type SiteContent } from "@/lib/site-content";
 import type { SiteMaster } from "@/server/masters";
 import type { OnlineMenu } from "@/server/online-booking";
@@ -36,6 +37,7 @@ export function Website({
   masters,
   guest,
   preset,
+  lang,
 }: {
   c: SiteContent;
   prices: PriceList;
@@ -44,9 +46,11 @@ export function Website({
   dates: string[];
   preview?: { publishedAt?: string };
   masters: SiteMaster[];
-  guest: (NavGuest & { phone: string }) | null;
+  guest: (NavGuest & { phone: string; favouriteStaffId: string | null }) | null;
   preset?: BookingPreset;
+  lang: Lang;
 }) {
+  const t = dict(lang);
   const reviews = c.reviews.items.filter((r) => r.visible);
   const marquee = [...c.marquee, ...c.marquee];
 
@@ -55,12 +59,12 @@ export function Website({
       <SiteEffects intro={!preview} />
       {preview && (
         <div className={s.preview}>
-          <span>✦ Предпросмотр черновика — гостьи видят опубликованную версию</span>
-          <Link href="/admin">← Вернуться в админку</Link>
+          <span>{t.home.previewBanner}</span>
+          <Link href="/admin">{t.home.previewBack}</Link>
         </div>
       )}
 
-      <SiteNav guest={guest} />
+      <SiteNav guest={guest} lang={lang} path="/" />
 
       <header id="top" className={s.hero}>
         <div className={s.heroText}>
@@ -80,10 +84,10 @@ export function Website({
           </p>
           <div data-reveal className={s.heroCtas}>
             <a href="#zapis" className={s.btnCream}>
-              Записаться на визит
+              {t.home.bookVisit}
             </a>
             <a href="#uslugi" className={s.btnGhost}>
-              Услуги
+              {t.home.services}
             </a>
           </div>
           <div data-reveal className={s.badges}>
@@ -96,7 +100,7 @@ export function Website({
           </div>
         </div>
         <div className={`${s.photoBox} ${s.heroPhoto}`} style={{ minHeight: 540 }}>
-          <Photo photo={c.photos.hero} alt="Салон Mavzunai Jovid" eager />
+          <Photo photo={c.photos.hero} alt={t.home.heroAlt} eager />
         </div>
       </header>
 
@@ -149,15 +153,15 @@ export function Website({
                   {cat.services.map((sv) => (
                     <div key={sv.id} className={s.priceRow}>
                       <span>{sv.name}</span>
-                      <small>{duration(sv.durationMin)}</small>
+                      <small>{duration(sv.durationMin, lang)}</small>
                       <span className={s.dots} aria-hidden="true" />
-                      <span className={s.priceValue}>{somoni(sv.price)}</span>
+                      <span className={s.priceValue}>{somoni(sv.price, lang)}</span>
                     </div>
                   ))}
                 </div>
               ))}
             </div>
-            <p className={s.priceNote}>Цены в сомони. Точную стоимость подтвердит мастер после консультации.</p>
+            <p className={s.priceNote}>{t.home.priceNote}</p>
           </>
         )}
       </section>
@@ -172,7 +176,7 @@ export function Website({
 
       <section id="nevesta" className={s.bridal} aria-labelledby="bridal-title">
         <div className={s.photoBox} style={{ minHeight: 440 }}>
-          <Photo photo={c.photos.bridal} alt="Свадебный образ" />
+          <Photo photo={c.photos.bridal} alt={t.home.bridalAlt} />
         </div>
         <div data-reveal className={s.bridalText}>
           <div className={s.kickerLight}>{c.bridal.kicker}</div>
@@ -181,7 +185,7 @@ export function Website({
           </h2>
           <div className={`${s.ruleLight} ${s.ruleLeft}`} style={{ marginTop: 20 }} />
           <p className={s.bridalBody}>{c.bridal.body}</p>
-          <a href={whatsappLink(c.contacts, "Здравствуйте! Хочу обсудить свадебный образ.")} className={s.btnCream} style={{ alignSelf: "flex-start", marginTop: 32 }} target="_blank" rel="noopener noreferrer">
+          <a href={whatsappLink(c.contacts, t.home.bridalWhatsapp)} className={s.btnCream} style={{ alignSelf: "flex-start", marginTop: 32 }} target="_blank" rel="noopener noreferrer">
             {c.bridal.cta}
           </a>
         </div>
@@ -195,15 +199,15 @@ export function Website({
           <div className={s.rule} />
           <div className={s.teamGrid}>
             {masters.map((m) => (
-              <MasterCard key={m.id} m={m} />
+              <MasterCard key={m.id} m={m} lang={lang} favourite={m.id === guest?.favouriteStaffId} />
             ))}
           </div>
           <div className={s.teamLinks}>
-            <Link href="/mastera" className={s.textLink}>
-              Все мастера →
+            <Link href={localePath(lang, "/mastera")} className={s.textLink}>
+              {t.home.allMasters}
             </Link>
-            <Link href="/portfolio" className={s.textLink}>
-              Портфолио работ →
+            <Link href={localePath(lang, "/portfolio")} className={s.textLink}>
+              {t.home.portfolioLink}
             </Link>
           </div>
         </section>
@@ -227,7 +231,7 @@ export function Website({
                     {r.author.trim()[0]}
                   </div>
                 )}
-                <div className={s.stars} aria-label="5 из 5">
+                <div className={s.stars} aria-label={t.home.rating}>
                   ★★★★★
                 </div>
                 <p className={s.reviewText}>{r.text}</p>
@@ -241,7 +245,7 @@ export function Website({
       <section className={s.light} style={{ padding: 0 }} aria-labelledby="about-title">
         <div className={s.about}>
           <div className={s.photoBox} style={{ minHeight: 360 }}>
-            <Photo photo={c.photos.interior} alt="Интерьер салона" />
+            <Photo photo={c.photos.interior} alt={t.home.interiorAlt} />
           </div>
           <div data-reveal>
             <h2 id="about-title" className={s.h2}>
@@ -270,11 +274,11 @@ export function Website({
           <p data-reveal className={s.bookingIntro}>
             {c.booking.intro}
           </p>
-          <OnlineBooking menu={menu} dates={dates} preview={!!preview} preset={preset} guest={guest} />
+          <OnlineBooking menu={menu} dates={dates} preview={!!preview} preset={preset} guest={guest} lang={lang} />
         </div>
       </section>
 
-      <SiteFooter c={c} year={today.slice(0, 4)} />
+      <SiteFooter c={c} year={today.slice(0, 4)} lang={lang} />
     </div>
   );
 }

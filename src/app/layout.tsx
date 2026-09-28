@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Jost, Zen_Old_Mincho } from "next/font/google";
 import { FxProvider } from "@/components/fx/FxProvider";
+import { getLang } from "@/server/lang";
 import "./globals.css";
 
 const mincho = Zen_Old_Mincho({
@@ -18,14 +19,20 @@ const jost = Jost({
   display: "swap",
 });
 
+const domain = process.env.SITE_DOMAIN && process.env.SITE_DOMAIN !== "localhost" ? process.env.SITE_DOMAIN : null;
+
 export const metadata: Metadata = {
   title: "Mavzunai Jovid — Gallery of Beauty MJ",
   description: "Салон красоты и свадебный зал в Душанбе.",
+  ...(domain ? { metadataBase: new URL(`https://${domain}`) } : {}),
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+const HTML_LANG = { ru: "ru", tg: "tg", en: "en" } as const;
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const lang = await getLang();
   return (
-    <html lang="ru" className={`${mincho.variable} ${jost.variable}`}>
+    <html lang={HTML_LANG[lang]} className={`${mincho.variable} ${jost.variable}`}>
       <body>
         <FxProvider>{children}</FxProvider>
       </body>

@@ -5,11 +5,12 @@ import { useState, type ReactNode } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { duration } from "@/lib/duration";
 import { somoni } from "@/lib/format";
+import type { Names } from "@/lib/i18n/content";
 import type { SiteContent, SitePhoto } from "@/lib/site-content";
 import s from "./admin.module.css";
 
 type Props = { c: SiteContent; onChange: (c: SiteContent) => void };
-export type AdminService = { id: string; name: string; price: number; durationMin: number; showOnSite: boolean; category: string };
+export type AdminService = { id: string; name: string; price: number; durationMin: number; showOnSite: boolean; category: string; categoryId: string };
 
 /** Immutable edit helper: clone, mutate, hand back. */
 export const editor = (c: SiteContent, onChange: Props["onChange"]) => (fn: (d: SiteContent) => void) => {
@@ -109,8 +110,15 @@ export function TextsSection({ c, onChange }: Props) {
 }
 
 // ── Услуги и цены ──────────────────────────────────────────
-export function ServicesSection({ c, services, onChange }: Props & { services: AdminService[] }) {
+export function ServicesSection({
+  c,
+  services,
+  onChange,
+  names,
+  onName,
+}: Props & { services: AdminService[]; names?: Names; onName?: (kind: keyof Names, id: string, v: string) => void }) {
   const edit = editor(c, onChange);
+  if (names && onName) return <ServiceNames services={services} names={names} onName={onName} />;
   return (
     <>
       <Head
@@ -147,6 +155,40 @@ export function ServicesSection({ c, services, onChange }: Props & { services: A
                 >
                   {on ? "На сайте ✓" : "Скрыто"}
                 </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+/** Translation mode: names of categories and services in Tajik / English (empty = Russian name). */
+function ServiceNames({ services, names, onName }: { services: AdminService[]; names: Names; onName: (kind: keyof Names, id: string, v: string) => void }) {
+  return (
+    <>
+      <Head title="Названия услуг" lead="Как услуги и категории называются на этом языке — в прайсе, онлайн-записи, боте и сообщениях. Пустое поле — русское название." />
+      <div className={s.stack} style={{ gap: 6 }}>
+        {services.map((sv, i) => {
+          const cat = i === 0 || services[i - 1]!.categoryId !== sv.categoryId;
+          return (
+            <div key={sv.id}>
+              {cat && (
+                <div className={s.nameRow} style={{ marginTop: i ? 18 : 0 }}>
+                  <span className={s.svcCat}>{sv.category}</span>
+                  <input
+                    aria-label={`Категория: ${sv.category}`}
+                    className={s.input}
+                    placeholder={sv.category}
+                    value={names.categories[sv.categoryId] ?? ""}
+                    onChange={(e) => onName("categories", sv.categoryId, e.target.value)}
+                  />
+                </div>
+              )}
+              <div className={s.nameRow}>
+                <span className={s.svcName}>{sv.name}</span>
+                <input aria-label={`Услуга: ${sv.name}`} className={s.input} placeholder={sv.name} value={names.services[sv.id] ?? ""} onChange={(e) => onName("services", sv.id, e.target.value)} />
               </div>
             </div>
           );
@@ -229,9 +271,23 @@ export function PhotosSection({ c, onChange }: Props) {
 }
 
 // ── Отзывы ─────────────────────────────────────────────────
-export function ReviewsSection({ c, onChange }: Props) {
+export function ReviewsSection({ c, onChange, translating }: Props & { translating?: boolean }) {
   const edit = editor(c, onChange);
   const [draft, setDraft] = useState({ author: "", text: "", source: "" });
+  if (translating)
+    return (
+      <>
+        <Head title="Отзывы" lead="Перевод текстов отзывов. Скрыть, удалить или добавить отзыв можно на русской вкладке." />
+        <div className={s.stack} style={{ gap: 14 }}>
+          {c.reviews.items.map((r, i) => (
+            <div key={r.id} className={`${s.review} ${r.visible ? "" : s.reviewHidden}`}>
+              <div className={s.reviewAuthor}>{r.author}</div>
+              <Text label={`Текст отзыва: ${r.author}`} rows={3} value={r.text} onChange={(v) => edit((d) => void (d.reviews.items[i]!.text = v))} />
+            </div>
+          ))}
+        </div>
+      </>
+    );
   return (
     <>
       <Head title="Отзывы" lead="Что показывается в секции «Нас любят гости». Скрытые отзывы остаются в архиве." />
@@ -297,13 +353,16 @@ const CONTACT_FIELDS: { key: keyof SiteContent["contacts"]; label: string; hint?
   { key: "dayOff", label: "Выходной" },
 ];
 
-export function ContactsSection({ c, onChange }: Props) {
+const TRANSLATED_CONTACTS = new Set(["address", "district", "hours", "dayOff"]);
+
+export function ContactsSection({ c, onChange, translating }: Props & { translating?: boolean }) {
   const edit = editor(c, onChange);
+  const fields = translating ? CONTACT_FIELDS.filter((f) => TRANSLATED_CONTACTS.has(f.key)) : CONTACT_FIELDS;
   return (
     <>
       <Head title="Контакты и часы" lead="Показываются в футере сайта и в кнопках WhatsApp." />
       <div className={s.stack} style={{ gap: 16 }}>
-        {CONTACT_FIELDS.map((f) => (
+        {fields.map((f) => (
           <label key={f.key} style={{ display: "block" }}>
             <div className={s.boxLabel} style={{ marginBottom: 7 }}>
               {f.label} {f.hint && <span className={s.small}>({f.hint})</span>}
