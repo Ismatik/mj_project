@@ -11,6 +11,7 @@ import { addDays, todayYmd } from "@/lib/time";
 import { cancelByGuest, createGuestBooking, getOnlineMenu, rescheduleByGuest, slotsFor, upcomingForGuest } from "../online-booking";
 import { guestBonus, siteOffers } from "../loyalty/core";
 import { siteUrl } from "../payments/core";
+import { joinWaitlist } from "../waitlist/core";
 import { getSiteContent } from "../site";
 
 /** Code staff send as "/staff CODE" to receive reception alerts. Stored in the Telegram integration config. */
@@ -102,6 +103,16 @@ export function botDeps(): BotDeps {
           until: dayMonthYear(new Date(`${o.endsOn}T07:00:00Z`), lang),
           code: o.code,
         }));
+    },
+    async waitlist({ chatId, guestId, ...i }) {
+      // She becomes a guest now, so the offer comes into this chat rather than WhatsApp
+      const guest =
+        (guestId ? await db.guest.findUnique({ where: { id: guestId } }) : null) ??
+        (await db.guest.findUnique({ where: { phone: i.phone } })) ??
+        (await db.guest.create({ data: { name: i.name, phone: i.phone, tag: "NEW", lang: i.lang } }));
+      await db.telegramChat.update({ where: { id: chatId }, data: { guestId: guest.id } });
+      const res = await joinWaitlist(db, { ...i, name: guest.name, guestId: guest.id, source: "TELEGRAM" });
+      return res.duplicate ? "already" : res.offered ? "offered" : "joined";
     },
   };
 }

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { LANG_HEADER, splitLocalePath } from "@/lib/i18n/locales";
 
 /** Website pages that exist in every language (under /tj and /en) */
-const LOCALIZED = /^\/($|mastera(\/|$)|portfolio$|kabinet$|podarok$|oplata\/[\w-]+$|sertifikat\/[\w-]+$)/;
+const LOCALIZED = /^\/($|mastera(\/|$)|portfolio$|kabinet$|podarok$|oplata\/[\w-]+$|sertifikat\/[\w-]+$|ochered\/[\w-]+$)/;
 const PROTECTED = /^\/(cms|admin|styleguide)(\/|$)/;
 
 export function proxy(request: NextRequest) {
@@ -31,5 +31,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/mastera/:path*", "/portfolio", "/kabinet", "/podarok", "/oplata/:path*", "/sertifikat/:path*", "/tj", "/tj/:path*", "/en", "/en/:path*", "/cms/:path*", "/admin/:path*", "/styleguide"],
+  matcher: ["/", "/mastera/:path*", "/portfolio", "/kabinet", "/podarok", "/oplata/:path*", "/sertifikat/:path*", "/ochered/:path*", "/tj", "/tj/:path*", "/en", "/en/:path*", "/cms/:path*", "/admin/:path*", "/styleguide"],
 };

@@ -25,6 +25,16 @@ const BODIES: Record<Exclude<MessageKind, "login-code" | "whatsapp-reply">, Reco
       example: ["Marta", "100", "30"],
     },
   },
+  "waitlist-offer": {
+    ru: {
+      text: "Mavzunai Jovid: {{1}}, освободилось время, которого вы ждали — {{2}}, {{3}}, мастер {{4}}. Мы держим его для вас 30 минут. Подтвердить или отказаться можно по ссылке {{5}} — спасибо!",
+      example: ["Марта", "Окрашивание в один тон", "Чт, 1 октября 2026, 11:00", "Инес", "https://mavzunaijovid.tj/ochered/abc123"],
+    },
+    en: {
+      text: "Mavzunai Jovid: {{1}}, the time you were waiting for is free — {{2}}, {{3}}, with {{4}}. We're holding it for you for 30 minutes. Confirm or decline at {{5}} — thank you!",
+      example: ["Marta", "Single-tone colour", "Thursday, 1 October 2026, 11:00", "Ines", "https://mavzunaijovid.tj/ochered/abc123"],
+    },
+  },
   "booking-confirmation": {
     ru: {
       text: "Mavzunai Jovid: {{1}}, вы записаны — {{2}}, {{3}}, мастер {{4}}. Ждём вас по адресу: ул. Бухоро, 23/25, Душанбе. Если планы изменятся, просто ответьте на это сообщение.",

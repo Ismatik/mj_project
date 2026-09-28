@@ -12,6 +12,7 @@ import { appointmentStatus } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
 import type { AppointmentDetail } from "@/server/calendar";
 import { rescheduleAppointment, setAppointmentStatus } from "./actions";
+import { Formulas } from "../guests/CardExtras";
 import s from "./calendar.module.css";
 
 const SOURCE: Record<string, string> = { CMS: "CMS", WEBSITE: "сайт", TELEGRAM: "Telegram", WHATSAPP: "WhatsApp", WALK_IN: "без записи" };
@@ -68,6 +69,11 @@ export function AppointmentPanel({ a, closeHref, role }: { a: AppointmentDetail;
             {a.guestPhone && <> · {formatPhone(a.guestPhone)}</>}
           </div>
           {a.note && <div className={s.panelNote}>«{a.note}»</div>}
+          {a.alerts.allergies && (
+            <div className={s.allergy} role="note">
+              <b>Аллергии</b> {a.alerts.allergies}
+            </div>
+          )}
         </div>
         <Tag tone={st.tone} wide>
           {st.label}
@@ -131,6 +137,15 @@ export function AppointmentPanel({ a, closeHref, role }: { a: AppointmentDetail;
       {error && (
         <div className={s.error} role="alert">
           {error}
+        </div>
+      )}
+      {a.guestId && (
+        <div className={s.formulas}>
+          <Formulas
+            guestId={a.guestId}
+            appointmentId={a.id}
+            formulas={a.alerts.formulas.map((f) => ({ ...f, by: null }))}
+          />
         </div>
       )}
     </section>

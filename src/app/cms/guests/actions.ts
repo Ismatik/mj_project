@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { normalizePhone } from "@/lib/phone";
 import { getCurrentUser } from "@/server/auth";
 
-export type GuestForm = { id: string; name: string; phone: string; tag: string; birthday: string; notes: string };
+export type GuestForm = { id: string; name: string; phone: string; tag: string; birthday: string; notes: string; allergies: string };
 export type GuestSaveResult = { ok: true } | { ok: false; errors: Partial<Record<keyof GuestForm, string>> };
 
 const TAGS = ["NEW", "REGULAR", "VIP", "BRIDE"] as const;
@@ -38,6 +38,7 @@ export async function saveGuest(form: GuestForm): Promise<GuestSaveResult> {
       tag: tag!,
       birthday: birthday ? new Date(`${birthday}T00:00:00Z`) : null,
       notes: String(form.notes ?? "").trim().slice(0, 2000) || null,
+      allergies: String(form.allergies ?? "").trim().slice(0, 500) || null,
     },
   });
   revalidatePath("/cms/guests");

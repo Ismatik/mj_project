@@ -14,6 +14,8 @@ import { formatPhone } from "@/lib/phone";
 import type { GuestCardData } from "@/server/guests";
 import { adjustPoints } from "../loyalty/actions";
 import { saveGuest, type GuestForm } from "./actions";
+import { Formulas, Photos } from "./CardExtras";
+import { inDays } from "@/lib/birthday";
 import s from "./guests.module.css";
 
 export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData; closeHref: string; isOwner: boolean }) {
@@ -27,7 +29,9 @@ export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData;
     tag: guest.tag,
     birthday: guest.birthday,
     notes: guest.notes,
+    allergies: guest.allergies,
   });
+  const [allHistory, setAllHistory] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof GuestForm, string>>>({});
   const [saving, setSaving] = useState(false);
   const tag = guestTag[guest.tag]!;
@@ -53,6 +57,7 @@ export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData;
           <div className={s.cardSub}>
             {formatPhone(guest.phone)}
             {guest.birthday && ` · день рождения ${shortDate(new Date(`${guest.birthday}T12:00:00Z`))}`}
+            {guest.nextBirthday && guest.nextBirthday.days <= 14 && ` (${inDays(guest.nextBirthday.days)}, исполнится ${guest.nextBirthday.turns})`}
           </div>
         </div>
         <Tag tone={tag.tone}>{tag.label}</Tag>
@@ -60,6 +65,13 @@ export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData;
           ×
         </Link>
       </div>
+
+      {guest.allergies && (
+        <div className={s.allergy} role="note">
+          <b>Аллергии</b>
+          <span>{guest.allergies}</span>
+        </div>
+      )}
 
       <div className={s.cardStats}>
         <div>
@@ -98,7 +110,10 @@ export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData;
           </label>
           <Field label="День рождения" type="date" value={form.birthday} onChange={set("birthday")} error={errors.birthday} />
           <div className={s.full}>
-            <TextArea label="Заметки" hint="(аллергии, предпочтения, формулы окрашивания)" rows={3} value={form.notes} onChange={set("notes")} />
+            <TextArea label="Аллергии и противопоказания" hint="(видно ресепшену и мастеру при каждой записи)" rows={2} value={form.allergies} onChange={set("allergies")} />
+          </div>
+          <div className={s.full}>
+            <TextArea label="Заметки" hint="(предпочтения, что важно помнить)" rows={3} value={form.notes} onChange={set("notes")} />
           </div>
           <div className={s.editActions}>
             <Button variant="outline" onClick={() => setEditing(false)}>
@@ -119,6 +134,11 @@ export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData;
         </div>
       )}
 
+      <div className={s.extras}>
+        <Formulas guestId={guest.id} formulas={guest.formulas} visits={guest.recentVisits} />
+        <Photos guestId={guest.id} photos={guest.photos} visits={guest.recentVisits} />
+      </div>
+
       <div className={s.history}>
         {guest.upcoming.length > 0 && (
           <>
@@ -130,9 +150,14 @@ export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData;
         )}
         <div className={s.histTitle}>История визитов</div>
         {guest.history.length === 0 && <div className={s.cardSub}>Визитов пока не было.</div>}
-        {guest.history.map((a) => (
+        {(allHistory ? guest.history : guest.history.slice(0, 12)).map((a) => (
           <HistoryRow key={a.id} a={a} />
         ))}
+        {guest.history.length > 12 && !allHistory && (
+          <button type="button" className={s.linkBtn} onClick={() => setAllHistory(true)}>
+            Показать все визиты · {guest.history.length}
+          </button>
+        )}
       </div>
     </section>
   );

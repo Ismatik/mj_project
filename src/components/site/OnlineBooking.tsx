@@ -13,6 +13,7 @@ import { normalizePhone } from "@/lib/phone";
 import { weekdayOf } from "@/lib/time";
 import type { OnlineMenu } from "@/server/online-booking";
 import s from "./booking.module.css";
+import { WaitlistJoin } from "./WaitlistJoin";
 
 type Done = Extract<OnlineBookingResult, { ok: true }>;
 /** Automatic offers shown in the form (the server applies them again when booking) */
@@ -317,6 +318,9 @@ export function OnlineBooking({
               <div role="alert" className={s.error}>
                 {error.text}
               </div>
+            )}
+            {service && slots !== null && (
+              <WaitlistJoin key={`${serviceId}/${staffId}/${date}`} serviceId={serviceId} staffId={staffId} date={date} name={name} phone={phone} lang={lang} open={slots.length === 0} preview={preview} />
             )}
           </fieldset>
 

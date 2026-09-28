@@ -5,6 +5,7 @@ import { Tag } from "@/components/ui/Tag";
 import { shortDate } from "@/lib/format";
 import { guestTag } from "@/lib/labels";
 import { formatPhone } from "@/lib/phone";
+import { inDays } from "@/lib/birthday";
 import { requirePage } from "@/server/auth";
 import { getGuestBook, getGuestCard, type GuestFilter } from "@/server/guests";
 import { GuestCard } from "./GuestCard";
@@ -16,6 +17,7 @@ const FILTERS: { key: GuestFilter; label: string }[] = [
   { key: "BRIDE", label: "Невесты" },
   { key: "REGULAR", label: "Постоянные" },
   { key: "NEW", label: "Новые" },
+  { key: "birthdays", label: "Дни рождения · 2 недели" },
 ];
 
 const plural = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? "гостья" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "гостьи" : "гостий");
@@ -81,6 +83,16 @@ export default async function GuestsPage({ searchParams }: PageProps<"/cms/guest
               <span className={s.nameCell}>
                 <Avatar name={g.name} size="sm" />
                 <span className={s.name}>{g.name}</span>
+                {g.allergy && (
+                  <i className={s.allergyDot} title="Есть аллергии — откройте карточку" aria-label="аллергии">
+                    !
+                  </i>
+                )}
+                {g.birthdayIn && (
+                  <i className={s.bday}>
+                    🎂 {inDays(g.birthdayIn.days)} · {g.birthdayIn.turns}
+                  </i>
+                )}
               </span>
               <span className={s.light}>{formatPhone(g.phone)}</span>
               <span className={s.serif}>{g.visits}</span>

@@ -112,6 +112,12 @@ Start Meta Business verification during R1 so WhatsApp is ready for R2.
 
 ### R4 — Operations and content (~3 weeks)
 
+| Sprint | Deliverables | Status |
+|---|---|---|
+| 1 | Rich guest card (allergies, colour formulas, private before/after photos, birthdays, full history); waitlist and walk-in queue with automatic offer of cancelled times (site, bot, CMS) | done |
+| 2 | Stock and consumables (low-stock alerts, write-off per service); bridal package builder | |
+| 3 | Blog / beauty tips; Instagram feed; map with click-to-call | |
+
 - Rich guest card: visit history, allergies and notes, colour formulas, before/after photos, birthday.
 - Waitlist and walk-ins, with auto-offer on cancellation.
 - Stock and consumables with low-stock alerts and write-off per service.

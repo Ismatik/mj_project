@@ -44,7 +44,7 @@ const navLabels = (p) => p.$$eval('aside nav a', (as) => as.map((a) => a.querySe
   check('entry loader shows after login', await p.isVisible('text=Открываем салон…'));
   await p.waitForTimeout(2600);
   check('welcome param removed', !p.url().includes('welcome'));
-  check('owner sees 14 pages', (await navLabels(p)).length === 14, (await navLabels(p)).join(', '));
+  check('owner sees 15 pages', (await navLabels(p)).length === 15, (await navLabels(p)).join(', '));
   await p.goto(`${BASE}/cms`); await p.waitForTimeout(1500);
   await p.screenshot({ path: `${out}/dashboard.png`, fullPage: true });
 
@@ -124,7 +124,7 @@ const navLabels = (p) => p.$$eval('aside nav a', (as) => as.map((a) => a.querySe
 {
   const { ctx, p } = await loginAs('reception');
   const labels = await navLabels(p);
-  check('reception sees 8 pages, no analytics/settings', labels.length === 8 && !labels.includes('Аналитика') && !labels.includes('Настройки'), labels.join(', '));
+  check('reception sees 9 pages, no analytics/settings', labels.length === 9 && !labels.includes('Аналитика') && !labels.includes('Настройки'), labels.join(', '));
   const html = await (await p.request.get(`${BASE}/cms/analytics`)).text();
   check('analytics content never reaches reception', !html.includes('Раздел в работе') && html.includes('NEXT_REDIRECT'));
   await p.goto(`${BASE}/cms/analytics`);

@@ -31,7 +31,7 @@ export type BotState = {
   /** Booking being rescheduled */
   apptId?: string;
   /** What to do once the phone is known */
-  after?: "confirm" | "my";
+  after?: "confirm" | "my" | "wait";
   name?: string;
   phone?: string;
 };
@@ -61,6 +61,8 @@ export interface BotDeps {
   bonus(guestId: string, lang: Lang): Promise<{ balance: number; tier: string; percent: number; maxSpendPercent: number } | null>;
   /** Current offers and public promo codes */
   offers(lang: Lang): Promise<{ title: string; description: string; label: string; until: string; code: string | null }[]>;
+  /** Waitlist for a full day: "joined", "already" there, or a time was free and is "offered" right away */
+  waitlist(input: { serviceId: string; staffId: string | null; date: Ymd; name: string; phone: string; guestId?: string; chatId: string; lang: Lang }): Promise<"joined" | "already" | "offered">;
 }
 
 const rows = <T>(xs: T[], n: number): T[][] => Array.from({ length: Math.ceil(xs.length / n) }, (_, i) => xs.slice(i * n, i * n + n));
@@ -119,6 +121,8 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     const list = await deps.slots(state.serviceId!, date, state.staffId ?? null, prefix === "rt" ? state.apptId : undefined);
     if (!list.length) {
       out.push({ text: t.noTimeThatDay(dateLabel(date)) });
+      // A new booking can wait for a cancellation on that day
+      if (prefix === "t") out.push({ text: t.waitAsk, buttons: [[{ text: t.waitBtn, data: `w:${date}` }]] });
       await showDates(prefix === "t" ? "d" : "rd", t.otherDays);
       return;
     }
@@ -145,7 +149,15 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     });
   };
 
-  const askPhone = async (after: "confirm" | "my") => {
+  const joinWaitlist = async (phone: string, name: string) => {
+    if (!state.serviceId || !state.date) return menu(t.startOver);
+    const date = state.date;
+    const res = await deps.waitlist({ serviceId: state.serviceId, staffId: state.staffId ?? null, date, name, phone, guestId: chat.guest?.id, chatId: u.chatId, lang });
+    await save({ step: "idle", phone, name });
+    out.push({ text: res === "offered" ? t.waitOffered : res === "already" ? t.waitAlready : t.waitJoined(dateLabel(date)), buttons: mainMenu() });
+  };
+
+  const askPhone = async (after: "confirm" | "my" | "wait") => {
     await save({ ...state, step: "phone", after });
     out.push({ text: t.askPhone, askContact: true, contactLabel: t.sharePhone });
   };
@@ -180,6 +192,11 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     const guest = await deps.findGuestByPhone(phone);
     if (guest) await deps.saveChat(u.chatId, { guestId: guest.id, lang });
     out.push({ text: guest ? t.thanksKnown(guest.name.split(" ")[0]!) : t.thanks, removeKeyboard: true });
+    if (state.after === "wait") {
+      await save({ ...state, phone });
+      await joinWaitlist(phone, guest?.name ?? state.name ?? u.firstName ?? "Гостья");
+      return out;
+    }
     if (state.after === "my") {
       await save({ step: "idle" });
       if (guest) await showMy(guest.id);
@@ -291,6 +308,14 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
 
     case "dates":
       await showDates("d", t.pickDay);
+      break;
+
+    case "w":
+      if (!state.serviceId) return bail();
+      await save({ ...state, date: arg, time: undefined });
+      if (chat.guest) await joinWaitlist(chat.guest.phone, chat.guest.name);
+      else if (state.phone) await joinWaitlist(state.phone, state.name ?? u.firstName ?? "Гостья");
+      else await askPhone("wait");
       break;
 
     case "d":

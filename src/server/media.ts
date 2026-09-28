@@ -1,6 +1,6 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 // Uploaded photos live in MEDIA_DIR (a Docker volume in production) and are served by /media/[name].
@@ -28,6 +28,35 @@ export async function saveUpload(file: File | null): Promise<UploadResult> {
   const name = `${randomUUID()}.${type.ext}`;
   await writeFile(path.join(MEDIA_DIR, name), buf);
   return { ok: true, url: `/media/${name}` };
+}
+
+// Guest photos (before/after) are private: kept in MEDIA_DIR/private, which /media/[name] never serves.
+const PRIVATE_DIR = path.join(MEDIA_DIR, "private");
+
+export async function savePrivateUpload(file: File | null): Promise<{ ok: true; name: string } | { ok: false; error: string }> {
+  if (!file || typeof file === "string" || file.size === 0) return { ok: false, error: "Выберите файл" };
+  if (file.size > MAX_BYTES) return { ok: false, error: "Файл больше 8 МБ" };
+  const buf = Buffer.from(await file.arrayBuffer());
+  const type = TYPES.find((t) => t.test(buf));
+  if (!type) return { ok: false, error: "Нужен JPG, PNG или WebP" };
+  await mkdir(PRIVATE_DIR, { recursive: true });
+  const name = `${randomUUID()}.${type.ext}`;
+  await writeFile(path.join(PRIVATE_DIR, name), buf);
+  return { ok: true, name };
+}
+
+export async function readPrivateMedia(name: string): Promise<{ body: Buffer; mime: string } | null> {
+  if (!MEDIA_NAME.test(name)) return null;
+  try {
+    const body = await readFile(path.join(PRIVATE_DIR, name));
+    return { body, mime: TYPES.find((t) => t.ext === name.split(".").pop())!.mime };
+  } catch {
+    return null;
+  }
+}
+
+export async function removePrivateMedia(name: string) {
+  if (MEDIA_NAME.test(name)) await unlink(path.join(PRIVATE_DIR, name)).catch(() => {});
 }
 
 export async function readMedia(name: string): Promise<{ body: Buffer; mime: string } | null> {

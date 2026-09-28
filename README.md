@@ -52,8 +52,8 @@ Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
 
 | Login | Role | Sees |
 |---|---|---|
-| `mavzuna` | owner | all 14 CMS sections, site admin |
-| `reception` | reception | day-to-day pages (till with shift close, guests, calendar, services, rental, certificates, staff); no analytics, reports, payroll, bonus rules or settings; can book |
+| `mavzuna` | owner | all 15 CMS sections, site admin |
+| `reception` | reception | day-to-day pages (till with shift close, guests, waitlist, calendar, services, rental, certificates, staff); no analytics, reports, payroll, bonus rules or settings; can book |
 | `mira` | master | calendar (own bookings), services, staff schedule, her own pay |
 | `content` | content manager | site admin only |
 
@@ -106,7 +106,7 @@ Guests book, see, move and cancel their visits in Telegram; reception gets alert
 Guests without Telegram get their confirmation, reminders and sign-in codes in WhatsApp (Cloud API, `src/server/integrations/whatsapp-api.ts`).
 
 - Step-by-step setup in Meta (account, number, token, webhook, costs): **`docs/whatsapp-setup.md`**. The templates are prepared in `src/lib/whatsapp-templates.ts` and submitted for approval from CMS → Интеграции → Шаблоны сообщений → «Отправить шаблоны в Meta» (needs `WHATSAPP_WABA_ID`); their approval status shows there.
-- WhatsApp only lets a business write first with templates approved by Meta. Create them in WhatsApp Manager with the names and parameter order shown on the templates page (`mj_booking_confirmation`, `mj_reminder_day`, `mj_reminder_hours`, `mj_birthday` — *Marketing*, `mj_login_code` — *Authentication*). Tajik guests get the Russian template on WhatsApp unless Meta accepts Tajik.
+- WhatsApp only lets a business write first with templates approved by Meta. Create them in WhatsApp Manager with the names and parameter order shown on the templates page (`mj_booking_confirmation`, `mj_reminder_day`, `mj_reminder_hours`, `mj_birthday` — *Marketing*, `mj_waitlist_offer`, `mj_login_code` — *Authentication*). Tajik guests get the Russian template on WhatsApp unless Meta accepts Tajik.
 - Webhook `https://SITE_DOMAIN/api/whatsapp/webhook`: verified with `WHATSAPP_VERIFY_TOKEN`, every request checked against `WHATSAPP_APP_SECRET`. It records delivery failures in the outbox, forwards guests' WhatsApp messages to reception (Telegram) and sends her a short auto-reply at most every 12 hours.
 - Going live: Meta Business verification and a Cloud API number; put `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` in `.env`; restart; set the webhook in Meta (field `messages`); CMS → Интеграции → WhatsApp → "Тест" (sends Meta's `hello_world` template) and "Живой".
 
@@ -123,6 +123,13 @@ Guests without Telegram get their confirmation, reminders and sign-in codes in W
 - **Promotions:** an offer without a code applies by itself to its services and dates — in online booking (old price struck through), in the bot and at the till. A promo code (e.g. `MJ10`) applies when typed in the booking form or at the till; it can have a usage limit. Offers marked "на сайте" appear in the website's «Акции» section and in the bot (✦ Акции), in all three languages.
 - Guests see their points, level and history in `/kabinet` and in the bot (🎁 Бонусы).
 
+## Guest card, waitlist and walk-ins
+
+- **Guest card** (Книга гостей): allergies and contraindications (a red note on the card, a «!» in the guest book, and in the calendar for the master of each visit), colour formulas per visit (the master can record them from her booking in the calendar), before/after photos (stored in `MEDIA_DIR/private`, shown only to staff through `/api/cms/guest-photos/<id>`, never under `/media`), the whole visit history and a «Дни рождения · 2 недели» filter with how old she turns.
+- **Лист ожидания** (`/cms/waitlist`, owner and reception):
+  - *Живая очередь* — guests who came in without a booking, with how long they've been waiting; «Посадить» books them "в кресле" with a master who is free right now.
+  - *Лист ожидания* — guests waiting for a full day (added by reception, on the website — «Сообщить, если освободится» under the times — or in the bot). Whenever a booking is cancelled or moved (by reception, by the guest in her account or the bot, or because a prepayment wasn't made), the freed time is offered to the first guest it suits (service, master, preferred hours). The time is held for 30 minutes and she gets a message with a link (`/ochered/<token>`, in her language) to confirm or decline. If she declines or doesn't answer (the worker checks every minute), it goes to the next guest.
+
 ## Payroll, shift close and reports
 
 - **Закрытие смены** (Ресепшен и касса → «Закрытие смены», `/cms/pos/shift`): the day's money by cash / card / QR, prepayments, certificates and points used, cash put in or taken out (with a reason), and the cash expected in the drawer: what the previous shift left + cash taken today + put in − taken out (salary paid from the till included). Reception counts the drawer, says how much goes to the owner, and closes the day. The difference (shortfall or surplus) is kept, and the staff Telegram chat is told about it. The Z-report is a PDF. Once a day is closed, its cash can't change; the till warns if an earlier day with receipts wasn't closed (`?day=YYYY-MM-DD` closes it).
@@ -132,4 +139,4 @@ Guests without Telegram get their confirmation, reminders and sign-in codes in W
 ## Tests
 
 - `npm test` — unit tests (booking rules, free slots, formatting, access, content, translations, bot, message templates, bonus points and promotions, payroll and the till's cash count, the Excel writer, WhatsApp payloads and webhook parsing).
-- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates, bonus points and promotions, payroll, shift close and reports (see `e2e/README.md`).
+- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates, bonus points and promotions, payroll, shift close and reports, guest card and waitlist (see `e2e/README.md`).

@@ -6,6 +6,7 @@ import { INTEGRATIONS } from "@/lib/integrations";
 import { getCurrentUser } from "@/server/auth";
 import { sweepOutbox } from "@/server/integrations/outbox";
 import { releaseExpired } from "@/server/payments/core";
+import { expireOffers } from "@/server/waitlist/core";
 import { queueReminders } from "@/server/integrations/reminders";
 import { getMe, setWebhook, telegramConfigured } from "@/server/integrations/telegram-api";
 import { rotateStaffCode } from "@/server/telegram/deps";
@@ -52,6 +53,7 @@ export async function deliverNow(): Promise<number> {
   await requireOwner();
   // Same as the worker's minute job: release unpaid prepayment holds, then deliver the queue
   await releaseExpired(db);
+  await expireOffers(db);
   const n = await sweepOutbox(db);
   revalidatePath("/cms/integrations");
   return n;

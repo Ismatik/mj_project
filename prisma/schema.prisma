@@ -61,6 +61,8 @@ model Staff {
   favouriteOf Guest[]   @relation("FavouriteMaster")
   adjustments StaffAdjustment[]
   payouts     StaffPayout[]
+  formulas    ColourFormula[]
+  waitlist    WaitlistEntry[]
 }
 
 model ServiceCategory {
@@ -90,6 +92,7 @@ model Service {
   saleItems   SaleItem[]
   /// Masters qualified to perform this service
   staff       Staff[]         @relation("ServiceStaff")
+  waitlist    WaitlistEntry[]
 }
 
 // ─── Guests & bookings ───────────────────────────────────
@@ -108,6 +111,8 @@ model Guest {
   birthday     DateTime?     @db.Date
   tag          GuestTag      @default(NEW)
   notes        String?
+  /// Allergies and contraindications — shown as a warning wherever she is booked
+  allergies    String?
   createdAt    DateTime      @default(now())
   appointments Appointment[]
   sales        Sale[]
@@ -123,6 +128,9 @@ model Guest {
   /// Bonus points (1 point = 1 somoni); the ledger is BonusTx
   bonusBalance  Int            @default(0)
   bonusTxs      BonusTx[]
+  formulas      ColourFormula[]
+  photos        GuestPhoto[]
+  waitlist      WaitlistEntry[]
 }
 
 /// Website account session of a guest (signed in with a code sent to her phone).
@@ -197,6 +205,9 @@ model Appointment {
   promotion       Promotion? @relation(fields: [promotionId], references: [id])
   promotionId     String?
   fullPrice       Int?
+  photos          GuestPhoto[]
+  formulas        ColourFormula[]
+  waitlistOffer   WaitlistEntry? @relation("WaitlistOffer")
 
   @@index([startsAt])
 }
@@ -608,4 +619,107 @@ model CashShift {
   note         String?
   closedBy     String
   closedAt     DateTime @default(now())
+}
+
+// ─── Guest card: colour formulas and photos ──────────────
+
+/// A colour (or lash / brow tint) formula written after a visit
+model ColourFormula {
+  id            String       @id @default(cuid())
+  guest         Guest        @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  guestId       String
+  staff         Staff?       @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  staffId       String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  appointmentId String?
+  /// What it was for: "Окрашивание корней", "Тонирование"
+  title         String
+  /// The mix: "Igora 7-1 + 7-0 1:1, оксид 6%, 35 мин"
+  formula       String
+  note          String?
+  createdBy     String?
+  createdAt     DateTime     @default(now())
+
+  @@index([guestId, createdAt])
+}
+
+enum GuestPhotoKind {
+  BEFORE
+  AFTER
+  OTHER
+}
+
+/// A before/after photo. Private: stored outside the public media folder, shown only in the CMS.
+model GuestPhoto {
+  id            String         @id @default(cuid())
+  guest         Guest          @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  guestId       String
+  appointment   Appointment?   @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  appointmentId String?
+  kind          GuestPhotoKind @default(OTHER)
+  /// File name in MEDIA_DIR/private
+  file          String
+  caption       String?
+  createdBy     String?
+  createdAt     DateTime       @default(now())
+
+  @@index([guestId, createdAt])
+}
+
+// ─── Waitlist and walk-ins ───────────────────────────────
+
+enum WaitlistKind {
+  /// Wants a time on a day that is full: offered the first matching time that frees up
+  WAITLIST
+  /// Came in without a booking and waits in the salon today
+  WALK_IN
+}
+
+enum WaitlistStatus {
+  WAITING
+  /// A freed time is held for her until offerExpiresAt
+  OFFERED
+  BOOKED
+  /// Walk-in seated
+  SERVED
+  /// Walk-in left without service
+  LEFT
+  DECLINED
+  EXPIRED
+  CANCELLED
+}
+
+model WaitlistEntry {
+  id             String         @id @default(cuid())
+  kind           WaitlistKind   @default(WAITLIST)
+  status         WaitlistStatus @default(WAITING)
+  guest          Guest?         @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  guestId        String?
+  name           String
+  phone          String?
+  lang           String         @default("ru")
+  service        Service        @relation(fields: [serviceId], references: [id])
+  serviceId      String
+  /// Wanted master; null = any
+  staff          Staff?         @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  staffId        String?
+  /// Salon day she wants
+  date           DateTime       @db.Date
+  /// Preferred window "HH:MM" (optional)
+  timeFrom       String?
+  timeTo         String?
+  note           String?
+  source         BookingSource  @default(CMS)
+  /// Secret for the accept / decline page sent to her
+  token          String         @unique
+  /// The held booking offered to her
+  offer          Appointment?   @relation("WaitlistOffer", fields: [offerId], references: [id], onDelete: SetNull)
+  offerId        String?        @unique
+  offerExpiresAt DateTime?
+  offers         Int            @default(0)
+  createdBy      String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([status, date])
 }

@@ -7,6 +7,7 @@ import { asLang } from "../../lib/i18n/locales";
 import { GIFT_VALID_DAYS } from "../../lib/money";
 import { formatPhone } from "../../lib/phone";
 import { appointmentVars, guestMessage, messageContext } from "../integrations/guest-messages";
+import { onBookingCancelled } from "../waitlist/core";
 
 type Db = PrismaClient;
 type Tx = Prisma.TransactionClient;
@@ -87,6 +88,7 @@ export async function cancelPayment(db: Db | Tx, paymentId: string, reason: "can
           meta: { kind: "deposit-expired", appointmentId: a.id },
         },
       });
+      if ("$transaction" in db) await onBookingCancelled(db as PrismaClient, a);
     }
   }
   if (p.purpose === "GIFT_CARD" && p.giftCardId) {
@@ -103,10 +105,6 @@ export async function releaseExpired(db: Db, now = new Date()): Promise<number> 
   return n;
 }
 
-/** Absolute site address for links in messages (the bot, WhatsApp) */
-export function siteUrl(): string {
-  const d = (process.env.SITE_DOMAIN ?? "").replace(/^https?:\/\//, "").replace(/\/$/, "");
-  return d && d !== "localhost" ? `https://${d}` : "http://localhost:3000";
-}
+export { siteUrl } from "../../lib/site-url";
 
 export const langOf = (p: { lang: string }) => asLang(p.lang);

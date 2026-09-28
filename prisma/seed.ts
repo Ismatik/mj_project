@@ -30,6 +30,9 @@ function anchorDay(): Ymd {
 async function wipe() {
   await db.$transaction([
     db.outboxMessage.deleteMany(),
+    db.waitlistEntry.deleteMany(),
+    db.guestPhoto.deleteMany(),
+    db.colourFormula.deleteMany(),
     db.cashShift.deleteMany(),
     db.cashMovement.deleteMany(),
     db.staffPayout.deleteMany(),
@@ -448,6 +451,40 @@ async function main() {
       { staffId: staffId.mira!, month, amount: 300, note: "Лучшие отзывы месяца", createdBy: "Мавзуна" },
       { staffId: staffId.dario!, month, amount: -100, note: "Опоздание", createdBy: "Мавзуна" },
     ],
+  });
+
+  // Guest card: allergies and colour formulas
+  await db.guest.update({ where: { id: guestId.marta }, data: { allergies: "Аммиак — только безаммиачные красители. Чувствительная кожа головы." } });
+  await db.guest.update({ where: { id: guestId.sevara }, data: { allergies: "Латекс (перчатки — нитриловые)" } });
+  await db.colourFormula.createMany({
+    data: [
+      { guestId: guestId.marta!, staffId: staffId.ines, title: "Балаяж", formula: "Осветление Blondor + 6% 1:2, 40 мин; тонирование Igora Vibrance 9-24 + 1,9% 1:2, 20 мин", note: "Корни не трогать", createdBy: "Инес", createdAt: atSalonTime(addDays(today, -40), "13:00") },
+      { guestId: guestId.marta!, staffId: staffId.ines, title: "Тонирование", formula: "Igora Vibrance 9-24 + 9-0 1:1, оксид 1,9%, 20 мин", createdBy: "Инес", createdAt: atSalonTime(addDays(today, -12), "15:00") },
+      { guestId: guestId.gulnora!, staffId: staffId.ines, title: "Окрашивание в один тон", formula: "Igora Royal 6-68 + 6-0 2:1, оксид 6%, 35 мин", createdBy: "Инес", createdAt: atSalonTime(addDays(today, -9), "11:30") },
+      { guestId: guestId.anna!, staffId: staffId.mira, title: "Ламинирование ресниц", formula: "Состав 1 — 9 мин, состав 2 — 8 мин, краска графит 5 мин", createdBy: "Мира", createdAt: atSalonTime(addDays(today, -20), "12:00") },
+    ],
+  });
+
+  // Waitlist: someone waits for a balayage in ten days (afternoon), one walk-in waits now
+  let waitDay = addDays(today, 10);
+  if (isClosed(waitDay)) waitDay = addDays(waitDay, 1);
+  await db.waitlistEntry.create({
+    data: {
+      kind: "WAITLIST",
+      name: "Дилноза Каримова",
+      phone: "+992900000201",
+      serviceId: serviceId.balayage!,
+      staffId: staffId.ines,
+      date: new Date(`${waitDay}T00:00:00Z`),
+      timeFrom: "14:00",
+      timeTo: "18:00",
+      source: "WEBSITE",
+      token: "demo-waitlist-dilnoza",
+      createdAt: atSalonTime(addDays(today, -1), "19:20"),
+    },
+  });
+  await db.waitlistEntry.create({
+    data: { kind: "WALK_IN", name: "Мадина", serviceId: serviceId.gel!, date: new Date(`${today}T00:00:00Z`), source: "WALK_IN", token: "demo-walkin-madina", note: "Спешит к 13:00", createdBy: "Ресепшен", createdAt: new Date(Date.now() - 12 * 60_000) },
   });
 
   // Sign-in accounts (the same demo password for every role; change it after first sign-in)

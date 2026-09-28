@@ -14,6 +14,7 @@ import { LANG_NAME, type Lang } from "@/lib/i18n/locales";
 import { addDays, atSalonTime, todayYmd, type Ymd } from "@/lib/time";
 import { appointmentVars, guestMessage, messageContext } from "./integrations/guest-messages";
 import { promotionsBetween } from "./loyalty/core";
+import { onBookingCancelled } from "./waitlist/core";
 import { namerFor } from "./names";
 import { getSiteContent } from "./site";
 
@@ -267,6 +268,7 @@ export async function cancelByGuest(appointmentId: string, guestId: string, lang
       },
     }),
   ]);
+  await onBookingCancelled(db, a); // the freed time goes to the waitlist
   return { ok: true };
 }
 
@@ -274,7 +276,7 @@ export async function cancelByGuest(appointmentId: string, guestId: string, lang
 export async function rescheduleByGuest(appointmentId: string, guestId: string, date: Ymd, time: string, lang: Lang = "ru"): Promise<GuestBookingResult> {
   const e = dict(lang).errors;
   const name = await namerFor(lang);
-  return db.$transaction(async (tx) => {
+  const result = await db.$transaction(async (tx): Promise<GuestBookingResult & { freed?: { startsAt: Date; durationMin: number } }> => {
     const a = await tx.appointment.findFirst({ where: { id: appointmentId, guestId }, include: { staff: { include: { staff: true } }, guest: true } });
     if (!a || !a.serviceId || !["PENDING", "CONFIRMED"].includes(a.status)) return { ok: false as const, error: e.notFound };
     await lockDate(tx, date);
@@ -282,6 +284,7 @@ export async function rescheduleByGuest(appointmentId: string, guestId: string, 
     const { slots } = await slotsFor(a.serviceId, date, staffId, tx, a.id);
     if (!slots.some((x) => x.time === time)) return { ok: false as const, error: e.slotBusy };
     const startsAt = atSalonTime(date, time);
+    const freed = { startsAt: a.startsAt, durationMin: a.durationMin };
     await tx.appointment.update({ where: { id: a.id }, data: { startsAt, status: "PENDING", remindedDayAt: null, remindedHoursAt: null } });
     await tx.outboxMessage.create({
       data: {
@@ -301,6 +304,11 @@ export async function rescheduleByGuest(appointmentId: string, guestId: string, 
         when: when(startsAt, lang),
         phone: formatPhone(a.guest?.phone ?? ""),
       },
+      freed,
     };
   });
+  if (result.ok && result.freed) await onBookingCancelled(db, result.freed);
+  if (!result.ok) return result;
+  const { freed: _freed, ...rest } = result;
+  return rest;
 }

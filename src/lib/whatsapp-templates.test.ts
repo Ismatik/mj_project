@@ -5,8 +5,8 @@ import { metaTemplates } from "./whatsapp-templates";
 describe("WhatsApp templates for Meta", () => {
   const all = metaTemplates();
   it("five messages in Russian and English", () => {
-    expect(all).toHaveLength(10);
-    expect(new Set(all.map((t) => `${t.name}/${t.language}`)).size).toBe(10);
+    expect(all).toHaveLength(12);
+    expect(new Set(all.map((t) => `${t.name}/${t.language}`)).size).toBe(12);
   });
   it("placeholders match the parameters the driver sends, with examples", () => {
     for (const t of all.filter((x) => x.category !== "AUTHENTICATION")) {

@@ -1,4 +1,5 @@
 import "server-only";
+import { guestAlerts } from "./guest-card";
 import { db } from "@/lib/db";
 import { addDays, atSalonTime, isClosed, mondayOf, todayYmd, weekdayOf, WEEKDAYS_SHORT } from "@/lib/time";
 import type { CurrentUser } from "./auth";
@@ -70,6 +71,8 @@ export async function getAppointment(id: string, user: CurrentUser) {
     holdUntil: a.holdUntil,
     note: a.note,
     ymd: todayYmd(a.startsAt),
+    // What the master should know before starting
+    alerts: a.guestId ? await guestAlerts(a.guestId) : { allergies: null, formulas: [] },
   };
 }
 

@@ -68,6 +68,14 @@ function makeDeps() {
     formatWhen: (d) => d.toISOString(),
     bonus: async () => ({ balance: 120, tier: "Серебро", percent: 7, maxSpendPercent: 30 }),
     offers: async () => [{ title: "Осенний маникюр", description: "", label: "−20%", until: "31 октября 2026", code: null }],
+    async waitlist(i) {
+      calls.push(`wait ${i.serviceId} ${i.date} ${i.name} ${i.phone}`);
+      // Like the real one: she becomes a guest linked to this chat
+      let g = guests.find((x) => x.phone === i.phone);
+      if (!g) guests.push((g = { id: `g${guests.length}`, name: i.name, phone: i.phone }));
+      await deps.saveChat(i.chatId, { guestId: g.id });
+      return calls.filter((c) => c.startsWith(`wait ${i.serviceId} ${i.date}`)).length > 1 ? "already" : "joined";
+    },
   };
   return { deps, chats, booked, calls };
 }
@@ -112,6 +120,25 @@ describe("Telegram bot", () => {
     const again = await send({ data: "t:11:00" });
     expect(again[0]!.askContact).toBeFalsy();
     expect(texts(again)).toContain("Проверьте");
+  });
+
+  it("puts her on the waitlist when a day is full", async () => {
+    for (const time of ["10:00", "10:30", "11:00"]) t.booked.push({ id: time, guestId: "g-marta", serviceId: "svc-lash", staffId: "mira", date: "2026-10-01", time, status: "PENDING" });
+    await send({ data: "s:svc-lash" });
+    await send({ data: "m:mira" });
+    const full = await send({ data: "d:2026-10-01" });
+    expect(texts(full)).toContain("свободного времени нет");
+    expect(buttons(full).find((b) => b.data === "w:2026-10-01")?.text).toBe("🔔 Сообщить, если освободится");
+    const ask = await send({ data: "w:2026-10-01" });
+    expect(ask[0]!.askContact).toBe(true);
+    const joined = await send({ contactPhone: "93 111 22 33" });
+    expect(texts(joined)).toContain("Вы в листе ожидания на");
+    expect(t.calls).toEqual(["wait svc-lash 2026-10-01 Зарина +992931112233"]);
+    // Again, phone already known
+    await send({ data: "s:svc-lash" });
+    await send({ data: "m:any" });
+    await send({ data: "d:2026-10-01" });
+    expect(texts(await send({ data: "w:2026-10-01" }))).toContain("уже в листе ожидания");
   });
 
   it("rejects a malformed phone and accepts a typed one", async () => {

@@ -469,3 +469,24 @@
   border-left: 2px solid var(--mj-gold);
   font-size: 14px;
 }
+.waitlist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--mj-paper);
+  border-left: 2px solid var(--mj-gold);
+}
+.waitlist .promo {
+  margin-top: 8px;
+}
+.waitlist select {
+  border: 1px solid var(--mj-line);
+  background: var(--mj-cream);
+  padding: 8px 10px;
+  font-family: var(--mj-sans);
+  font-size: 13px;
+  color: var(--mj-ink);
+  border-radius: 0;
+}

@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { clock } from "@/lib/format";
 import { addDays, atSalonTime, todayYmd } from "@/lib/time";
 import { getCurrentUser } from "@/server/auth";
+import { onBookingCancelled } from "@/server/waitlist/core";
 
 type Status = "PENDING" | "CONFIRMED" | "IN_CHAIR" | "CANCELLED" | "NO_SHOW";
 
@@ -21,7 +22,8 @@ export async function setAppointmentStatus(id: string, status: Status): Promise<
   if (user.role === "MASTER") {
     if (!a.staff.some((s) => s.staffId === user.staffId) || status !== "IN_CHAIR") return { ok: false, error: "Мастер может только отметить «в кресле»" };
   }
-  await db.appointment.update({ where: { id }, data: { status } });
+  await db.appointment.update({ where: { id }, data: { status, ...(status === "CANCELLED" ? { holdUntil: null } : {}) } });
+  if (status === "CANCELLED" && a.status !== "CANCELLED") await onBookingCancelled(db, a); // offer the time to the waitlist
   revalidatePath("/cms", "layout");
   return { ok: true };
 }
@@ -66,6 +68,7 @@ export async function rescheduleAppointment(id: string, date: string, time: stri
   if (first) return { ok: false, error: first };
 
   await db.appointment.update({ where: { id }, data: { startsAt: atSalonTime(date, time.padStart(5, "0")) } });
+  await onBookingCancelled(db, a); // its old time is free now
   revalidatePath("/cms", "layout");
   return { ok: true };
 }
