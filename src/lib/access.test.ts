@@ -3,7 +3,7 @@ import { canOpen, canUseCms, canUseSiteAdmin, homeFor, navFor, safeNext } from "
 
 describe("access", () => {
   it("gives the owner every CMS page and the site admin", () => {
-    expect(navFor("OWNER").flatMap((g) => g.items)).toHaveLength(15);
+    expect(navFor("OWNER").flatMap((g) => g.items)).toHaveLength(17);
     expect(canUseSiteAdmin("OWNER")).toBe(true);
   });
 

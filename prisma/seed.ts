@@ -30,6 +30,9 @@ function anchorDay(): Ymd {
 async function wipe() {
   await db.$transaction([
     db.outboxMessage.deleteMany(),
+    db.stockMove.deleteMany(),
+    db.serviceConsumption.deleteMany(),
+    db.stockItem.deleteMany(),
     db.waitlistEntry.deleteMany(),
     db.guestPhoto.deleteMany(),
     db.colourFormula.deleteMany(),
@@ -49,6 +52,7 @@ async function wipe() {
     db.reminder.deleteMany(),
     db.setting.deleteMany(),
     db.dressBooking.deleteMany(),
+    db.bridalPackage.deleteMany(),
     db.dress.deleteMany(),
     db.saleItem.deleteMany(),
     db.promotion.deleteMany(),
@@ -486,6 +490,65 @@ async function main() {
   await db.waitlistEntry.create({
     data: { kind: "WALK_IN", name: "Мадина", serviceId: serviceId.gel!, date: new Date(`${today}T00:00:00Z`), source: "WALK_IN", token: "demo-walkin-madina", note: "Спешит к 13:00", createdBy: "Ресепшен", createdAt: new Date(Date.now() - 12 * 60_000) },
   });
+
+  // Stock: consumables with norms per service (two are already running low)
+  const stock = [
+    { key: "igora", name: "Краситель Igora Royal 6-0", unit: "мл", category: "Окрашивание", packSize: 60, packPrice: 95, quantity: 420, min: 180, supplier: "Schwarzkopf Professional" },
+    { key: "oxide", name: "Оксид Igora 6%", unit: "мл", category: "Окрашивание", packSize: 1000, packPrice: 160, quantity: 2400, min: 1000, supplier: "Schwarzkopf Professional" },
+    { key: "blondor", name: "Осветлитель Blondor", unit: "г", category: "Окрашивание", packSize: 450, packPrice: 380, quantity: 300, min: 450, supplier: "Wella" },
+    { key: "gelRose", name: "Гель-лак «розовое золото»", unit: "мл", category: "Ногти", packSize: 15, packPrice: 180, quantity: 12, min: 20, supplier: "Kodi" },
+    { key: "base", name: "База для гель-лака", unit: "мл", category: "Ногти", packSize: 15, packPrice: 150, quantity: 60, min: 15, supplier: "Kodi" },
+    { key: "files", name: "Пилки одноразовые", unit: "шт", category: "Ногти", packSize: 50, packPrice: 90, quantity: 160, min: 50, supplier: null },
+    { key: "lashKit", name: "Набор для ламинирования ресниц", unit: "шт", category: "Брови и ресницы", packSize: 10, packPrice: 450, quantity: 14, min: 5, supplier: "InLei" },
+    { key: "mask", name: "Альгинатная маска", unit: "г", category: "Уход", packSize: 500, packPrice: 320, quantity: 900, min: 300, supplier: null },
+    { key: "gloves", name: "Перчатки нитриловые", unit: "шт", category: "Расходники", packSize: 100, packPrice: 120, quantity: 340, min: 100, supplier: null },
+  ];
+  const itemId: Record<string, string> = {};
+  for (const it of stock) {
+    const row = await db.stockItem.create({
+      data: { name: it.name, unit: it.unit, category: it.category, packSize: it.packSize, packPrice: it.packPrice, quantity: it.quantity, minQuantity: it.min, supplier: it.supplier, createdAt: atSalonTime(addDays(today, -30), "10:00") },
+    });
+    itemId[it.key] = row.id;
+    await db.stockMove.create({ data: { itemId: row.id, delta: it.quantity, balance: it.quantity, kind: "RECEIPT", note: "Начальный остаток", createdBy: "Мавзуна", createdAt: atSalonTime(addDays(today, -30), "10:00") } });
+  }
+  await db.stockMove.create({ data: { itemId: itemId.base!, delta: 0, balance: 60, kind: "COUNT", note: "Пересчёт: сошлось", createdBy: "Ресепшен", createdAt: atSalonTime(addDays(today, -7), "18:05") } });
+  const norms: [string, string, number][] = [
+    ["color", "igora", 60], ["color", "oxide", 60], ["color", "gloves", 2],
+    ["balayage", "blondor", 60], ["balayage", "oxide", 90], ["balayage", "igora", 30], ["balayage", "gloves", 2],
+    ["gel", "base", 1], ["gel", "gelRose", 1], ["gel", "files", 1], ["gel", "gloves", 2],
+    ["pedi", "files", 2], ["pedi", "gloves", 2],
+    ["lashes", "lashKit", 1],
+    ["skin", "mask", 50], ["skin", "gloves", 2],
+  ];
+  await db.serviceConsumption.createMany({ data: norms.map(([sv, it, amount]) => ({ serviceId: serviceId[sv]!, itemId: itemId[it]!, amount })) });
+
+  // Bridal package: Фарзона's wedding, with the dress already booked for her
+  const farzonaDress = await db.dressBooking.findFirst({ where: { guestId: guestId.farzona }, include: { dress: true } });
+  if (farzonaDress) {
+    const wedding = farzonaDress.startsOn.toISOString().slice(0, 10);
+    const svc = ["bridalHair", "bridal", "gel"].map((k) => data.services.find((x) => x.key === k)!);
+    const sum = svc.reduce((a, x) => a + x.price, 0);
+    const dressPrice = farzonaDress.dress.pricePerDay * 2;
+    const pkg = await db.bridalPackage.create({
+      data: {
+        status: "CONFIRMED",
+        guestId: guestId.farzona,
+        name: "Фарзона Икромова",
+        phone: data.guests.find((g) => g.key === "farzona")!.phone,
+        weddingDate: new Date(`${wedding}T00:00:00Z`),
+        services: svc.map((x) => ({ serviceId: serviceId[x.key], name: x.name, price: x.price })),
+        dressId: farzonaDress.dressId,
+        dressDays: 2,
+        dressPrice,
+        subtotal: sum + dressPrice,
+        discountPercent: 10,
+        total: sum - Math.round(sum * 0.1) + dressPrice,
+        note: "Сбор в 07:00, фотограф к 10:00",
+        createdAt: atSalonTime(addDays(today, -20), "16:00"),
+      },
+    });
+    await db.dressBooking.update({ where: { id: farzonaDress.id }, data: { bridalPackageId: pkg.id } });
+  }
 
   // Sign-in accounts (the same demo password for every role; change it after first sign-in)
   const password = process.env.SEED_OWNER_PASSWORD || "change-me-now";

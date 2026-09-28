@@ -93,6 +93,8 @@ model Service {
   /// Masters qualified to perform this service
   staff       Staff[]         @relation("ServiceStaff")
   waitlist    WaitlistEntry[]
+  /// Consumables written off each time the service is paid
+  consumption ServiceConsumption[]
 }
 
 // ─── Guests & bookings ───────────────────────────────────
@@ -117,6 +119,7 @@ model Guest {
   appointments Appointment[]
   sales        Sale[]
   dressBookings DressBooking[]
+  bridalPackages BridalPackage[]
   requests     BookingRequest[]
   telegramChats TelegramChat[]
   /// Master the guest marked as favourite in her account
@@ -249,6 +252,7 @@ model Sale {
   method    PaymentMethod
   createdAt DateTime      @default(now())
   items     SaleItem[]
+  stockMoves  StockMove[]
   redemptions GiftRedemption[]
   bonusTxs    BonusTx[]
 
@@ -292,6 +296,7 @@ model Dress {
   photoUrl    String?
   sortOrder   Int            @default(0)
   bookings    DressBooking[]
+  bridalPackages BridalPackage[]
 }
 
 model DressBooking {
@@ -302,6 +307,9 @@ model DressBooking {
   guestId   String?
   startsOn  DateTime @db.Date
   endsOn    DateTime @db.Date
+  /// Booked as part of a bridal package
+  bridalPackage   BridalPackage? @relation(fields: [bridalPackageId], references: [id], onDelete: SetNull)
+  bridalPackageId String?
   createdAt DateTime @default(now())
 }
 
@@ -722,4 +730,104 @@ model WaitlistEntry {
   updatedAt      DateTime       @updatedAt
 
   @@index([status, date])
+}
+
+// ─── Stock and consumables ───────────────────────────────
+
+/// A product or consumable kept in stock, counted in its smallest unit (ml, g, pcs)
+model StockItem {
+  id          String   @id @default(cuid())
+  name        String
+  /// мл | г | шт
+  unit        String
+  category    String   @default("Расходники")
+  quantity    Int      @default(0)
+  /// Alert when the quantity drops below this
+  minQuantity Int      @default(0)
+  /// One package: how many units and what it costs (for the stock value)
+  packSize    Int      @default(1)
+  packPrice   Int      @default(0)
+  supplier    String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  moves       StockMove[]
+  consumption ServiceConsumption[]
+}
+
+/// How much of an item one service uses (written off when the service is paid)
+model ServiceConsumption {
+  service   Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  serviceId String
+  item      StockItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId    String
+  amount    Int
+
+  @@id([serviceId, itemId])
+}
+
+enum StockMoveKind {
+  /// Delivery
+  RECEIPT
+  /// Used by a paid service
+  SERVICE
+  /// Thrown away, broken, expired, own use
+  WASTE
+  /// Stocktake: set to the counted quantity
+  COUNT
+}
+
+model StockMove {
+  id        String        @id @default(cuid())
+  item      StockItem     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId    String
+  delta     Int
+  /// Quantity after the move
+  balance   Int
+  kind      StockMoveKind
+  sale      Sale?         @relation(fields: [saleId], references: [id], onDelete: SetNull)
+  saleId    String?
+  note      String?
+  createdBy String?
+  createdAt DateTime      @default(now())
+
+  @@index([itemId, createdAt])
+  @@index([createdAt])
+}
+
+// ─── Bridal packages ─────────────────────────────────────
+
+enum BridalStatus {
+  NEW
+  CONFIRMED
+  DONE
+  CANCELLED
+}
+
+/// A bride's package put together on the website (or by reception): services for the wedding day,
+/// a dress from the rental and a trial look before the wedding.
+model BridalPackage {
+  id           String        @id @default(cuid())
+  number       Int           @unique @default(autoincrement())
+  status       BridalStatus  @default(NEW)
+  guest        Guest?        @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  guestId      String?
+  name         String
+  phone        String
+  lang         String        @default("ru")
+  weddingDate  DateTime      @db.Date
+  /// [{ serviceId, name, price }]
+  services     Json
+  dress        Dress?        @relation(fields: [dressId], references: [id], onDelete: SetNull)
+  dressId      String?
+  dressDays    Int           @default(0)
+  dressPrice   Int           @default(0)
+  subtotal     Int
+  discountPercent Int        @default(0)
+  total        Int
+  /// The trial look booked with the package
+  trialAppointmentId String?
+  note         String?
+  source       BookingSource @default(WEBSITE)
+  createdAt    DateTime      @default(now())
+  dressBookings DressBooking[]
 }

@@ -139,6 +139,23 @@ export function periodXlsx(r: PeriodReport): Buffer {
       ],
       rows: r.shifts.map((x) => [dmy(x.ymd), x.receipts, x.revenue, x.openingCash, x.cashSales, x.cardSales, x.qrSales, x.cashIn, x.cashOut, x.expectedCash, x.countedCash, x.difference, x.handedOver, x.leftCash, x.closedBy]),
     },
+    {
+      name: "Склад",
+      title,
+      subtitle: `${sub} · расход по услугам и списания — по цене упаковки`,
+      columns: [
+        { header: "Позиция", width: 32 },
+        { header: "Ед.", width: 6 },
+        { header: "Приход", width: 10, type: "number" },
+        { header: "На услуги", width: 11, type: "number" },
+        { header: "Списано", width: 10, type: "number" },
+        { header: "Пересчёт ±", width: 11, type: "number" },
+        { header: "Остаток сейчас", width: 14, type: "number" },
+        { header: "Стоимость расхода, c.", width: 16, type: "money" },
+      ],
+      rows: r.stock.map((x) => [x.name, x.unit, x.received, x.used, x.wasted, x.counted, x.left, x.cost]),
+      totals: ["Итого", null, null, null, null, null, null, r.stock.reduce((a, x) => a + x.cost, 0)],
+    },
   ];
   return xlsx(sheets);
 }
@@ -223,6 +240,20 @@ export async function periodPdf(r: PeriodReport): Promise<Uint8Array> {
     r.shifts.map((x) => [dmy(x.ymd), String(x.receipts), somoni(x.revenue), somoni(x.cashSales), somoni(x.expectedCash), somoni(x.countedCash), signed(x.difference), somoni(x.handedOver), x.closedBy]),
     { empty: "Закрытых смен нет" },
   );
+  if (r.stock.length) {
+    pdf.heading("Склад: расход");
+    pdf.table(
+      [
+        { header: "Позиция", width: 5 },
+        { header: "Приход", width: 2, align: "right" },
+        { header: "На услуги", width: 2, align: "right" },
+        { header: "Списано", width: 2, align: "right" },
+        { header: "Стоимость расхода", width: 2, align: "right" },
+      ],
+      r.stock.map((x) => [x.name, `${x.received} ${x.unit}`, `${x.used} ${x.unit}`, `${x.wasted} ${x.unit}`, somoni(x.cost)]),
+      { totals: ["Итого", "", "", "", somoni(r.stock.reduce((a, x) => a + x.cost, 0))] },
+    );
+  }
   pdf.heading("Чеки");
   pdf.table(
     [

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { bridalDict } from "@/lib/i18n/dict-bridal";
 import { Brush, Crown, Droplet, Eye, Hand, Scissors, Sparkles, type LucideIcon } from "lucide-react";
 import { dict } from "@/lib/i18n/dict";
 import { moneyDict } from "@/lib/i18n/dict-money";
@@ -206,9 +207,14 @@ export function Website({
           </h2>
           <div className={`${s.ruleLight} ${s.ruleLeft}`} style={{ marginTop: 20 }} />
           <p className={s.bridalBody}>{c.bridal.body}</p>
-          <a href={whatsappLink(c.contacts, t.home.bridalWhatsapp)} className={s.btnCream} style={{ alignSelf: "flex-start", marginTop: 32 }} target="_blank" rel="noopener noreferrer">
-            {c.bridal.cta}
-          </a>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 32 }}>
+            <Link href={localePath(lang, "/svadba")} className={s.btnCream}>
+              {bridalDict(lang).cta}
+            </Link>
+            <a href={whatsappLink(c.contacts, t.home.bridalWhatsapp)} className={s.btnGhost} target="_blank" rel="noopener noreferrer">
+              {c.bridal.cta}
+            </a>
+          </div>
         </div>
       </section>
 

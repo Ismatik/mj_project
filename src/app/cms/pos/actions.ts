@@ -11,6 +11,7 @@ import { todayYmd } from "@/lib/time";
 import { getCurrentUser } from "@/server/auth";
 import { checkGiftCard } from "@/server/gift-cards";
 import { addPoints, getRules, guestBonus, promotionsBetween, spentLastYear } from "@/server/loyalty/core";
+import { writeOffForSale } from "@/server/stock";
 
 export type SaleLine = { serviceId: string; appointmentId?: string | null };
 export type PayInput = {
@@ -137,6 +138,8 @@ export async function paySale(input: PayInput): Promise<PayResult> {
       if (guest && firstVisit) await addPoints(tx, guest.id, rules.welcomePoints, "WELCOME", { saleId: created.id });
       if (code && usedPromos.has(code.id)) await tx.promotion.update({ where: { id: code.id }, data: { usedCount: { increment: 1 } } });
       if (apptIds.length) await tx.appointment.updateMany({ where: { id: { in: apptIds } }, data: { status: "DONE" } });
+      // Consumables of these services come off the stock
+      await writeOffForSale(tx, created.id, items.map((i) => i.serviceId), user.name);
       return created;
     })
     .catch((e: Error) => {

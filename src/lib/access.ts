@@ -10,6 +10,8 @@ export type CmsPageId =
   | "waitlist"
   | "services"
   | "rental"
+  | "stock"
+  | "bridal"
   | "certificates"
   | "loyalty"
   | "staff"
@@ -29,6 +31,8 @@ export const CMS_PAGES: CmsPage[] = [
   { id: "waitlist", label: "Лист ожидания", path: "/cms/waitlist", group: "Гостьи", roles: ["OWNER", "RECEPTION"] },
   { id: "services", label: "Меню услуг и цены", path: "/cms/services", group: "Услуги", roles: ["OWNER", "RECEPTION", "MASTER"] },
   { id: "rental", label: "Прокат платьев", path: "/cms/rental", group: "Услуги", roles: ["OWNER", "RECEPTION"] },
+  { id: "bridal", label: "Свадебные пакеты", path: "/cms/bridal", group: "Услуги", roles: ["OWNER", "RECEPTION"] },
+  { id: "stock", label: "Склад", path: "/cms/stock", group: "Услуги", roles: ["OWNER", "RECEPTION"] },
   { id: "certificates", label: "Сертификаты и оплаты", path: "/cms/certificates", group: "Услуги", roles: ["OWNER", "RECEPTION"] },
   { id: "staff", label: "Мастера и график", path: "/cms/staff", group: "Команда", roles: ["OWNER", "RECEPTION", "MASTER"] },
   { id: "payroll", label: "Зарплата", path: "/cms/payroll", group: "Команда", roles: ["OWNER", "MASTER"] },

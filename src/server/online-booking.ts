@@ -72,9 +72,9 @@ async function busyOn(tx: Tx, date: Ymd, staffIds: string[], excludeId?: string)
 }
 
 /** Free slots for a service on a date, optionally for one master. Works inside or outside a transaction. */
-export async function slotsFor(serviceId: string, date: Ymd, staffId: string | null, tx: Tx = db, excludeAppointmentId?: string) {
+export async function slotsFor(serviceId: string, date: Ymd, staffId: string | null, tx: Tx = db, excludeAppointmentId?: string, includeHidden = false) {
   const service = await tx.service.findFirst({
-    where: { id: serviceId, active: true, showOnSite: true },
+    where: { id: serviceId, active: true, ...(includeHidden ? {} : { showOnSite: true }) },
     include: { staff: { where: { active: true }, orderBy: { sortOrder: "asc" } } },
   });
   if (!service) return { service: null, slots: [] };
@@ -132,13 +132,17 @@ export async function createGuestBooking(input: {
   lang?: Lang;
   /** Promo code typed by the guest (otherwise the best automatic offer applies) */
   promoCode?: string | null;
+  /** A service not shown on the website (the trial look of a bridal package) */
+  includeHidden?: boolean;
+  /** Added to the reception alert and the booking note */
+  note?: string;
 }): Promise<GuestBookingResult> {
   const lang = input.lang ?? "ru";
   const e = dict(lang).errors;
   const pe = loyaltyDict(lang).promo;
   return db.$transaction(async (tx) => {
     await lockDate(tx, input.date);
-    const { service, slots } = await slotsFor(input.serviceId, input.date, input.staffId, tx);
+    const { service, slots } = await slotsFor(input.serviceId, input.date, input.staffId, tx, undefined, input.includeHidden);
     if (!service) return { ok: false as const, error: e.serviceUnavailable };
     const slot = slots.find((x) => x.time === input.time);
     if (!slot) return { ok: false as const, error: e.slotTaken };
@@ -180,7 +184,7 @@ export async function createGuestBooking(input: {
         price,
         fullPrice: promo ? service.price : null,
         promotionId: promo?.id ?? null,
-        note: promo ? `${promo.code ? `Промокод ${promo.code}` : "Акция"}: ${promo.title}` : null,
+        note: [input.note, promo ? `${promo.code ? `Промокод ${promo.code}` : "Акция"}: ${promo.title}` : null].filter(Boolean).join(" · ") || null,
         status: "PENDING",
         source: input.source,
         staff: { create: [{ staffId }] },
@@ -195,7 +199,7 @@ export async function createGuestBooking(input: {
       {
         channel: "telegram",
         to: "reception",
-        body: `Онлайн-запись с ${via}: ${guest.name}, ${formatPhone(guest.phone)} — ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}.${promo ? ` ${promo.code ? `Промокод ${promo.code}` : `Акция «${promo.title}»`}: ${somoni(price)} вместо ${somoni(service.price)}.` : ""}${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}${deposit ? ` Ждёт предоплату ${somoni(deposit)} до ${clock(holdUntil!)}.` : " Подтвердите в календаре."}`,
+        body: `Онлайн-запись с ${via}${input.note ? ` (${input.note})` : ""}: ${guest.name}, ${formatPhone(guest.phone)} — ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}.${promo ? ` ${promo.code ? `Промокод ${promo.code}` : `Акция «${promo.title}»`}: ${somoni(price)} вместо ${somoni(service.price)}.` : ""}${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}${deposit ? ` Ждёт предоплату ${somoni(deposit)} до ${clock(holdUntil!)}.` : " Подтвердите в календаре."}`,
         meta: { kind: "online-booking", appointmentId: appt.id },
       },
     ];

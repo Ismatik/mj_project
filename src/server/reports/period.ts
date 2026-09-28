@@ -1,6 +1,7 @@
 import "server-only";
 import { db } from "@/lib/db";
 import { atSalonTime, todayYmd, type Ymd } from "@/lib/time";
+import { stockValue } from "@/lib/stock";
 import { recentShifts } from "../shift";
 
 // Everything that happened with money over a period [from, to): receipts, services, masters, payments, shifts.
@@ -27,9 +28,10 @@ export async function getPeriodReport(from: Ymd, to: Ymd) {
       orderBy: { createdAt: "asc" },
       include: { guest: { select: { name: true, phone: true } }, staff: { select: { name: true, commission: true } }, items: { select: { name: true, price: true, discount: true, serviceId: true, promotion: { select: { title: true, code: true } } } } },
     }),
-    db.payment.findMany({ where: { status: "PAID", paidAt: range }, orderBy: { paidAt: "asc" }, }),
+    db.payment.findMany({ where: { status: "PAID", paidAt: range }, orderBy: { paidAt: "asc" } }),
     recentShifts(from, to, 400),
   ]);
+  const moves = await db.stockMove.findMany({ where: { createdAt: range }, include: { item: true } });
 
   const sum = <T,>(xs: T[], f: (x: T) => number) => xs.reduce((a, x) => a + f(x), 0);
   const byMethod = (m: string) => sum(sales.filter((s) => s.method === m), (s) => s.paid);
@@ -117,6 +119,25 @@ export async function getPeriodReport(from: Ymd, to: Ymd) {
       amount: p.amount,
     })),
     shifts: shifts.slice().reverse(),
+    stock: stockSummary(moves),
   };
 }
 export type PeriodReport = Awaited<ReturnType<typeof getPeriodReport>>;
+
+/** Stock over the period per item: received, used by services, wasted, stocktake corrections, cost of what was used */
+function stockSummary(moves: { itemId: string; delta: number; kind: string; item: { name: string; unit: string; packSize: number; packPrice: number; quantity: number } }[]) {
+  const rows = new Map<string, { name: string; unit: string; received: number; used: number; wasted: number; counted: number; cost: number; left: number }>();
+  for (const m of moves) {
+    const r = rows.get(m.itemId) ?? { name: m.item.name, unit: m.item.unit, received: 0, used: 0, wasted: 0, counted: 0, cost: 0, left: m.item.quantity };
+    if (m.kind === "RECEIPT") r.received += m.delta;
+    if (m.kind === "SERVICE") r.used -= m.delta;
+    if (m.kind === "WASTE") r.wasted -= m.delta;
+    if (m.kind === "COUNT") r.counted += m.delta;
+    rows.set(m.itemId, r);
+  }
+  for (const [id, r] of rows) {
+    const it = moves.find((m) => m.itemId === id)!.item;
+    r.cost = stockValue(r.used + r.wasted, it.packSize, it.packPrice);
+  }
+  return [...rows.values()].sort((a, b) => b.cost - a.cost);
+}

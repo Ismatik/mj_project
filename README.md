@@ -52,8 +52,8 @@ Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
 
 | Login | Role | Sees |
 |---|---|---|
-| `mavzuna` | owner | all 15 CMS sections, site admin |
-| `reception` | reception | day-to-day pages (till with shift close, guests, waitlist, calendar, services, rental, certificates, staff); no analytics, reports, payroll, bonus rules or settings; can book |
+| `mavzuna` | owner | all 17 CMS sections, site admin |
+| `reception` | reception | day-to-day pages (till with shift close, guests, waitlist, calendar, services, rental, bridal packages, stock, certificates, staff); no analytics, reports, payroll, bonus rules or settings; can book |
 | `mira` | master | calendar (own bookings), services, staff schedule, her own pay |
 | `content` | content manager | site admin only |
 
@@ -130,6 +130,11 @@ Guests without Telegram get their confirmation, reminders and sign-in codes in W
   - *Живая очередь* — guests who came in without a booking, with how long they've been waiting; «Посадить» books them "в кресле" with a master who is free right now.
   - *Лист ожидания* — guests waiting for a full day (added by reception, on the website — «Сообщить, если освободится» under the times — or in the bot). Whenever a booking is cancelled or moved (by reception, by the guest in her account or the bot, or because a prepayment wasn't made), the freed time is offered to the first guest it suits (service, master, preferred hours). The time is held for 30 minutes and she gets a message with a link (`/ochered/<token>`, in her language) to confirm or decline. If she declines or doesn't answer (the worker checks every minute), it goes to the next guest.
 
+## Stock and bridal packages
+
+- **Склад** (`/cms/stock`, owner and reception): products and consumables counted in ml, g or pieces, with package size and price (for the stock value) and a minimum. Deliveries (in units or packages), waste with a reason and stocktakes are recorded as moves. «Расход на услуги» sets what one service uses; when a receipt is paid at the till, those amounts are written off automatically (the move shows the receipt number). When an item drops below its minimum, the staff Telegram chat gets one message, and the sidebar shows how many items are low. The period report has a «Склад» sheet: received, used by services, wasted and what was used cost.
+- **Свадебный пакет** (`/svadba`, three languages, linked from the «Невестам» section): the bride picks her wedding date, the wedding-day services (a package discount — 10 % from 3 services by default — applies to the services), a dress from the rental catalog (only dresses free for the rental days around that date can be chosen; the dress is booked straight away) and optionally a trial look before the wedding (a normal online booking with its prepayment link). Reception gets the package in Telegram and in CMS → **Свадебные пакеты**, confirms it and books the wedding-day times; cancelling a package frees the dress. The owner sets the discount, the minimum number of services, the rental days and the trial service there.
+
 ## Payroll, shift close and reports
 
 - **Закрытие смены** (Ресепшен и касса → «Закрытие смены», `/cms/pos/shift`): the day's money by cash / card / QR, prepayments, certificates and points used, cash put in or taken out (with a reason), and the cash expected in the drawer: what the previous shift left + cash taken today + put in − taken out (salary paid from the till included). Reception counts the drawer, says how much goes to the owner, and closes the day. The difference (shortfall or surplus) is kept, and the staff Telegram chat is told about it. The Z-report is a PDF. Once a day is closed, its cash can't change; the till warns if an earlier day with receipts wasn't closed (`?day=YYYY-MM-DD` closes it).
@@ -139,4 +144,4 @@ Guests without Telegram get their confirmation, reminders and sign-in codes in W
 ## Tests
 
 - `npm test` — unit tests (booking rules, free slots, formatting, access, content, translations, bot, message templates, bonus points and promotions, payroll and the till's cash count, the Excel writer, WhatsApp payloads and webhook parsing).
-- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates, bonus points and promotions, payroll, shift close and reports, guest card and waitlist (see `e2e/README.md`).
+- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates, bonus points and promotions, payroll, shift close and reports, guest card and waitlist, stock and bridal packages (see `e2e/README.md`).
