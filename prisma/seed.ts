@@ -48,6 +48,7 @@ async function wipe() {
     db.telegramChat.deleteMany(),
     db.integration.deleteMany(),
     db.siteDocument.deleteMany(),
+    db.blogPost.deleteMany(),
     db.bookingRequest.deleteMany(),
     db.reminder.deleteMany(),
     db.setting.deleteMany(),
@@ -549,6 +550,62 @@ async function main() {
     });
     await db.dressBooking.update({ where: { id: farzonaDress.id }, data: { bridalPackageId: pkg.id } });
   }
+
+  // Blog: three tips from the masters (one translated), one draft
+  const img = (id: string) => `https://images.unsplash.com/${id}?q=75&w=1200&auto=format&fit=crop&sat=-100`;
+  const posts = [
+    {
+      slug: "uhod-za-okrashennymi-volosami",
+      title: "Как сохранить цвет после окрашивания",
+      excerpt: "Пять простых правил от колориста Инес: чтобы оттенок оставался ярким до следующего визита.",
+      body: "Цвет держится дольше, если в первые дни дать ему закрепиться.\n\n## Первые 48 часов\n- Не мойте голову двое суток после окрашивания.\n- Откажитесь от горячей воды — она раскрывает чешуйки волоса.\n\n## Каждый день\n- Шампунь без сульфатов и маска для окрашенных волос раз в неделю.\n- **Термозащита** перед феном и утюжком обязательна.\n\n> Тонирование раз в 4–6 недель освежает оттенок и добавляет блеск.\n\nЗапишитесь на [окрашивание](/#zapis) — Инес подберёт уход под ваш цвет.",
+      tags: ["волосы", "уход"],
+      service: "color",
+      cover: "photo-1688395199230-ab7c7170a4b6",
+      daysAgo: 12,
+      i18n: {
+        tg: {
+          title: "Чӣ тавр рангро пас аз рангкунӣ нигоҳ доштан мумкин",
+          excerpt: "Панҷ қоидаи оддӣ аз колорист Инес: то ранг то ташрифи оянда дурахшон монад.",
+          body: "Ранг дарозтар мемонад, агар дар рӯзҳои аввал ба он имкони мустаҳкам шудан диҳед.\n\n## 48 соати аввал\n- Ду шабонарӯз мӯйро нашӯед.\n- Аз оби гарм даст кашед.\n\n## Ҳар рӯз\n- Шампуни бесулфат ва ниқоб барои мӯйи рангкардашуда ҳафтае як бор.\n- **Муҳофизати гармӣ** пеш аз фен ҳатмист.",
+        },
+        en: {
+          title: "How to keep your colour after dyeing",
+          excerpt: "Five simple rules from our colourist Ines to keep the shade bright until your next visit.",
+          body: "Colour lasts longer if you give it a few days to settle.\n\n## The first 48 hours\n- Don't wash your hair for two days after colouring.\n- Avoid hot water — it opens the hair cuticle.\n\n## Every day\n- A sulphate-free shampoo and a colour mask once a week.\n- **Heat protection** before the dryer or straightener is a must.\n\n> A toner every 4–6 weeks refreshes the shade and adds shine.",
+        },
+      },
+    },
+    {
+      slug: "podgotovka-k-svadbe",
+      title: "Подготовка к свадьбе: календарь невесты",
+      excerpt: "Когда делать пробный образ, окрашивание и маникюр, чтобы в главный день всё было идеально.",
+      body: "Красивый образ начинается за несколько недель до свадьбы.\n\n## За месяц\n- Пробный образ: причёска и макияж, фото при дневном свете.\n- Примерка платья и подгонка по фигуре.\n\n## За неделю\n- Окрашивание и уход за кожей лица.\n- Архитектура бровей — за 5–7 дней, чтобы форма «улеглась».\n\n## Накануне\n- Маникюр и педикюр.\n- Ранний сон и много воды.\n\nСоберите свой [свадебный пакет](/svadba) — со скидкой на услуги и платьем из проката.",
+      tags: ["невестам"],
+      service: "bridal",
+      cover: "photo-1708134128589-0dfd38b2203a",
+      daysAgo: 5,
+      i18n: {},
+    },
+    {
+      slug: "gel-lak-bez-skolov",
+      title: "Гель-лак без сколов: три недели идеального маникюра",
+      excerpt: "Петра рассказывает, что продлевает жизнь покрытию и чего лучше избегать.",
+      body: "Покрытие держится 3 недели, если соблюдать простые правила.\n\n- Работайте по дому в перчатках.\n- Масло для кутикулы — каждый вечер.\n- Не используйте ногти как инструмент.\n\nЕсли появился скол, не снимайте покрытие сами — придите на коррекцию.",
+      tags: ["ногти", "уход"],
+      service: "gel",
+      cover: "photo-1650292266612-a634d749626f",
+      daysAgo: 20,
+      i18n: {},
+    },
+  ];
+  for (const p of posts) {
+    const at = atSalonTime(addDays(today, -p.daysAgo), "10:00");
+    await db.blogPost.create({
+      data: { slug: p.slug, status: "PUBLISHED", title: p.title, excerpt: p.excerpt, body: p.body, i18n: p.i18n, coverUrl: img(p.cover), tags: p.tags, serviceId: serviceId[p.service], publishedAt: at, createdAt: at, createdBy: "Контент-менеджер" },
+    });
+  }
+  await db.blogPost.create({ data: { slug: "brovi-osen", status: "DRAFT", title: "Брови осенью: тренды сезона", excerpt: "Черновик", body: "Скоро здесь будет статья Миры.", tags: ["брови"], createdBy: "Контент-менеджер" } });
 
   // Sign-in accounts (the same demo password for every role; change it after first sign-in)
   const password = process.env.SEED_OWNER_PASSWORD || "change-me-now";

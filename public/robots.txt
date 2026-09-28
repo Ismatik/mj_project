@@ -1,5 +1,0 @@
-User-agent: *
-Disallow: /cms
-Disallow: /admin
-Disallow: /login
-Disallow: /styleguide

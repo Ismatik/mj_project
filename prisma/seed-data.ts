@@ -210,7 +210,7 @@ export const settings: Record<string, string> = {
 
 // Website texts, photos and reviews: DEFAULT_CONTENT in src/lib/site-content.ts
 
-export const integrations = ["telegram", "whatsapp", "sms", "payments"];
+export const integrations = ["telegram", "whatsapp", "sms", "payments", "instagram"];
 
 /** Tajik and English names and master profiles for the website (drafts for the salon to review in /admin). */
 export const translations = {

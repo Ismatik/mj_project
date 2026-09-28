@@ -1,6 +1,6 @@
 // Background worker: every minute releases unpaid prepayment holds, passes unanswered waitlist offers on
 // and delivers queued outbox messages;
-// every 10 minutes queues visit reminders; every morning gives birthday points.
+// every 10 minutes queues visit reminders; every hour refreshes the Instagram feed; every morning gives birthday points.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PgBoss } from "pg-boss";
@@ -10,6 +10,7 @@ import { awardBirthdays } from "../src/server/loyalty/core";
 import { releaseExpired } from "../src/server/payments/core";
 import { queueReminders } from "../src/server/integrations/reminders";
 import { closePastEntries, expireOffers } from "../src/server/waitlist/core";
+import { refreshInstagram } from "../src/server/integrations/instagram";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL is not set");
@@ -20,6 +21,7 @@ const boss = new PgBoss({ connectionString, schema: "pgboss" });
 const SWEEP = "outbox-sweep";
 const REMINDERS = "reminders";
 const BIRTHDAYS = "birthdays";
+const INSTAGRAM = "instagram";
 
 async function main() {
   boss.on("error", (e) => console.error("[worker]", e));
@@ -42,6 +44,13 @@ async function main() {
   await boss.work(REMINDERS, async () => {
     const n = await queueReminders(db);
     if (n) console.log(`[worker] reminders: queued ${n}`);
+  });
+  // Instagram feed for the website, every hour (live mode only)
+  await boss.createQueue(INSTAGRAM);
+  await boss.schedule(INSTAGRAM, "17 * * * *");
+  await boss.work(INSTAGRAM, async () => {
+    const res = await refreshInstagram(db);
+    if (res.ok) console.log(`[worker] instagram: ${res.count} posts`);
   });
   // Birthday points and greetings, every morning at 09:00 in Dushanbe
   await boss.createQueue(BIRTHDAYS);

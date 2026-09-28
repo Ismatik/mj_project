@@ -1,7 +1,7 @@
 // What each connector is for and what it needs to go live (shown on /cms/integrations).
 
 export type IntegrationInfo = {
-  key: "telegram" | "whatsapp" | "sms" | "payments";
+  key: "telegram" | "whatsapp" | "sms" | "payments" | "instagram";
   title: string;
   purpose: string;
   envKeys: string[];
@@ -49,6 +49,16 @@ export const INTEGRATIONS: IntegrationInfo[] = [
     envKeys: ["PAYMENTS_API_KEY"],
     goLive: "Договор эквайринга с банком (Алиф, Душанбе Сити или Корти Милли), ключи API и адрес для уведомлений.",
     liveIn: "R3",
+  },
+  {
+    key: "instagram",
+    title: "Instagram",
+    purpose: "Лента последних публикаций @mavzunai.jovid.official на главной странице сайта. В режиме «Мок» вместо неё показываются фото из портфолио со ссылкой на профиль.",
+    envKeys: ["INSTAGRAM_TOKEN"],
+    goLive:
+      "Профессиональный аккаунт Instagram (бизнес или автор), приложение Meta с продуктом «Instagram API with Instagram Login», долгосрочный токен в INSTAGRAM_TOKEN (см. docs/instagram-setup.md). Затем «Живой» и «Обновить ленту» — дальше лента обновляется каждый час.",
+    liveIn: "R4",
+    liveReady: true,
   },
 ];
 

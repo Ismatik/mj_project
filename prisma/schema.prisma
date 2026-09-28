@@ -831,3 +831,33 @@ model BridalPackage {
   createdAt    DateTime      @default(now())
   dressBookings DressBooking[]
 }
+
+// ─── Blog ────────────────────────────────────────────────
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// A beauty tip / article for /blog. Russian in the main fields; Tajik and English in i18n (empty = Russian).
+model BlogPost {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  status      PostStatus @default(DRAFT)
+  title       String
+  excerpt     String     @default("")
+  /// Light markup: paragraphs, "## " headings, "- " lists, "> " quotes, **bold**, [links](https://…)
+  body        String     @default("")
+  /// { tg: { title, excerpt, body }, en: { … } }
+  i18n        Json       @default("{}")
+  coverUrl    String?
+  tags        String[]
+  /// "Записаться" under the article goes to this service
+  serviceId   String?
+  publishedAt DateTime?
+  createdBy   String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([status, publishedAt])
+}

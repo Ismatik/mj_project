@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { bridalDict } from "@/lib/i18n/dict-bridal";
+import { blogDict } from "@/lib/i18n/dict-blog";
+import type { InstaPost } from "@/lib/instagram";
+import type { PostView } from "@/server/blog";
+import { BlogCards } from "./BlogCards";
+import { FindUs, MobileBar } from "./FindUs";
+import { InstaFeed } from "./InstaFeed";
+import bl from "./blog.module.css";
 import { Brush, Crown, Droplet, Eye, Hand, Scissors, Sparkles, type LucideIcon } from "lucide-react";
 import { dict } from "@/lib/i18n/dict";
 import { moneyDict } from "@/lib/i18n/dict-money";
@@ -50,6 +57,8 @@ export function Website({
   lang,
   offers,
   promos,
+  posts = [],
+  insta = [],
 }: {
   c: SiteContent;
   prices: PriceList;
@@ -63,6 +72,8 @@ export function Website({
   lang: Lang;
   offers: Offer[];
   promos: SitePromo[];
+  posts?: PostView[];
+  insta?: InstaPost[];
 }) {
   const lt = loyaltyDict(lang);
   const svcName = new Map(menu.flatMap((c) => c.services).map((x) => [x.id, x.name]));
@@ -354,7 +365,26 @@ export function Website({
         </div>
       </section>
 
+      {posts.length > 0 && (
+        <section id="sovety" className={bl.section} aria-labelledby="tips-title">
+          <div className={bl.head}>
+            <h2 id="tips-title" data-reveal className={bl.title}>
+              {blogDict(lang).blog.homeTitle}
+            </h2>
+            <div className={bl.rule} />
+          </div>
+          <BlogCards posts={posts} lang={lang} />
+          <div style={{ textAlign: "center", marginTop: 32 }}>
+            <Link href={localePath(lang, "/blog")} className={bl.ghost}>
+              {blogDict(lang).blog.homeAll}
+            </Link>
+          </div>
+        </section>
+      )}
+      <InstaFeed posts={insta} handle={c.contacts.instagram} lang={lang} />
+      <FindUs contacts={c.contacts} lang={lang} />
       <SiteFooter c={c} year={today.slice(0, 4)} lang={lang} />
+      <MobileBar contacts={c.contacts} lang={lang} />
     </div>
   );
 }

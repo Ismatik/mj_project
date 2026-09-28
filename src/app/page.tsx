@@ -9,6 +9,8 @@ import { getCurrentGuest } from "@/server/guest-auth";
 import { alternates, getLang } from "@/server/lang";
 import { db } from "@/lib/db";
 import { siteOffers } from "@/server/loyalty/core";
+import { publishedPosts } from "@/server/blog";
+import { instagramFeed } from "@/server/integrations/instagram";
 import { getSiteMasters } from "@/server/masters";
 import { getOnlineMenu, type OnlineMenu } from "@/server/online-booking";
 import { getSiteContent, getSitePriceList } from "@/server/site";
@@ -48,12 +50,14 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const raw = await getSiteContent(showDraft ? "draft" : "published");
   const content = localize(raw, lang);
   const today = todayYmd();
-  const [prices, menu, masters, guest, offers] = await Promise.all([
+  const [prices, menu, masters, guest, offers, posts, insta] = await Promise.all([
     getSitePriceList(showDraft ? content.serviceOverrides : {}, lang, content),
     getOnlineMenu(lang),
     getSiteMasters(content, lang),
     getCurrentGuest(),
     siteOffers(db, today),
+    publishedPosts(lang, { limit: 3 }),
+    instagramFeed(db, raw),
   ]);
 
   return (
@@ -69,6 +73,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       preset={presetFrom(menu, service, master)}
       lang={lang}
       offers={offers.booking.map((o) => ({ ...o, title: o.titles[lang] }))}
+      posts={posts}
+      insta={insta.posts}
       promos={offers.shown.map((o) => ({ id: o.id, title: o.titles[lang], description: o.descriptions[lang], kind: o.kind, value: o.value, code: o.code, endsOn: o.endsOn, startsOn: o.startsOn, serviceIds: o.serviceIds }))}
     />
   );

@@ -1399,3 +1399,9 @@
     display: none;
   }
 }
+/* Room for the phone call bar at the bottom */
+@media (max-width: 760px) {
+  .footer {
+    padding-bottom: 52px;
+  }
+}

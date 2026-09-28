@@ -27,6 +27,10 @@ export type SiteContent = {
     district: string;
     hours: string;
     dayOff: string;
+    /** Map pin (decimal degrees) and an optional 2GIS link to the salon's card */
+    mapLat: string;
+    mapLng: string;
+    twoGisUrl: string;
   };
   seo: { title: string; description: string };
   /** Masters pages: title and intro of /mastera and /portfolio */
@@ -138,6 +142,10 @@ export const DEFAULT_CONTENT: SiteContent = {
     whatsapp: "992981031111",
     instagram: "mavzunai.jovid.official",
     instagramGallery: "mavzunai_jovid_gallery_beauty",
+    // Approximate pin for ул. Бухоро, 23/25 — check it in the admin (Контакты и часы)
+    mapLat: "38.5761",
+    mapLng: "68.7824",
+    twoGisUrl: "",
     address: "ул. Бухоро, 23/25, 1–2 этаж",
     district: "Шохмансур, Душанбе",
     hours: "Вт–Вс: 09:00–18:00",
@@ -187,3 +195,17 @@ export const whatsappLink = (c: SiteContent["contacts"], text?: string) =>
   `https://wa.me/${c.whatsapp.replace(/\D/g, "")}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
 export const telLink = (c: SiteContent["contacts"]) => `tel:+${c.phone.replace(/\D/g, "")}`;
 export const instagramLink = (handle: string) => `https://instagram.com/${handle.replace(/^@/, "")}`;
+
+/** Route and map links for the salon's pin (Google Maps and 2GIS open the apps on phones) */
+export function mapLinks(c: SiteContent["contacts"]) {
+  const lat = Number(c.mapLat);
+  const lng = Number(c.mapLng);
+  const ok = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 && !(lat === 0 && lng === 0);
+  if (!ok) return null;
+  const twoGis = /^https:\/\/[^\s"'<>]*2gis\.[^\s"'<>]+$/.test(c.twoGisUrl) ? c.twoGisUrl : `https://2gis.tj/dushanbe?m=${lng}%2C${lat}%2F17`;
+  return {
+    google: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+    twoGis,
+    embed: `https://maps.google.com/maps?q=${lat},${lng}&z=17&output=embed`,
+  };
+}

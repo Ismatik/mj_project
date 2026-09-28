@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { Button } from "@/components/ui/Button";
-import { connectTelegramWebhook, deliverNow, newStaffCode, runRemindersNow, sendTestMessage, setIntegrationEnabled, setIntegrationMode } from "./actions";
+import { connectTelegramWebhook, deliverNow, newStaffCode, refreshInstagramNow, runRemindersNow, sendTestMessage, setIntegrationEnabled, setIntegrationMode } from "./actions";
 import s from "./integrations.module.css";
 
 export function IntegrationControls({ k, title, mode, enabled, channel }: { k: string; title: string; mode: string; enabled: boolean; channel: boolean }) {
@@ -121,6 +121,40 @@ export function TelegramTools({ staffCode, staffChats, configured }: { staffCode
             }
           >
             Подключить webhook
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Instagram: when the feed was last fetched, and a button to fetch it now. */
+export function InstagramTools({ status, mode }: { status: { updatedAt: string | null; count: number; error: string | null }; mode: string }) {
+  const fx = useFx();
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const when = status.updatedAt && status.updatedAt > "2000" ? new Date(status.updatedAt).toLocaleString("ru-RU", { timeZone: "Asia/Dushanbe", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : null;
+  return (
+    <div className={s.tg}>
+      <div className={s.tgRow}>
+        <span>
+          {mode === "LIVE" ? (when ? `Лента обновлена ${when} · публикаций: ${status.count}` : "Лента ещё не загружалась") : "На сайте — фото из портфолио со ссылкой на профиль"}
+          {status.error && mode === "LIVE" && <b className={s.msgError}> · ошибка: {status.error}</b>}
+        </span>
+        {mode === "LIVE" && (
+          <button
+            type="button"
+            className={s.linkBtn}
+            disabled={pending}
+            onClick={() =>
+              start(async () => {
+                const res = await refreshInstagramNow();
+                fx.toast(res.ok ? `Загружено публикаций: ${res.count}` : res.error, "Instagram");
+                router.refresh();
+              })
+            }
+          >
+            Обновить ленту
           </button>
         )}
       </div>

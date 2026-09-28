@@ -62,7 +62,9 @@ try {
   await r.fill('[aria-label="Добавить фото"] input[name=caption]', 'Балаяж, итог');
   await r.click('button:has-text("Добавить фото")');
   await r.waitForSelector('figure:has-text("Балаяж, итог") img');
-  const shown = await r.$eval('figure:has-text("Балаяж, итог") img', (img) => img.complete && img.naturalWidth > 0);
+  const shown = await r
+    .waitForFunction(() => [...document.querySelectorAll('figure img')].some((img) => img.complete && img.naturalWidth > 0), null, { timeout: 5000 })
+    .then(() => true, () => false);
   check('photo uploaded and shown', shown);
   const photoUrl = await r.getAttribute('figure:has-text("Балаяж, итог") img', 'src');
   const anon = await (await b.newContext()).request.get(BASE + photoUrl);

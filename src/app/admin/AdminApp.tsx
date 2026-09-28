@@ -10,6 +10,8 @@ import { LANG_NAME, LANGS, localePath, type Lang } from "@/lib/i18n/locales";
 import type { SiteContent } from "@/lib/site-content";
 import { logout } from "../login/actions";
 import { discardDraft, publishSite, saveDraft } from "./actions";
+import type { AdminPost } from "@/server/blog";
+import { BlogSection } from "./BlogSection";
 import { MastersSection, type AdminCategory, type AdminStaff } from "./MastersSection";
 import { ContactsSection, PhotosSection, ReviewsSection, SeoSection, ServicesSection, TextsSection, type AdminService } from "./sections";
 import s from "./admin.module.css";
@@ -20,6 +22,7 @@ const SECTIONS = [
   { id: "photos", label: "Фотографии" },
   { id: "masters", label: "Мастера и портфолио" },
   { id: "reviews", label: "Отзывы" },
+  { id: "blog", label: "Блог и советы" },
   { id: "contacts", label: "Контакты и часы" },
   { id: "seo", label: "SEO" },
 ] as const;
@@ -33,6 +36,7 @@ export function AdminApp(props: {
   services: AdminService[];
   staff: AdminStaff[];
   categories: AdminCategory[];
+  posts: AdminPost[];
   user: { name: string; roleLabel: string; isOwner: boolean };
 }) {
   const fx = useFx();
@@ -193,6 +197,7 @@ export function AdminApp(props: {
             <MastersSection c={view} onChange={change} staff={props.staff} categories={props.categories} translating={translating} names={names} onName={setName} />
           )}
           {section === "reviews" && <ReviewsSection c={view} onChange={change} translating={!!translating} />}
+          {section === "blog" && <BlogSection posts={props.posts} services={props.services} lang={editLang} />}
           {section === "contacts" && <ContactsSection c={view} onChange={change} translating={!!translating} />}
           {section === "seo" && <SeoSection c={view} onChange={change} />}
         </main>

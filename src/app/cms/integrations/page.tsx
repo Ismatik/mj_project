@@ -6,8 +6,9 @@ import { clock, shortDate } from "@/lib/format";
 import { CHANNEL_LABEL, INTEGRATIONS } from "@/lib/integrations";
 import { requirePage } from "@/server/auth";
 import { telegramConfigured } from "@/server/integrations/telegram-api";
+import { instagramStatus } from "@/server/integrations/instagram";
 import { getStaffCode } from "@/server/telegram/deps";
-import { DeliverNow, IntegrationControls, TelegramTools } from "./IntegrationControls";
+import { DeliverNow, InstagramTools, IntegrationControls, TelegramTools } from "./IntegrationControls";
 import s from "./integrations.module.css";
 
 const STATUS = {
@@ -23,6 +24,7 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
   await requirePage("integrations", "/cms/integrations");
   const sp = await searchParams;
   const channel = typeof sp.channel === "string" && ["telegram", "whatsapp", "sms"].includes(sp.channel) ? sp.channel : null;
+  const insta = await instagramStatus(db);
   const [rows, messages, queued, staffCode, staffChats] = await Promise.all([
     db.integration.findMany(),
     db.outboxMessage.findMany({ where: channel ? { channel } : {}, orderBy: { createdAt: "desc" }, take: 60 }),
@@ -72,7 +74,8 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
                 </div>
               </dl>
               {info.key === "telegram" && <TelegramTools staffCode={staffCode} staffChats={staffChats} configured={telegramConfigured()} />}
-              <IntegrationControls k={info.key} title={info.title} mode={mode} enabled={enabled} channel={info.key !== "payments"} />
+              {info.key === "instagram" && <InstagramTools status={insta} mode={mode} />}
+              <IntegrationControls k={info.key} title={info.title} mode={mode} enabled={enabled} channel={!["payments", "instagram"].includes(info.key)} />
             </article>
           );
         })}

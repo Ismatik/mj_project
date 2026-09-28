@@ -3,6 +3,8 @@ import { UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 import { dict } from "@/lib/i18n/dict";
 import { moneyDict } from "@/lib/i18n/dict-money";
+import { blogDict } from "@/lib/i18n/dict-blog";
+import { MobileBar } from "./FindUs";
 import { LANG_CODE, LANG_LABEL, LANG_NAME, LANGS, localePath, type Lang } from "@/lib/i18n/locales";
 import { instagramLink, telLink, whatsappLink, type SiteContent } from "@/lib/site-content";
 import { SiteEffects } from "./SiteEffects";
@@ -127,6 +129,9 @@ export function SiteFooter({ c, year, lang }: { c: SiteContent; year: string; la
           <div>
             <Link href={localePath(lang, "/podarok")}>{moneyDict(lang).gift.nav} →</Link>
           </div>
+          <div>
+            <Link href={localePath(lang, "/blog")}>{blogDict(lang).blog.nav} →</Link>
+          </div>
           {[c.contacts.instagram, c.contacts.instagramGallery].filter(Boolean).map((h) => (
             <div key={h}>
               <a href={instagramLink(h)} target="_blank" rel="noopener noreferrer">
@@ -177,6 +182,7 @@ export function SitePage({
       <SiteNav guest={guest} lang={lang} path={path} current={current} bookHref={bookHref} />
       <main>{children}</main>
       <SiteFooter c={c} year={year} lang={lang} />
+      <MobileBar contacts={c.contacts} lang={lang} />
     </div>
   );
 }

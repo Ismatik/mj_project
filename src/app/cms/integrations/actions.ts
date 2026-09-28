@@ -8,6 +8,7 @@ import { sweepOutbox } from "@/server/integrations/outbox";
 import { releaseExpired } from "@/server/payments/core";
 import { expireOffers } from "@/server/waitlist/core";
 import { queueReminders } from "@/server/integrations/reminders";
+import { refreshInstagram } from "@/server/integrations/instagram";
 import { getMe, setWebhook, telegramConfigured } from "@/server/integrations/telegram-api";
 import { rotateStaffCode } from "@/server/telegram/deps";
 
@@ -83,4 +84,11 @@ export async function connectTelegramWebhook(): Promise<{ ok: boolean; message: 
   if (!me.ok) return { ok: false, message: `Telegram не принял токен: ${me.description ?? "ошибка"}` };
   const res = await setWebhook(`https://${domain}/api/telegram/webhook`);
   return res.ok ? { ok: true, message: `Бот @${me.result.username} подключён к https://${domain}` } : { ok: false, message: res.description ?? "Ошибка Telegram" };
+}
+
+export async function refreshInstagramNow() {
+  await requireOwner();
+  const res = await refreshInstagram(db);
+  revalidatePath("/", "layout");
+  return res;
 }

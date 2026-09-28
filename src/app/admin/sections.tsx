@@ -351,6 +351,9 @@ const CONTACT_FIELDS: { key: keyof SiteContent["contacts"]; label: string; hint?
   { key: "district", label: "Район, город" },
   { key: "hours", label: "Часы работы" },
   { key: "dayOff", label: "Выходной" },
+  { key: "mapLat", label: "Карта — широта", hint: "например 38.5761; в Google Maps нажмите на точку салона и скопируйте координаты" },
+  { key: "mapLng", label: "Карта — долгота", hint: "например 68.7824" },
+  { key: "twoGisUrl", label: "Ссылка на салон в 2ГИС", hint: "необязательно; иначе откроется точка на карте" },
 ];
 
 const TRANSLATED_CONTACTS = new Set(["address", "district", "hours", "dayOff"]);
