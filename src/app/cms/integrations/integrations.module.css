@@ -190,3 +190,18 @@
 .linkBtn:hover {
   color: var(--mj-ink);
 }
+
+.notice {
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  background: var(--mj-paper);
+  border-left: 2px solid var(--mj-gold);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--mj-text-2);
+  max-width: 980px;
+}
+.notice b {
+  color: var(--mj-ink);
+  font-weight: 600;
+}

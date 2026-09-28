@@ -12,6 +12,33 @@ export const staff = [
 
 export type StaffKey = (typeof staff)[number]["key"];
 
+/** Website profiles of the masters (placeholder texts until the salon writes its own). Photos: temporary stock from the design. */
+export const masterProfiles: Record<StaffKey, { bio: string; works?: { url: string; caption: string; category: string }[] }> = {
+  mavzuna: {
+    bio: "Основательница Mavzunai Jovid и стилист. Подбирает образ под характер и черты лица, ведёт свадебные причёски и стрижки. Гостьи ценят её честный совет — она сама скажет, что пойдёт именно вам.",
+    works: [
+      {
+        url: "https://images.unsplash.com/photo-1688395199230-ab7c7170a4b6?q=75&w=900&auto=format&fit=crop&sat=-100",
+        caption: "Укладка для вечернего выхода",
+        category: "hair",
+      },
+    ],
+  },
+  ines: { bio: "Колорист: окрашивание в один тон, балаяж и шатуш, уход за кожей. Подбирает оттенок под тон кожи и бережёт длину." },
+  mira: {
+    bio: "Брови, ресницы и макияж — от дневного до свадебного. Архитектура бровей по пропорциям лица, ламинирование ресниц и пробные свадебные образы.",
+    works: [
+      {
+        url: "https://images.unsplash.com/photo-1708134128589-0dfd38b2203a?q=75&w=900&auto=format&fit=crop&sat=-100",
+        caption: "Свадебный образ под ключ",
+        category: "makeup",
+      },
+    ],
+  },
+  petra: { bio: "Ногтевой сервис: маникюр с гель-лаком, педикюр, нюдовые и смелые дизайны. Стерильные инструменты и аккуратная работа с кутикулой." },
+  dario: { bio: "Парикмахер: стрижки, укладки и свадебные причёски для невест и гостей торжества." },
+};
+
 export const categories = [
   { slug: "hair", name: "Волосы", icon: "scissors" },
   { slug: "nails", name: "Ногти", icon: "hand" },

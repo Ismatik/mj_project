@@ -12,19 +12,37 @@ import s from "./booking.module.css";
 
 const MONTHS = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
 type Summary = Extract<OnlineBookingResult, { ok: true }>["summary"];
+/** Pre-selected service and master ("Записаться снова", a master's page) */
+export type BookingPreset = { serviceId?: string; staffId?: string | null };
+
+/** "+992981031111" → "98 103 11 11" for the phone field */
+const localPhone = (e164: string) => e164.replace(/^\+992(\d{2})(\d{3})(\d{2})(\d{2})$/, "$1 $2 $3 $4");
 
 /** Online booking with real free times: service → master → date → time → contacts. */
-export function OnlineBooking({ menu, dates, preview }: { menu: OnlineMenu; dates: string[]; preview?: boolean }) {
+export function OnlineBooking({
+  menu,
+  dates,
+  preview,
+  preset,
+  guest,
+}: {
+  menu: OnlineMenu;
+  dates: string[];
+  preview?: boolean;
+  preset?: BookingPreset;
+  guest?: { name: string; phone: string; favouriteStaffId?: string | null } | null;
+}) {
   const fx = useFx();
   const submitRef = useRef<HTMLButtonElement>(null);
-  const [catId, setCatId] = useState(menu[0]?.id ?? "");
-  const [serviceId, setServiceId] = useState("");
-  const [staffId, setStaffId] = useState<string | null>(null);
+  const presetCat = preset?.serviceId ? menu.find((c) => c.services.some((x) => x.id === preset.serviceId)) : undefined;
+  const [catId, setCatId] = useState(presetCat?.id ?? menu[0]?.id ?? "");
+  const [serviceId, setServiceId] = useState(presetCat ? preset!.serviceId! : "");
+  const [staffId, setStaffId] = useState<string | null>(preset?.staffId ?? null);
   const [date, setDate] = useState(dates[0] ?? "");
   const [slots, setSlots] = useState<{ time: string; staffIds: string[] }[] | null>(null);
   const [time, setTime] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState(guest?.name ?? "");
+  const [phone, setPhone] = useState(guest ? localPhone(guest.phone) : "");
   const [company, setCompany] = useState("");
   const [focus, setFocus] = useState<"name" | "phone" | null>(null);
   const [tried, setTried] = useState(false);
@@ -94,12 +112,18 @@ export function OnlineBooking({ menu, dates, preview }: { menu: OnlineMenu; date
         <p className={s.doneText}>
           {done.service} · {done.when} · мастер {done.master}. Мы пришлём подтверждение на {done.phone}. Если планы изменятся — просто напишите нам.
         </p>
+        {guest && (
+          <a href="/kabinet" className={s.again} style={{ marginRight: 12 }}>
+            Мои записи
+          </a>
+        )}
         <button
           type="button"
           className={s.again}
           onClick={() => {
             setDone(null);
             setServiceId("");
+            setStaffId(preset?.staffId ?? null);
             setTime("");
             setSlots(null);
             setTried(false);
@@ -195,11 +219,13 @@ export function OnlineBooking({ menu, dates, preview }: { menu: OnlineMenu; date
               <button type="button" aria-pressed={!staffId} className={`${s.chip} ${!staffId ? s.chipOn : ""}`} onClick={() => reset(() => setStaffId(null))}>
                 Любой мастер
               </button>
-              {service.staff.map((m) => (
-                <button key={m.id} type="button" aria-pressed={staffId === m.id} className={`${s.chip} ${staffId === m.id ? s.chipOn : ""}`} onClick={() => reset(() => setStaffId(m.id))} title={m.title}>
-                  {m.name}
-                </button>
-              ))}
+              {[...service.staff]
+                .sort((a, b) => Number(b.id === guest?.favouriteStaffId) - Number(a.id === guest?.favouriteStaffId))
+                .map((m) => (
+                  <button key={m.id} type="button" aria-pressed={staffId === m.id} className={`${s.chip} ${staffId === m.id ? s.chipOn : ""}`} onClick={() => reset(() => setStaffId(m.id))} title={m.title}>
+                    {m.id === guest?.favouriteStaffId ? `★ ${m.name}` : m.name}
+                  </button>
+                ))}
             </div>
           </fieldset>
 

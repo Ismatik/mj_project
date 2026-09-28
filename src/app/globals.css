@@ -100,6 +100,14 @@ h3 {
     transform: none;
   }
 }
+@keyframes mj-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 @keyframes mj-bar-in {
   from {
     transform: scaleX(0);

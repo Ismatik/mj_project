@@ -1,10 +1,14 @@
+import Link from "next/link";
 import { Brush, Crown, Droplet, Eye, Hand, Scissors, Sparkles, type LucideIcon } from "lucide-react";
 import { duration } from "@/lib/duration";
 import { somoni } from "@/lib/format";
-import { instagramLink, telLink, whatsappLink, type SiteContent } from "@/lib/site-content";
+import { whatsappLink, type SiteContent } from "@/lib/site-content";
+import type { SiteMaster } from "@/server/masters";
 import type { OnlineMenu } from "@/server/online-booking";
-import { OnlineBooking } from "./OnlineBooking";
+import { MasterCard } from "./MasterCard";
+import { OnlineBooking, type BookingPreset } from "./OnlineBooking";
 import { Photo } from "./Photo";
+import { SiteFooter, SiteNav, type NavGuest } from "./SiteChrome";
 import { SiteEffects } from "./SiteEffects";
 import s from "./site.module.css";
 
@@ -22,20 +26,6 @@ const DUST = [
   { left: "35%", bottom: "30%", size: 3, dur: 12, delay: 5.5 },
 ];
 
-function Mono({ size, color }: { size: number; color: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" style={{ overflow: "visible", flexShrink: 0 }} aria-hidden="true">
-      <rect x="7" y="4" width="34" height="30" fill="none" stroke={color} strokeWidth="2.3" />
-      <text x="24" y="26.5" textAnchor="middle" fontFamily="var(--mj-serif)" fontSize="17" fontWeight="600" fill={color}>
-        MJ
-      </text>
-      <text x="24" y="44" textAnchor="middle" fontFamily="var(--mj-sans)" fontSize="5.2" letterSpacing="1.6" fill={color}>
-        MAVZUNAI JOVID
-      </text>
-    </svg>
-  );
-}
-
 export function Website({
   c,
   prices,
@@ -43,6 +33,9 @@ export function Website({
   menu,
   dates,
   preview,
+  masters,
+  guest,
+  preset,
 }: {
   c: SiteContent;
   prices: PriceList;
@@ -50,8 +43,10 @@ export function Website({
   menu: OnlineMenu;
   dates: string[];
   preview?: { publishedAt?: string };
+  masters: SiteMaster[];
+  guest: (NavGuest & { phone: string }) | null;
+  preset?: BookingPreset;
 }) {
-  const wa = whatsappLink(c.contacts);
   const reviews = c.reviews.items.filter((r) => r.visible);
   const marquee = [...c.marquee, ...c.marquee];
 
@@ -61,28 +56,11 @@ export function Website({
       {preview && (
         <div className={s.preview}>
           <span>✦ Предпросмотр черновика — гостьи видят опубликованную версию</span>
-          <a href="/admin">← Вернуться в админку</a>
+          <Link href="/admin">← Вернуться в админку</Link>
         </div>
       )}
 
-      <nav className={s.nav} aria-label="Главное меню">
-        <a href="#top" className={s.brand} aria-label="Mavzunai Jovid — на главную">
-          <Mono size={40} color="var(--mj-ink)" />
-          <div>
-            <div className={s.brandName}>Mavzunai Jovid</div>
-            <div className={s.brandTag}>gallery of beauty</div>
-          </div>
-        </a>
-        <div className={s.navLinks}>
-          <a href="#uslugi">Услуги</a>
-          <a href="#nevesta">Невестам</a>
-          <a href="#otzyvy">Отзывы</a>
-          <a href="#kontakty">Контакты</a>
-        </div>
-        <a href="#zapis" className={s.btnInk}>
-          Записаться
-        </a>
-      </nav>
+      <SiteNav guest={guest} />
 
       <header id="top" className={s.hero}>
         <div className={s.heroText}>
@@ -209,6 +187,28 @@ export function Website({
         </div>
       </section>
 
+      {masters.length > 0 && (
+        <section id="mastera" className={s.light} aria-labelledby="team-title">
+          <h2 id="team-title" data-reveal className={`${s.h2} ${s.center}`}>
+            {c.team.title}
+          </h2>
+          <div className={s.rule} />
+          <div className={s.teamGrid}>
+            {masters.map((m) => (
+              <MasterCard key={m.id} m={m} />
+            ))}
+          </div>
+          <div className={s.teamLinks}>
+            <Link href="/mastera" className={s.textLink}>
+              Все мастера →
+            </Link>
+            <Link href="/portfolio" className={s.textLink}>
+              Портфолио работ →
+            </Link>
+          </div>
+        </section>
+      )}
+
       {reviews.length > 0 && (
         <section id="otzyvy" className={s.dark} aria-labelledby="reviews-title">
           <h2 id="reviews-title" data-reveal data-blur className={s.h2}>
@@ -270,54 +270,11 @@ export function Website({
           <p data-reveal className={s.bookingIntro}>
             {c.booking.intro}
           </p>
-          <OnlineBooking menu={menu} dates={dates} preview={!!preview} />
+          <OnlineBooking menu={menu} dates={dates} preview={!!preview} preset={preset} guest={guest} />
         </div>
       </section>
 
-      <footer id="kontakty" className={s.footer}>
-        <div className={s.footerGrid}>
-          <div>
-            <div className={s.footerBrand}>
-              <Mono size={36} color="var(--mj-cream)" />
-              <div className={s.footerName}>Mavzunai Jovid</div>
-            </div>
-            <p className={s.footerText}>
-              Gallery of Beauty MJ.
-              <br />
-              Салон красоты и свадебный зал.
-            </p>
-          </div>
-          <div className={s.footerCol}>
-            <div className={s.footerLabel}>Контакты</div>
-            <div>
-              <a href={telLink(c.contacts)}>{c.contacts.phone}</a>
-            </div>
-            <div>
-              <a href={wa} target="_blank" rel="noopener noreferrer">
-                WhatsApp
-              </a>
-            </div>
-            {[c.contacts.instagram, c.contacts.instagramGallery].filter(Boolean).map((h) => (
-              <div key={h}>
-                <a href={instagramLink(h)} target="_blank" rel="noopener noreferrer">
-                  @{h.replace(/^@/, "")}
-                </a>
-              </div>
-            ))}
-          </div>
-          <div className={s.footerCol}>
-            <div className={s.footerLabel}>Адрес и часы</div>
-            <div>{c.contacts.address}</div>
-            <div>{c.contacts.district}</div>
-            <div>{c.contacts.hours}</div>
-            <div>{c.contacts.dayOff}</div>
-          </div>
-        </div>
-        <div className={s.footerBottom}>
-          <span>© {today.slice(0, 4)} Mavzunai Jovid</span>
-          <span>Душанбе · Таджикистан</span>
-        </div>
-      </footer>
+      <SiteFooter c={c} year={today.slice(0, 4)} />
     </div>
   );
 }

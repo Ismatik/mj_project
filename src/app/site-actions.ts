@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { formatPhone, normalizePhone } from "@/lib/phone";
 import { BOOKING_HORIZON_DAYS } from "@/lib/slots";
 import { addDays, isClosed, todayYmd } from "@/lib/time";
+import { getCurrentGuest } from "@/server/guest-auth";
 import { createGuestBooking, slotsFor } from "@/server/online-booking";
 import { tooManyAttempts } from "@/server/rate-limit";
 
@@ -57,8 +58,14 @@ export async function bookOnline(input: OnlineBookingInput): Promise<OnlineBooki
   if (!/^\d{2}:\d{2}$/.test(time)) return { ok: false, field: "slot", error: "Выберите время" };
   const wantedStaff = input.staffId ? String(input.staffId) : null;
 
-  const result = await createGuestBooking({ serviceId: String(input.serviceId), staffId: wantedStaff, date, time, name, phone, source: "WEBSITE" });
-  if (result.ok) revalidatePath("/cms", "layout");
+  // Signed in to her account with the same number → the booking goes to her guest card
+  const guest = await getCurrentGuest();
+  const guestId = guest && guest.phone === phone ? guest.id : undefined;
+  const result = await createGuestBooking({ serviceId: String(input.serviceId), staffId: wantedStaff, date, time, name, phone, source: "WEBSITE", guestId });
+  if (result.ok) {
+    revalidatePath("/cms", "layout");
+    if (guestId) revalidatePath("/kabinet");
+  }
   return result.ok ? result : { ok: false, field: "slot", error: result.error };
 }
 

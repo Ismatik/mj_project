@@ -16,7 +16,7 @@ export const INTEGRATIONS: IntegrationInfo[] = [
   {
     key: "telegram",
     title: "Telegram",
-    purpose: "Бот для гостей: запись, «Мои записи» с отменой и переносом, цены, контакты. Уведомления ресепшену и напоминания гостям.",
+    purpose: "Бот для гостей: запись, «Мои записи» с отменой и переносом, цены, контакты. Уведомления ресепшену, напоминания и коды входа в личный кабинет гостям.",
     envKeys: ["TELEGRAM_BOT_TOKEN", "TELEGRAM_WEBHOOK_SECRET"],
     goLive: "Создайте бота у @BotFather, добавьте токен и любой длинный секрет в .env, перезапустите сервер, нажмите «Подключить webhook» и переключите в «Живой».",
     liveIn: "R2",
@@ -25,7 +25,7 @@ export const INTEGRATIONS: IntegrationInfo[] = [
   {
     key: "whatsapp",
     title: "WhatsApp",
-    purpose: "Подтверждение записи гостье, напоминания за 24 и 2 часа, просьба об отзыве.",
+    purpose: "Подтверждение записи гостье, напоминания за 24 и 2 часа, коды входа в личный кабинет, просьба об отзыве.",
     envKeys: ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_ID"],
     goLive: "Верификация Meta Business, номер WhatsApp Business API и одобренные шаблоны сообщений.",
     liveIn: "R2",

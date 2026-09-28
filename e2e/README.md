@@ -15,9 +15,11 @@ npm run e2e                       # re-seeds the demo data before each suite
 | `03-website-admin.mjs` | website loader and effects, callback request reaches the CMS, admin draft → preview → publish (price hidden on the site), photo upload checks |
 | `04-online-booking.mjs` | a guest books a real time slot on a phone and reception sees it in the calendar on another device; integrations and outbox |
 | `05-telegram-bot.mjs` | the Telegram bot in the CMS simulator: booking, calendar entry, reschedule, cancel, staff chat, webhook security |
+| `06-guest-account.mjs` | masters and portfolio pages, sign-in by code (wrong code, resend limit, first-time guest), reschedule, cancel, rebook with pre-filled form, favourite master, mobile menu, hiding a master and adding works in the admin |
 
 Notes:
 
 - `BASE_URL` points the suites at another address (for example the Docker stack behind Caddy); `OUT` sets the screenshot folder (`e2e-output`).
 - The CMS suites expect a working day: on Mondays (the salon's day off) the "today" checks have nothing to show.
+- Suite 06 reads the sign-in code from the screen: run the app in development or with `DEMO_LOGIN_CODES=1`.
 - The website form is rate-limited per address; restart the app if you run the suites many times within an hour.

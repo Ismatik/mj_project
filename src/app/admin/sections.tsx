@@ -12,13 +12,13 @@ type Props = { c: SiteContent; onChange: (c: SiteContent) => void };
 export type AdminService = { id: string; name: string; price: number; durationMin: number; showOnSite: boolean; category: string };
 
 /** Immutable edit helper: clone, mutate, hand back. */
-const editor = (c: SiteContent, onChange: Props["onChange"]) => (fn: (d: SiteContent) => void) => {
+export const editor = (c: SiteContent, onChange: Props["onChange"]) => (fn: (d: SiteContent) => void) => {
   const next = structuredClone(c);
   fn(next);
   onChange(next);
 };
 
-function Head({ title, lead }: { title: string; lead: string }) {
+export function Head({ title, lead }: { title: string; lead: string }) {
   return (
     <>
       <h1 className={s.h1}>{title}</h1>
@@ -27,7 +27,7 @@ function Head({ title, lead }: { title: string; lead: string }) {
   );
 }
 
-function Box({ label, children }: { label: string; children: ReactNode }) {
+export function Box({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className={s.box}>
       <div className={s.boxLabel}>{label}</div>
@@ -36,7 +36,7 @@ function Box({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Text({ value, onChange, title, label, rows }: { value: string; onChange: (v: string) => void; title?: boolean; label: string; rows?: number }) {
+export function Text({ value, onChange, title, label, rows }: { value: string; onChange: (v: string) => void; title?: boolean; label: string; rows?: number }) {
   if (rows)
     return <textarea aria-label={label} className={s.textarea} rows={rows} value={value} onChange={(e) => onChange(e.target.value)} />;
   return <input aria-label={label} className={title ? s.inputTitle : s.input} value={value} onChange={(e) => onChange(e.target.value)} />;
@@ -157,7 +157,7 @@ export function ServicesSection({ c, services, onChange }: Props & { services: A
 }
 
 // ── Фотографии ─────────────────────────────────────────────
-async function upload(file: File): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+export async function upload(file: File): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
   const form = new FormData();
   form.append("file", file);
   const res = await fetch("/api/admin/upload", { method: "POST", body: form });

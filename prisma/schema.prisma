@@ -56,6 +56,7 @@ model Staff {
   appointments AppointmentStaff[]
   sales       Sale[]
   services    Service[] @relation("ServiceStaff")
+  favouriteOf Guest[]   @relation("FavouriteMaster")
 }
 
 model ServiceCategory {
@@ -107,6 +108,34 @@ model Guest {
   dressBookings DressBooking[]
   requests     BookingRequest[]
   telegramChats TelegramChat[]
+  /// Master the guest marked as favourite in her account
+  favouriteStaff   Staff?  @relation("FavouriteMaster", fields: [favouriteStaffId], references: [id], onDelete: SetNull)
+  favouriteStaffId String?
+  sessions      GuestSession[]
+}
+
+/// Website account session of a guest (signed in with a code sent to her phone).
+model GuestSession {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  guest     Guest    @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  guestId   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+/// One-time sign-in code. Only its hash is stored.
+model LoginCode {
+  id        String    @id @default(cuid())
+  phone     String
+  codeHash  String
+  channel   String    /// telegram | whatsapp | sms
+  attempts  Int       @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([phone, createdAt])
 }
 
 enum AppointmentStatus {

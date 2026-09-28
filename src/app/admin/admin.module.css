@@ -448,3 +448,108 @@
     grid-template-columns: 1fr auto;
   }
 }
+
+/* Мастера и портфолио */
+.master {
+  border: 1px solid var(--mj-line);
+  border-top: 2px solid var(--mj-gold);
+  background: var(--mj-paper);
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.masterHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.masterAvatar {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  background: var(--mj-sand-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: var(--mj-serif);
+  font-size: 22px;
+  font-weight: 600;
+}
+.masterAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+}
+.masterWho {
+  flex: 1;
+  min-width: 0;
+}
+.masterWho a {
+  color: var(--mj-gold-deep);
+}
+.masterFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mj-gold-deep);
+}
+.fieldLabel .input,
+.fieldLabel .textarea {
+  text-transform: none;
+  letter-spacing: normal;
+}
+.masterPhotoRow,
+.worksHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.worksHead {
+  justify-content: space-between;
+  border-top: 1px solid var(--mj-line);
+  padding-top: 14px;
+}
+.works {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+.workCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--mj-cream);
+  border: 1px solid var(--mj-line);
+  padding: 8px;
+}
+.workCard img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  filter: grayscale(1);
+  background: var(--mj-sand-2);
+}
+.workCard .input {
+  font-size: 12.5px;
+  padding: 7px 8px;
+}
+.workActions {
+  display: flex;
+  gap: 6px;
+}
+.workActions .smallBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}

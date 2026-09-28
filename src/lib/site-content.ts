@@ -1,5 +1,6 @@
 // Everything the site admin edits. Stored as JSON in SiteDocument ("draft" / "published").
 // Defaults are the texts of design/Mavzunai Jovid Website Main.dc.html.
+import { normalizeMasters, type MasterProfile } from "./masters";
 
 export type SitePhoto = { url: string; credit?: string; creditUrl?: string };
 export type SiteReview = { id: string; author: string; text: string; source: string; visible: boolean; photo?: SitePhoto };
@@ -26,6 +27,10 @@ export type SiteContent = {
     dayOff: string;
   };
   seo: { title: string; description: string };
+  /** Masters pages: title and intro of /mastera and /portfolio */
+  team: { title: string; intro: string; portfolioTitle: string; portfolioIntro: string };
+  /** Master profiles and portfolio, keyed by Staff id */
+  masters: Record<string, MasterProfile>;
   /** Pending "на сайте" changes from the admin, applied to Service.showOnSite on publish. */
   serviceOverrides: Record<string, boolean>;
 };
@@ -139,6 +144,13 @@ export const DEFAULT_CONTENT: SiteContent = {
     description:
       "Gallery of Beauty MJ: волосы, ногти, макияж, свадебные образы и прокат платьев. ул. Бухоро 23/25. Запись в WhatsApp +992 98 103 11 11.",
   },
+  team: {
+    title: "Наши мастера",
+    intro: "Команда Мавзуны: у каждого мастера своя специализация и свой почерк. Выберите мастера и запишитесь к нему онлайн.",
+    portfolioTitle: "Портфолио",
+    portfolioIntro: "Работы наших мастеров — причёски, окрашивание, маникюр, брови и свадебные образы.",
+  },
+  masters: {},
   serviceOverrides: {},
 };
 
@@ -160,7 +172,9 @@ export function normalizeContent(raw: Json, base: Json = DEFAULT_CONTENT): SiteC
     }
     return typeof val === typeof def ? val : def;
   };
-  return merge(base, raw) as SiteContent;
+  const out = merge(base, raw) as SiteContent;
+  out.masters = normalizeMasters(isObj(raw) ? raw.masters : undefined);
+  return out;
 }
 
 export const whatsappLink = (c: SiteContent["contacts"], text?: string) =>

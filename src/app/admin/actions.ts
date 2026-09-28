@@ -17,11 +17,11 @@ const cleanPhoto = (p: SitePhoto | undefined): SitePhoto | undefined => {
 };
 
 /** Normalizes shape, clips every string and drops unsafe photo links. */
-function sanitize(input: unknown, fallback: SiteContent): SiteContent {
+function sanitize(input: unknown, fallback: SiteContent, staffIds: Set<string>): SiteContent {
   const c = normalizeContent(input, fallback);
   const clip = (v: unknown): unknown => {
     if (typeof v === "string") return v.slice(0, MAX_TEXT);
-    if (Array.isArray(v)) return v.slice(0, 30).map(clip);
+    if (Array.isArray(v)) return v.slice(0, 60).map(clip);
     if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, clip(x)]));
     return v;
   };
@@ -41,14 +41,23 @@ function sanitize(input: unknown, fallback: SiteContent): SiteContent {
       visible: !!r.visible,
       photo: cleanPhoto(r.photo),
     }));
+  // Master profiles: only known staff, safe photo links
+  for (const [id, m] of Object.entries(out.masters)) {
+    if (!staffIds.has(id)) {
+      delete out.masters[id];
+      continue;
+    }
+    m.photo = cleanPhoto(m.photo);
+    m.portfolio = m.portfolio.filter((w) => cleanPhoto({ url: w.url }));
+  }
   out.booking.services = out.booking.services.filter((x) => typeof x === "string" && x.trim()).slice(0, 10);
   return out;
 }
 
 export async function saveDraft(input: SiteContent): Promise<{ ok: true; savedAt: string }> {
   const user = await requireSiteAdmin();
-  const current = await getSiteContent("draft");
-  await writeSiteContent("draft", sanitize(input, current), user.name);
+  const [current, staff] = await Promise.all([getSiteContent("draft"), db.staff.findMany({ select: { id: true } })]);
+  await writeSiteContent("draft", sanitize(input, current, new Set(staff.map((x) => x.id))), user.name);
   return { ok: true, savedAt: new Date().toISOString() };
 }
 
@@ -61,8 +70,7 @@ export async function publishSite(): Promise<{ ok: true; publishedAt: string }> 
   const clean = { ...draft, serviceOverrides: {} };
   await writeSiteContent("published", clean, user.name);
   await writeSiteContent("draft", clean, user.name);
-  revalidatePath("/");
-  revalidatePath("/cms", "layout");
+  revalidatePath("/", "layout");
   revalidatePath("/admin");
   return { ok: true, publishedAt: new Date().toISOString() };
 }

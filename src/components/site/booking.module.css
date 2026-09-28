@@ -178,6 +178,8 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
 }
 .again:hover {
   background: var(--mj-ink-line);

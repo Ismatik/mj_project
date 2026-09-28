@@ -44,3 +44,12 @@ export function clock(d: Date): string {
 export function percent(part: number, total: number): string {
   return total ? `${Math.round((part / total) * 100)}%` : "0%";
 }
+
+/** Russian plural: plural(3, ["работа", "работы", "работ"]) → "работы". */
+export function plural(n: number, [one, few, many]: [string, string, string]): string {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}

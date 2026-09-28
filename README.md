@@ -10,7 +10,7 @@ Website, website admin and salon CMS for **Mavzunai Jovid — Gallery of Beauty 
 Next.js 16 (App Router, TypeScript) · PostgreSQL 16 + Prisma 7 · pg-boss worker · Caddy (HTTPS) · Docker Compose.
 
 ```
-src/app/            routes: / · /login · /cms/* · /admin · /styleguide (owner only)
+src/app/            routes: / · /mastera · /portfolio · /kabinet · /login · /cms/* · /admin · /styleguide (owner only)
 src/components/fx/  effects: MJ nail loader, toasts, count-up, skeleton, sparkles
 src/components/ui/  shared components: buttons, tags, headings, stat cards, bars, fields, monogram
 src/lib/            formatting (somoni, dates in Dushanbe time), passwords, db client
@@ -69,6 +69,15 @@ Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
 - Uploaded photos (JPG/PNG/WebP up to 8 MB) are stored in `MEDIA_DIR` and served from `/media/…`.
 - **Онлайн-запись**: guests pick a service, a master (or "любой"), a day and a free time. Free times come from the masters' schedules and existing bookings (`src/lib/slots.ts`); each booking is re-checked under a per-date lock, so two guests can't take the same slot. The booking appears in the CMS calendar as "Ожидание" (source: сайт) for reception to confirm.
 - "Не нашли удобное время?" leaves a callback request, shown on the CMS dashboard ("Заявки с сайта").
+- `/mastera`, `/mastera/<name>` and `/portfolio` — the team, each master's page (bio, prices, works, booking with that master) and all works with filters. Names, titles and services come from the CMS; portraits, bios, page addresses and portfolio photos are edited in `/admin` → «Мастера и портфолио» (a hidden master disappears from the site).
+
+## Guest account (`/kabinet`)
+
+Guests sign in with their phone number and a 4-digit code — no password. The code goes to the salon's Telegram bot if the guest has used it, otherwise to WhatsApp, otherwise SMS (`src/lib/guest-code.ts`). Codes live 10 minutes, allow 5 attempts, can be re-sent after 60 s and at most 4 times an hour per number; only a hash is stored.
+
+In the account: upcoming bookings (move to another free time with the same master or cancel, up to 2 hours before), visit history with **Записаться снова** (opens the booking form with the service and master chosen and contacts filled in), and a favourite master (listed first when booking). A first-time number creates a guest card after the code is confirmed.
+
+While the channel is in mock mode the code is shown on screen. That is always on in development; on a server it needs `DEMO_LOGIN_CODES=1` (demo/staging only — otherwise anyone could open any account). Without it, sign-in opens once a channel is live.
 
 ## Integrations
 
@@ -85,4 +94,4 @@ Guests book, see, move and cancel their visits in Telegram; reception gets alert
 ## Tests
 
 - `npm test` — unit tests (booking rules, free slots, formatting, access, content).
-- `npm run e2e` — browser suites for the CMS, website, admin and online booking (see `e2e/README.md`).
+- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot and guest account (see `e2e/README.md`).

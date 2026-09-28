@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clock, initials, longDate, somoni } from "./format";
+import { clock, initials, longDate, plural, somoni } from "./format";
 import { addDays, atSalonTime, isClosed, mondayOf, todayYmd, weekdayOf } from "./time";
 
 describe("format", () => {
@@ -33,5 +33,12 @@ describe("time", () => {
 
   it("takes today in Dushanbe, not UTC", () => {
     expect(todayYmd(new Date("2026-09-21T20:30:00Z"))).toBe("2026-09-22");
+  });
+});
+
+describe("plural", () => {
+  it("picks the Russian form", () => {
+    const f: [string, string, string] = ["работа", "работы", "работ"];
+    expect([1, 2, 5, 11, 12, 21, 22, 25, 111].map((n) => plural(n, f))).toEqual(["работа", "работы", "работ", "работ", "работ", "работа", "работы", "работ", "работ"]);
   });
 });

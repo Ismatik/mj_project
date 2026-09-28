@@ -5,7 +5,7 @@ import { PrismaClient, type PaymentMethod } from "../src/generated/prisma/client
 import { clock } from "../src/lib/format";
 import { hashPassword } from "../src/lib/password";
 import { addDays, atSalonTime, isClosed, mondayOf, todayYmd, weekdayOf, type Ymd } from "../src/lib/time";
-import { DEFAULT_CONTENT } from "../src/lib/site-content";
+import { DEFAULT_CONTENT, type SiteContent } from "../src/lib/site-content";
 import * as data from "./seed-data";
 
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
@@ -29,6 +29,7 @@ function anchorDay(): Ymd {
 async function wipe() {
   await db.$transaction([
     db.outboxMessage.deleteMany(),
+    db.loginCode.deleteMany(),
     db.integration.deleteMany(),
     db.siteDocument.deleteMany(),
     db.bookingRequest.deleteMany(),
@@ -240,11 +241,22 @@ async function main() {
   // Salon settings, reminders, website content, integrations
   await db.setting.createMany({ data: Object.entries(data.settings).map(([key, value]) => ({ key, value })) });
   await db.reminder.createMany({ data: data.reminders.map((text) => ({ text })) });
-  // Website content: draft and published start identical (texts from the design)
+  // Website content: draft and published start identical (texts from the design, master profiles)
+  const masters: SiteContent["masters"] = {};
+  for (const [key, p] of Object.entries(data.masterProfiles)) {
+    masters[staffId[key]!] = {
+      visible: true,
+      slug: "",
+      specialty: "",
+      bio: p.bio,
+      portfolio: (p.works ?? []).map((w, i) => ({ id: `${key}${i}`, ...w })),
+    };
+  }
+  const content = { ...DEFAULT_CONTENT, masters };
   await db.siteDocument.createMany({
     data: [
-      { id: "draft", data: DEFAULT_CONTENT },
-      { id: "published", data: DEFAULT_CONTENT },
+      { id: "draft", data: content },
+      { id: "published", data: content },
     ],
   });
   await db.integration.createMany({ data: data.integrations.map((key) => ({ key })) });

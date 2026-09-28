@@ -31,6 +31,11 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
   return (
     <div>
       <PageHead title="Интеграции" meta="Каждый канал работает в режиме «мок» до подключения — всё видно в «Исходящих»" />
+      <p className={s.notice}>
+        <b>Вход гостей в личный кабинет.</b> Код уходит в Telegram-бот, если гостья им пользуется, иначе — в WhatsApp или по SMS. Пока канал в режиме «мок», код
+        показывается гостье прямо на экране: на сервере это включается переменной DEMO_LOGIN_CODES=1 (для демо и staging). Без неё вход откроется, когда канал
+        станет «Живым». Отправленные коды в «Исходящих» скрываются.
+      </p>
       <div className={s.grid}>
         {INTEGRATIONS.map((info) => {
           const row = rows.find((r) => r.key === info.key);

@@ -8,6 +8,7 @@ import { Monogram } from "@/components/ui/Monogram";
 import type { SiteContent } from "@/lib/site-content";
 import { logout } from "../login/actions";
 import { discardDraft, publishSite, saveDraft } from "./actions";
+import { MastersSection, type AdminCategory, type AdminStaff } from "./MastersSection";
 import { ContactsSection, PhotosSection, ReviewsSection, SeoSection, ServicesSection, TextsSection, type AdminService } from "./sections";
 import s from "./admin.module.css";
 
@@ -15,6 +16,7 @@ const SECTIONS = [
   { id: "texts", label: "Тексты секций" },
   { id: "prices", label: "Услуги и цены" },
   { id: "photos", label: "Фотографии" },
+  { id: "masters", label: "Мастера и портфолио" },
   { id: "reviews", label: "Отзывы" },
   { id: "contacts", label: "Контакты и часы" },
   { id: "seo", label: "SEO" },
@@ -27,6 +29,8 @@ export function AdminApp(props: {
   draft: SiteContent;
   published: SiteContent;
   services: AdminService[];
+  staff: AdminStaff[];
+  categories: AdminCategory[];
   user: { name: string; roleLabel: string; isOwner: boolean };
 }) {
   const fx = useFx();
@@ -155,6 +159,7 @@ export function AdminApp(props: {
           {section === "texts" && <TextsSection c={draft} onChange={update} />}
           {section === "prices" && <ServicesSection c={draft} services={props.services} onChange={update} />}
           {section === "photos" && <PhotosSection c={draft} onChange={update} />}
+          {section === "masters" && <MastersSection c={draft} onChange={update} staff={props.staff} categories={props.categories} />}
           {section === "reviews" && <ReviewsSection c={draft} onChange={update} />}
           {section === "contacts" && <ContactsSection c={draft} onChange={update} />}
           {section === "seo" && <SeoSection c={draft} onChange={update} />}
