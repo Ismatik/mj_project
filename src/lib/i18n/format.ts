@@ -54,3 +54,12 @@ export function duration(min: number, lang: Lang): string {
   if (lang === "tg") return hours ? `${hours} соат` : `${min} дақ`;
   return hours ? `${hours} h` : `${min} min`;
 }
+
+/** "29 сентября 2027" / "29 сентябр 2027" / "29 September 2027" */
+export function dayMonthYear(d: Date, lang: Lang): string {
+  const ymd = ymdOf(d);
+  const day = Number(ymd.slice(8));
+  const m = Number(ymd.slice(5, 7)) - 1;
+  if (lang === "ru") return `${day} ${["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"][m]} ${ymd.slice(0, 4)}`;
+  return `${day} ${MONTHS_LONG[lang][m]} ${ymd.slice(0, 4)}`;
+}

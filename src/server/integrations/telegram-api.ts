@@ -27,7 +27,8 @@ export function replyMarkup(r: BotReply): Record<string, unknown> | undefined {
   if (r.askContact) {
     return { keyboard: [[{ text: r.contactLabel ?? "📱 Поделиться номером", request_contact: true }]], resize_keyboard: true, one_time_keyboard: true };
   }
-  if (r.buttons?.length) return { inline_keyboard: r.buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))) };
+  // Telegram only opens https links from buttons
+  if (r.buttons?.length) return { inline_keyboard: r.buttons.map((row) => row.map((b) => (b.url?.startsWith("https://") ? { text: b.text, url: b.url } : { text: b.text, callback_data: b.data }))) };
   if (r.removeKeyboard) return { remove_keyboard: true };
   return undefined;
 }

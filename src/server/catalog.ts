@@ -28,6 +28,7 @@ export async function getServiceMenu() {
         price: s.price,
         showOnSite: s.showOnSite,
         showInPos: s.showInPos,
+        depositPercent: s.depositPercent,
         staffIds: s.staff.map((x) => x.id),
       })),
     })),

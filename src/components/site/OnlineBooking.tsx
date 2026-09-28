@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { bookOnline, getSlots, requestCallback, type OnlineBookingResult } from "@/app/site-actions";
 import { dict } from "@/lib/i18n/dict";
+import { moneyDict } from "@/lib/i18n/dict-money";
 import { duration, MONTHS, somoni, WEEKDAYS } from "@/lib/i18n/format";
 import { localePath, type Lang } from "@/lib/i18n/locales";
 import { normalizePhone } from "@/lib/phone";
@@ -11,7 +12,7 @@ import { weekdayOf } from "@/lib/time";
 import type { OnlineMenu } from "@/server/online-booking";
 import s from "./booking.module.css";
 
-type Summary = Extract<OnlineBookingResult, { ok: true }>["summary"];
+type Done = Extract<OnlineBookingResult, { ok: true }>;
 /** Pre-selected service and master ("Записаться снова", a master's page) */
 export type BookingPreset = { serviceId?: string; staffId?: string | null };
 
@@ -36,6 +37,7 @@ export function OnlineBooking({
 }) {
   const t = dict(lang);
   const b = t.booking;
+  const m = moneyDict(lang).pay;
   const fx = useFx();
   const submitRef = useRef<HTMLButtonElement>(null);
   const presetCat = preset?.serviceId ? menu.find((c) => c.services.some((x) => x.id === preset.serviceId)) : undefined;
@@ -52,7 +54,7 @@ export function OnlineBooking({
   const [tried, setTried] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<{ field?: string; text: string } | null>(null);
-  const [done, setDone] = useState<Summary | null>(null);
+  const [done, setDone] = useState<Done | null>(null);
   const [callback, setCallback] = useState<"closed" | "open" | "sent">("closed");
 
   const service = menu.flatMap((c) => c.services).find((x) => x.id === serviceId);
@@ -100,7 +102,7 @@ export function OnlineBooking({
       }
       if (submitRef.current) fx.sparkle(submitRef.current);
       await new Promise((r) => setTimeout(r, 250));
-      setDone(res.summary);
+      setDone(res);
     } catch {
       setError({ text: b.failed });
     } finally {
@@ -112,8 +114,18 @@ export function OnlineBooking({
     return (
       <div className={s.done} role="status">
         <div className={s.doneKicker}>{b.doneKicker}</div>
-        <div className={s.doneTitle}>{b.doneTitle(done.name)}</div>
-        <p className={s.doneText}>{b.doneText(done)}</p>
+        <div className={s.doneTitle}>{b.doneTitle(done.summary.name)}</div>
+        <p className={s.doneText}>{b.doneText(done.summary)}</p>
+        {done.payment && (
+          <>
+            <p className={s.doneText}>
+              <b>{m.depositNeeded(somoni(done.payment.amount, lang), done.payment.payBy)}</b>
+            </p>
+            <a href={done.payment.url} className={s.payDeposit}>
+              {m.payDeposit(somoni(done.payment.amount, lang))}
+            </a>
+          </>
+        )}
         {guest && (
           <a href={localePath(lang, "/kabinet")} className={s.again} style={{ marginRight: 12 }}>
             {b.myBookings}

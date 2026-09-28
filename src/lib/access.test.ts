@@ -3,12 +3,14 @@ import { canOpen, canUseCms, canUseSiteAdmin, homeFor, navFor, safeNext } from "
 
 describe("access", () => {
   it("gives the owner every CMS page and the site admin", () => {
-    expect(navFor("OWNER").flatMap((g) => g.items)).toHaveLength(10);
+    expect(navFor("OWNER").flatMap((g) => g.items)).toHaveLength(11);
     expect(canUseSiteAdmin("OWNER")).toBe(true);
   });
 
   it("keeps money pages away from reception", () => {
     expect(canOpen("RECEPTION", "pos")).toBe(true);
+    expect(canOpen("RECEPTION", "certificates")).toBe(true);
+    expect(canOpen("MASTER", "certificates")).toBe(false);
     expect(canOpen("RECEPTION", "analytics")).toBe(false);
     expect(canOpen("RECEPTION", "settings")).toBe(false);
     expect(canUseSiteAdmin("RECEPTION")).toBe(false);

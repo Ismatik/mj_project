@@ -22,6 +22,8 @@ ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
 COPY --from=build --chown=node:node /app/public ./public
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
+# Fonts for PDF certificates and reports
+COPY --from=build --chown=node:node /app/assets ./assets
 RUN mkdir -p /app/media && chown node:node /app/media
 USER node
 EXPOSE 3000

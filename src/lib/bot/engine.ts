@@ -6,7 +6,8 @@ import { normalizePhone } from "../phone";
 import type { Ymd } from "../time";
 import { botTexts } from "./texts";
 
-export type BotButton = { text: string; data: string };
+/** A button either sends data back to the bot or opens a link */
+export type BotButton = { text: string; data: string; url?: string };
 export type BotReply = {
   text: string;
   /** Inline buttons, row by row */
@@ -39,7 +40,7 @@ export type BotGuest = { id: string; name: string; phone: string };
 export type BotService = { id: string; name: string; durationMin: number; price: number; staff: { id: string; name: string }[] };
 export type BotCategory = { id: string; name: string; services: BotService[] };
 export type BotBooking = { id: string; service: string; serviceId: string | null; startsAt: Date; master: string; staffId: string | null; status: string };
-type Result = { ok: true; summary: { service: string; master: string; when: string } } | { ok: false; error: string };
+type Result = { ok: true; summary: { service: string; master: string; when: string }; deposit?: { amount: number; payBy: string; url: string } } | { ok: false; error: string };
 
 export interface BotDeps {
   getChat(chatId: string): Promise<{ state: BotState; guest: BotGuest | null; isStaff: boolean; lang: Lang | null }>;
@@ -318,7 +319,14 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
         break;
       }
       await save({ step: "idle" });
-      out.push({ text: t.booked(res.summary), buttons: mainMenu() });
+      if (res.deposit) {
+        // The time is held until the prepayment is made
+        const sum = money(res.deposit.amount);
+        out.push({
+          text: `${t.bookedDeposit(res.summary)}\n\n${t.depositLink(sum, res.deposit.payBy, res.deposit.url)}`,
+          buttons: [[{ text: t.payDeposit(sum), data: "menu", url: res.deposit.url }], ...mainMenu()],
+        });
+      } else out.push({ text: t.booked(res.summary), buttons: mainMenu() });
       break;
     }
 

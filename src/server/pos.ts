@@ -34,6 +34,8 @@ export async function getPos(today: Ymd = todayYmd()) {
       serviceId: a.serviceId,
       service: a.serviceLabel,
       price: a.price,
+      /** Paid online in advance — counted in the receipt */
+      depositPaid: a.depositPaid,
       startsAt: a.startsAt,
       staffId: a.staff[0]?.staffId ?? null,
       staffNames: a.staff.map((s) => s.staff.name).join(" + "),
@@ -43,6 +45,9 @@ export async function getPos(today: Ymd = todayYmd()) {
       id: s.id,
       number: s.number,
       total: s.total,
+      paid: s.paid,
+      depositAmount: s.depositAmount,
+      giftCardAmount: s.giftCardAmount,
       method: s.method,
       createdAt: s.createdAt,
       guest: s.guest?.name ?? null,

@@ -1,9 +1,11 @@
-// Background worker: delivers queued outbox messages every minute and queues visit reminders every 10 minutes.
+// Background worker: every minute releases unpaid prepayment holds and delivers queued outbox messages;
+// every 10 minutes queues visit reminders.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PgBoss } from "pg-boss";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { sweepOutbox } from "../src/server/integrations/outbox";
+import { releaseExpired } from "../src/server/payments/core";
 import { queueReminders } from "../src/server/integrations/reminders";
 
 const connectionString = process.env.DATABASE_URL;
@@ -21,6 +23,9 @@ async function main() {
   await boss.createQueue(SWEEP);
   await boss.schedule(SWEEP, "* * * * *");
   await boss.work(SWEEP, async () => {
+    // Unpaid prepayments past their time release the held booking
+    const released = await releaseExpired(db);
+    if (released) console.log(`[worker] payments: released ${released}`);
     const n = await sweepOutbox(db);
     if (n) console.log(`[worker] outbox: processed ${n}`);
   });

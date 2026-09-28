@@ -524,3 +524,18 @@
   border-color: var(--mj-ink);
   color: var(--mj-cream);
 }
+.payBtn {
+  display: inline-block;
+  margin-top: 6px;
+  background: var(--mj-gold);
+  color: var(--mj-ink);
+  padding: 10px 16px;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-decoration: none;
+}
+.payBtn:hover {
+  background: var(--mj-gold-hover);
+}

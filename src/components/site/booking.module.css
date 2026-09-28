@@ -391,3 +391,20 @@
 .callback button:hover {
   background: var(--mj-sand-2);
 }
+.payDeposit {
+  display: inline-block;
+  margin: 6px 12px 12px 0;
+  background: var(--mj-gold);
+  color: var(--mj-ink);
+  padding: 14px 24px;
+  font-family: var(--mj-sans);
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+.payDeposit:hover {
+  background: var(--mj-gold-hover);
+}

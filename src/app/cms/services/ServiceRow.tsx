@@ -23,6 +23,7 @@ export function ServiceRow({ service, staff, canEdit }: { service: ServiceRowDat
       <span className={s.tags}>
         {service.showOnSite && <span className={s.onSite}>на сайте</span>}
         {service.showInPos && <span className={s.inPos}>в кассе</span>}
+        {service.depositPercent > 0 && <span className={s.inPos}>предоплата {service.depositPercent}%</span>}
       </span>
       {canEdit && (
         <button type="button" className={s.edit} onClick={() => setEditing(true)} aria-label={`Изменить: ${service.name}`}>
@@ -43,7 +44,7 @@ export function NewService({ categoryId, staff }: { categoryId: string; staff: S
     );
   return (
     <ServiceEditor
-      initial={{ id: "", name: "", durationMin: 60, price: 0, showOnSite: true, showInPos: false, staffIds: [] }}
+      initial={{ id: "", name: "", durationMin: 60, price: 0, showOnSite: true, showInPos: false, depositPercent: 0, staffIds: [] }}
       staff={staff}
       categoryId={categoryId}
       onDone={() => setOpen(false)}
@@ -98,6 +99,17 @@ function ServiceEditor({ initial, staff, categoryId, onDone }: { initial: Servic
         </label>
         <label>
           <input type="checkbox" checked={f.showInPos} onChange={(e) => setF({ ...f, showInPos: e.target.checked })} /> в быстром меню кассы
+        </label>
+        <label title="Онлайн-запись держит время, пока гостья не внесёт предоплату (30 минут)">
+          предоплата онлайн{" "}
+          <input
+            aria-label="Предоплата, %"
+            className={s.percent}
+            inputMode="numeric"
+            value={String(f.depositPercent)}
+            onChange={(e) => setF({ ...f, depositPercent: Math.min(100, Number(e.target.value.replace(/\D/g, "")) || 0) })}
+          />{" "}
+          %
         </label>
       </div>
       <div className={s.checks}>

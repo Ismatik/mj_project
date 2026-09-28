@@ -167,3 +167,12 @@
     grid-column: 1 / -1;
   }
 }
+.percent {
+  width: 46px;
+  border: 1px solid var(--mj-line);
+  background: var(--mj-cream);
+  padding: 3px 6px;
+  font-family: var(--mj-sans);
+  font-size: 13px;
+  text-align: right;
+}

@@ -12,6 +12,8 @@ export type ServiceInput = {
   price: number;
   showOnSite: boolean;
   showInPos: boolean;
+  /** Prepayment for online bookings, % of the price */
+  depositPercent: number;
   staffIds: string[];
 };
 export type ServiceResult = { ok: true } | { ok: false; error: string };
@@ -26,6 +28,7 @@ function check(input: ServiceInput): string | null {
   if (!Number.isInteger(input.durationMin) || input.durationMin < 5 || input.durationMin > 600) return "Длительность от 5 до 600 минут";
   if (!Number.isInteger(input.price) || input.price < 0 || input.price > 100000) return "Цена в сомони, целое число";
   if (!Array.isArray(input.staffIds) || input.staffIds.length === 0) return "Отметьте хотя бы одного мастера";
+  if (!Number.isInteger(input.depositPercent) || input.depositPercent < 0 || input.depositPercent > 100) return "Предоплата — от 0 до 100 %";
   return null;
 }
 
@@ -39,6 +42,7 @@ export async function saveService(input: ServiceInput): Promise<ServiceResult> {
     price: input.price,
     showOnSite: !!input.showOnSite,
     showInPos: !!input.showInPos,
+    depositPercent: input.depositPercent,
     staff: { set: input.staffIds.slice(0, 20).map((id) => ({ id })) },
   };
   if (input.id) {

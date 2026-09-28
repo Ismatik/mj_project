@@ -110,7 +110,13 @@ Guests without Telegram get their confirmation, reminders and sign-in codes in W
 - Webhook `https://SITE_DOMAIN/api/whatsapp/webhook`: verified with `WHATSAPP_VERIFY_TOKEN`, every request checked against `WHATSAPP_APP_SECRET`. It records delivery failures in the outbox, forwards guests' WhatsApp messages to reception (Telegram) and sends her a short auto-reply at most every 12 hours.
 - Going live: Meta Business verification and a Cloud API number; put `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` in `.env`; restart; set the webhook in Meta (field `messages`); CMS → Интеграции → WhatsApp → "Тест" (sends Meta's `hello_world` template) and "Живой".
 
+## Prepayments and gift certificates
+
+- **Prepayment:** a service with "предоплата онлайн N %" (CMS → Меню услуг, e.g. wedding looks at 30 %) asks for it when booked online or in the bot. The time is held for 30 minutes. Once paid, reception is told and the guest gets her confirmation. If it isn't paid in time, the worker releases the time (`releaseExpired`, every minute). The prepayment is subtracted at the till.
+- **Gift certificates:** sold on the website (`/podarok`, in all three languages) or in CMS → **Сертификаты и оплаты**. Codes look like `MJ-XXXX-XXXX`, are valid 12 months and can be used in parts. At the till, type the code in the receipt: prepayment first, then the certificate, the rest with cash / card / QR. The certificate is an A5 PDF in MJ style with a QR code (`/api/gift/<token>/pdf`, fonts in `assets/fonts`). The QR opens `/sertifikat/<token>` with the balance.
+- **Payments:** `Payment` records prepayments and certificate sales. Until a bank is connected, online payments go through the **test checkout** (`/oplata/<id>`, no money charged). A bank driver later only has to call `markPaid` / `cancelPayment` (`src/server/payments/core.ts`).
+
 ## Tests
 
 - `npm test` — unit tests (booking rules, free slots, formatting, access, content, translations, bot, message templates, WhatsApp payloads and webhook parsing).
-- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp (see `e2e/README.md`).
+- `npm run e2e` — browser suites for the CMS, website, admin, online booking, Telegram bot, guest account, languages and WhatsApp, payments and certificates (see `e2e/README.md`).

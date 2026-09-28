@@ -5,6 +5,7 @@ import { PrismaClient, type PaymentMethod, type Prisma } from "../src/generated/
 import { clock } from "../src/lib/format";
 import { hashPassword } from "../src/lib/password";
 import { addDays, atSalonTime, isClosed, mondayOf, todayYmd, weekdayOf, type Ymd } from "../src/lib/time";
+import { depositFor } from "../src/lib/money";
 import { DEFAULT_CONTENT, type SiteContent } from "../src/lib/site-content";
 import * as data from "./seed-data";
 
@@ -29,6 +30,9 @@ function anchorDay(): Ymd {
 async function wipe() {
   await db.$transaction([
     db.outboxMessage.deleteMany(),
+    db.giftRedemption.deleteMany(),
+    db.payment.deleteMany(),
+    db.giftCard.deleteMany(),
     db.loginCode.deleteMany(),
     db.telegramChat.deleteMany(),
     db.integration.deleteMany(),
@@ -86,6 +90,7 @@ async function main() {
           price: s.price,
           showOnSite: s.site,
           showInPos: s.pos,
+          depositPercent: s.deposit ?? 0,
           sortOrder: si,
           staff: { connect: s.staff.map((k) => ({ id: staffId[k]! })) },
         },
@@ -149,6 +154,7 @@ async function main() {
           guestId: a.guest ? guestId[a.guest] : null,
           staffId: staffId[staffKeys[0]!],
           total: a.price,
+          paid: a.price,
           method: pick(methods),
           createdAt: new Date(startsAt.getTime() + durationMin * 60_000),
           items: { create: [{ serviceId: serviceId[a.service], name: a.label, price: a.price }] },
@@ -214,6 +220,7 @@ async function main() {
         data: {
           staffId: staffId[master],
           total: svc.price,
+          paid: svc.price,
           method: pick(methods),
           createdAt: atSalonTime(day, `${String(hour).padStart(2, "0")}:${minute}`),
           items: { create: [{ serviceId: serviceId[svc.key], name: svc.name, price: svc.price }] },
@@ -281,6 +288,38 @@ async function main() {
     ],
   });
   await db.integration.createMany({ data: data.integrations.map((key) => ({ key })) });
+
+  // Wedding looks booked ahead were prepaid online (30 %)
+  for (const sv of data.services.filter((x) => x.deposit)) {
+    const deposit = depositFor(sv.price, sv.deposit!);
+    await db.appointment.updateMany({
+      where: { serviceId: serviceId[sv.key], status: { in: ["PENDING", "CONFIRMED", "IN_CHAIR"] } },
+      data: { depositRequired: deposit, depositPaid: deposit },
+    });
+  }
+
+  // Gift certificates: one active (partly used on the website demo), one fully used
+  for (const g of data.giftCards) {
+    const created = atSalonTime(addDays(today, -g.daysAgo), "12:00");
+    await db.giftCard.create({
+      data: {
+        code: g.code,
+        token: g.token,
+        amount: g.amount,
+        balance: g.balance,
+        status: g.balance > 0 ? "ACTIVE" : "USED",
+        recipientName: g.recipient,
+        buyerName: g.buyer,
+        buyerPhone: g.buyerPhone,
+        message: g.message,
+        soldVia: "CMS",
+        soldBy: "Ресепшен",
+        createdAt: created,
+        expiresAt: new Date(created.getTime() + 365 * 864e5),
+        payments: { create: { purpose: "GIFT_CARD", amount: g.amount, status: "PAID", provider: "pos", method: "CARD", description: `Сертификат ${g.code}`, paidAt: created, createdAt: created, expiresAt: created } },
+      },
+    });
+  }
 
   // Sign-in accounts (the same demo password for every role; change it after first sign-in)
   const password = process.env.SEED_OWNER_PASSWORD || "change-me-now";

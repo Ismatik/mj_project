@@ -2,6 +2,7 @@ import Link from "next/link";
 import { UserRound } from "lucide-react";
 import type { ReactNode } from "react";
 import { dict } from "@/lib/i18n/dict";
+import { moneyDict } from "@/lib/i18n/dict-money";
 import { LANG_CODE, LANG_LABEL, LANG_NAME, LANGS, localePath, type Lang } from "@/lib/i18n/locales";
 import { instagramLink, telLink, whatsappLink, type SiteContent } from "@/lib/site-content";
 import { SiteEffects } from "./SiteEffects";
@@ -49,6 +50,7 @@ function LangSwitch({ lang, path, className, short }: { lang: Lang; path: string
 
 export function SiteNav({ guest, lang, path, current = "home", bookHref }: { guest: NavGuest; lang: Lang; path: string; current?: NavId; bookHref?: string }) {
   const t = dict(lang);
+  const g = moneyDict(lang).gift;
   const first = guest?.name.split(" ")[0];
   const href = (p: string) => localePath(lang, p);
   return (
@@ -87,6 +89,7 @@ export function SiteNav({ guest, lang, path, current = "home", bookHref }: { gue
               {t.nav[l.id]}
             </Link>
           ))}
+          <Link href={href("/podarok")}>{g.nav}</Link>
           <Link href={href("/kabinet")}>{guest ? t.nav.accountOf(first!) : t.nav.account}</Link>
           <LangSwitch lang={lang} path={path} className={s.menuLangs} />
         </div>
@@ -120,6 +123,9 @@ export function SiteFooter({ c, year, lang }: { c: SiteContent; year: string; la
             <a href={whatsappLink(c.contacts)} target="_blank" rel="noopener noreferrer">
               WhatsApp
             </a>
+          </div>
+          <div>
+            <Link href={localePath(lang, "/podarok")}>{moneyDict(lang).gift.nav} →</Link>
           </div>
           {[c.contacts.instagram, c.contacts.instagramGallery].filter(Boolean).map((h) => (
             <div key={h}>

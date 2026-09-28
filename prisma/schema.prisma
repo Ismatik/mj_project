@@ -78,6 +78,8 @@ model Service {
   price       Int
   showOnSite  Boolean         @default(true)
   showInPos   Boolean         @default(false)
+  /// Online bookings pay this share in advance (0 = no prepayment)
+  depositPercent Int          @default(0)
   sortOrder   Int             @default(0)
   active      Boolean         @default(true)
   appointments Appointment[]
@@ -178,6 +180,12 @@ model Appointment {
   /// When the day-before and hours-before reminders were queued
   remindedDayAt   DateTime?
   remindedHoursAt DateTime?
+  /// Prepayment asked for online (somoni) and paid so far
+  depositRequired Int       @default(0)
+  depositPaid     Int       @default(0)
+  /// An online booking waiting for its prepayment holds the time until then; afterwards it is released
+  holdUntil       DateTime?
+  payments        Payment[]
 
   @@index([startsAt])
 }
@@ -207,10 +215,16 @@ model Sale {
   guestId   String?
   staff     Staff?        @relation(fields: [staffId], references: [id])
   staffId   String?
+  /// Value of the services (revenue)
   total     Int
+  /// Paid now with the method below = total − prepayment − gift certificate
+  paid      Int           @default(0)
+  depositAmount  Int      @default(0)
+  giftCardAmount Int      @default(0)
   method    PaymentMethod
   createdAt DateTime      @default(now())
   items     SaleItem[]
+  redemptions GiftRedemption[]
 
   @@index([createdAt])
 }
@@ -364,4 +378,83 @@ model OutboxMessage {
   sentAt    DateTime?
 
   @@index([createdAt])
+}
+
+// ─── Payments, gift certificates (R3) ────────────────────
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum PaymentPurpose {
+  DEPOSIT
+  GIFT_CARD
+}
+
+/// Money received outside a receipt: online prepayments and certificate sales (online or at the till).
+model Payment {
+  id            String         @id @default(cuid())
+  purpose       PaymentPurpose
+  amount        Int
+  status        PaymentStatus  @default(PENDING)
+  /// test (test checkout) | pos (at the till) | bank name when a live acquiring contract exists
+  provider      String         @default("test")
+  /// At the till: cash / card / QR
+  method        PaymentMethod?
+  externalId    String?
+  description   String
+  /// Where the guest returns after paying (path on the website)
+  returnPath    String?
+  lang          String         @default("ru")
+  appointment   Appointment?   @relation(fields: [appointmentId], references: [id])
+  appointmentId String?
+  giftCard      GiftCard?      @relation(fields: [giftCardId], references: [id])
+  giftCardId    String?
+  createdAt     DateTime       @default(now())
+  paidAt        DateTime?
+  expiresAt     DateTime
+
+  @@index([status, createdAt])
+}
+
+enum GiftCardStatus {
+  PENDING
+  ACTIVE
+  USED
+  CANCELLED
+}
+
+model GiftCard {
+  id            String           @id @default(cuid())
+  /// Printed on the certificate: MJ-XXXX-XXXX
+  code          String           @unique
+  /// Secret part of the link to the PDF and balance page
+  token         String           @unique
+  amount        Int
+  balance       Int
+  status        GiftCardStatus   @default(PENDING)
+  recipientName String
+  message       String?
+  buyerName     String
+  buyerPhone    String?
+  lang          String           @default("ru")
+  soldVia       String           /// WEBSITE | CMS
+  soldBy        String?
+  expiresAt     DateTime
+  createdAt     DateTime         @default(now())
+  payments      Payment[]
+  redemptions   GiftRedemption[]
+}
+
+model GiftRedemption {
+  id         String   @id @default(cuid())
+  giftCard   GiftCard @relation(fields: [giftCardId], references: [id])
+  giftCardId String
+  sale       Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleId     String
+  amount     Int
+  createdAt  DateTime @default(now())
 }

@@ -59,6 +59,8 @@ export const services: {
   site: boolean;
   pos: boolean;
   staff: StaffKey[];
+  /** Prepayment percent for online bookings */
+  deposit?: number;
 }[] = [
   { key: "cut", cat: "hair", name: "Стрижка + укладка", min: 60, price: 180, site: true, pos: true, staff: ["dario", "mavzuna"] },
   { key: "color", cat: "hair", name: "Окрашивание в один тон", min: 120, price: 450, site: true, pos: true, staff: ["ines"] },
@@ -73,8 +75,8 @@ export const services: {
   { key: "spaHands", cat: "spa", name: "Спа-уход для рук", min: 45, price: 220, site: false, pos: false, staff: ["petra"] },
   { key: "dayMakeup", cat: "makeup", name: "Макияж дневной", min: 45, price: 250, site: true, pos: false, staff: ["mira"] },
   { key: "eveMakeup", cat: "makeup", name: "Макияж вечерний", min: 60, price: 400, site: true, pos: true, staff: ["mira"] },
-  { key: "bridal", cat: "makeup", name: "Свадебный образ под ключ", min: 180, price: 1500, site: true, pos: false, staff: ["mira", "ines"] },
-  { key: "trial", cat: "makeup", name: "Пробный образ", min: 90, price: 950, site: false, pos: false, staff: ["mira"] },
+  { key: "bridal", cat: "makeup", name: "Свадебный образ под ключ", min: 180, price: 1500, site: true, pos: false, staff: ["mira", "ines"], deposit: 30 },
+  { key: "trial", cat: "makeup", name: "Пробный образ", min: 90, price: 950, site: false, pos: false, staff: ["mira"], deposit: 30 },
 ];
 
 export type ServiceKey = string;
@@ -264,3 +266,9 @@ export const translations = {
     mira0: { tg: "Ороиши пурраи арӯсӣ", en: "Complete bridal look" },
   } as Record<string, { tg: string; en: string }>,
 };
+
+/** Demo gift certificates (codes are fixed so the demo can be tried at the till) */
+export const giftCards = [
+  { code: "MJ-7K2P-QX4M", token: "demo-gift-7k2p-qx4m-5b1c9e", amount: 1000, balance: 1000, recipient: "Нигора", buyer: "Фарзона Икромова", buyerPhone: "+992987004590", message: "С днём рождения! Твоя Фарзона", daysAgo: 12 },
+  { code: "MJ-4HWD-8RTA", token: "demo-gift-4hwd-8rta-2f7a1d", amount: 500, balance: 0, recipient: "Мохира", buyer: "Лейла Хамидова", buyerPhone: "+992983226733", message: null, daysAgo: 40 },
+];

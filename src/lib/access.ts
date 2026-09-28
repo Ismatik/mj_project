@@ -9,6 +9,7 @@ export type CmsPageId =
   | "calendar"
   | "services"
   | "rental"
+  | "certificates"
   | "staff"
   | "analytics"
   | "settings"
@@ -23,6 +24,7 @@ export const CMS_PAGES: CmsPage[] = [
   { id: "calendar", label: "Календарь записей", path: "/cms/calendar", group: "Гостьи", roles: ["OWNER", "RECEPTION", "MASTER"] },
   { id: "services", label: "Меню услуг и цены", path: "/cms/services", group: "Услуги", roles: ["OWNER", "RECEPTION", "MASTER"] },
   { id: "rental", label: "Прокат платьев", path: "/cms/rental", group: "Услуги", roles: ["OWNER", "RECEPTION"] },
+  { id: "certificates", label: "Сертификаты и оплаты", path: "/cms/certificates", group: "Услуги", roles: ["OWNER", "RECEPTION"] },
   { id: "staff", label: "Мастера и график", path: "/cms/staff", group: "Команда", roles: ["OWNER", "RECEPTION", "MASTER"] },
   { id: "analytics", label: "Аналитика", path: "/cms/analytics", group: "Развитие", roles: ["OWNER"] },
   { id: "settings", label: "Настройки", path: "/cms/settings", group: "Развитие", roles: ["OWNER"] },

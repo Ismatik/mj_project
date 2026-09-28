@@ -59,6 +59,12 @@ export function AppointmentPanel({ a, closeHref, role }: { a: AppointmentDetail;
           </div>
           <div className={s.panelSub}>
             мастер {a.staff.map((m) => m.name).join(" + ")} · {somoni(a.price)} · источник: {SOURCE[a.source] ?? a.source}
+            {a.depositRequired > 0 &&
+              (a.depositPaid >= a.depositRequired
+                ? ` · предоплата ${somoni(a.depositPaid)} внесена`
+                : a.holdUntil
+                  ? ` · ждёт предоплату ${somoni(a.depositRequired)} до ${clock(a.holdUntil)}`
+                  : ` · предоплата ${somoni(a.depositRequired)} не внесена`)}
             {a.guestPhone && <> · {formatPhone(a.guestPhone)}</>}
           </div>
           {a.note && <div className={s.panelNote}>«{a.note}»</div>}

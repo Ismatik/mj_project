@@ -5,10 +5,11 @@ import type { BotDeps, BotState } from "@/lib/bot/engine";
 import { db } from "@/lib/db";
 import { localize } from "@/lib/i18n/content";
 import { when } from "@/lib/i18n/format";
-import { asLang, isLang } from "@/lib/i18n/locales";
+import { asLang, isLang, localePath } from "@/lib/i18n/locales";
 import { bookableDates } from "@/lib/slots";
 import { addDays, todayYmd } from "@/lib/time";
 import { cancelByGuest, createGuestBooking, getOnlineMenu, rescheduleByGuest, slotsFor, upcomingForGuest } from "../online-booking";
+import { siteUrl } from "../payments/core";
 import { getSiteContent } from "../site";
 
 /** Code staff send as "/staff CODE" to receive reception alerts. Stored in the Telegram integration config. */
@@ -69,7 +70,9 @@ export function botDeps(): BotDeps {
       return slots.map((s) => ({ time: s.time }));
     },
     async book({ chatId, ...i }) {
-      return createGuestBooking({ ...i, source: "TELEGRAM", telegramChatId: chatId });
+      const res = await createGuestBooking({ ...i, source: "TELEGRAM", telegramChatId: chatId });
+      if (!res.ok || !res.payment) return res;
+      return { ...res, deposit: { amount: res.payment.amount, payBy: res.payment.payBy, url: `${siteUrl()}${localePath(i.lang, `/oplata/${res.payment.id}`)}` } };
     },
     upcoming: upcomingForGuest,
     cancel: cancelByGuest,

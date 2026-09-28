@@ -6,10 +6,12 @@ import { useFx } from "@/components/fx/FxProvider";
 import { clock, somoni } from "@/lib/format";
 import { paymentMethod } from "@/lib/labels";
 import type { PosData } from "@/server/pos";
-import { paySale, type PayInput } from "./actions";
+import { settle } from "@/lib/money";
+import { checkGift, paySale, type PayInput } from "./actions";
 import s from "./pos.module.css";
 
-type Line = { key: string; serviceId: string; name: string; price: number; appointmentId?: string };
+type Line = { key: string; serviceId: string; name: string; price: number; appointmentId?: string; depositPaid?: number };
+type Gift = { code: string; balance: number; recipientName: string };
 type Who = { guestId: string | null; guestName: string | null; staffId: string | null };
 
 const METHODS: { key: PayInput["method"]; cls: string }[] = [
@@ -27,12 +29,17 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
   const fromAppt = (id: string | undefined) => data.waiting.find((a) => a.id === id && a.serviceId);
   const first = fromAppt(initialAppt);
   const [lines, setLines] = useState<Line[]>(() =>
-    first ? [{ key: first.id, serviceId: first.serviceId!, name: first.service, price: first.price, appointmentId: first.id }] : [],
+    first ? [{ key: first.id, serviceId: first.serviceId!, name: first.service, price: first.price, appointmentId: first.id, depositPaid: first.depositPaid }] : [],
   );
   const [who, setWho] = useState<Who>(() => ({ guestId: first?.guestId ?? null, guestName: first?.guestName ?? null, staffId: first?.staffId ?? null }));
   const [paying, setPaying] = useState(false);
+  const [gift, setGift] = useState<Gift | null>(null);
+  const [giftInput, setGiftInput] = useState("");
+  const [giftError, setGiftError] = useState("");
+  const [checking, setChecking] = useState(false);
 
   const total = lines.reduce((sum, l) => sum + l.price, 0);
+  const split = settle(total, lines.reduce((sum, l) => sum + (l.depositPaid ?? 0), 0), gift?.balance ?? 0, gift?.balance ?? 0);
   const inCheck = new Set(lines.map((l) => l.appointmentId).filter(Boolean));
 
   function addService(id: string, name: string, price: number) {
@@ -43,13 +50,26 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
   function addAppointment(id: string) {
     const a = fromAppt(id);
     if (!a || inCheck.has(a.id)) return;
-    setLines((ls) => [...ls, { key: a.id, serviceId: a.serviceId!, name: a.service, price: a.price, appointmentId: a.id }]);
+    setLines((ls) => [...ls, { key: a.id, serviceId: a.serviceId!, name: a.service, price: a.price, appointmentId: a.id, depositPaid: a.depositPaid }]);
     setWho((w) => ({ guestId: w.guestId ?? a.guestId, guestName: w.guestName ?? a.guestName, staffId: w.staffId ?? a.staffId }));
   }
 
   function clear() {
     setLines([]);
     setWho({ guestId: null, guestName: null, staffId: null });
+    setGift(null);
+    setGiftInput("");
+    setGiftError("");
+  }
+
+  async function applyGift() {
+    setGiftError("");
+    setChecking(true);
+    const res = await checkGift(giftInput);
+    setChecking(false);
+    if (!res.ok) return setGiftError(res.error);
+    setGift({ code: res.code, balance: res.balance, recipientName: res.recipientName });
+    fx.toast(`Сертификат ${res.code}: доступно ${somoni(res.balance)}`, "Касса");
   }
 
   async function pay(method: PayInput["method"], button: HTMLElement) {
@@ -67,6 +87,8 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
           method,
           guestId: who.guestId,
           staffId: who.staffId,
+          giftCode: gift?.code ?? null,
+          giftAmount: split.gift,
           lines: lines.map((l) => ({ serviceId: l.serviceId, appointmentId: l.appointmentId ?? null })),
         }),
         new Promise((r) => setTimeout(r, 1700)),
@@ -129,6 +151,7 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
               <span className={s.lineName}>
                 {l.name}
                 {l.appointmentId && <small> · по записи</small>}
+                {!!l.depositPaid && <small className={s.deposit}>предоплата онлайн {somoni(l.depositPaid)}</small>}
               </span>
               <span className={s.lineRight}>
                 <span className={s.linePrice}>{somoni(l.price)}</span>
@@ -151,9 +174,61 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
           )}
         </div>
 
+        <div className={s.gift}>
+          {gift ? (
+            <div className={s.giftApplied}>
+              <span>
+                Сертификат {gift.code} · {gift.recipientName}
+                <small>на сертификате {somoni(gift.balance)}</small>
+              </span>
+              <button type="button" className={s.remove} aria-label="Убрать сертификат" onClick={() => setGift(null)}>
+                ×
+              </button>
+            </div>
+          ) : (
+            <form
+              className={s.giftForm}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (giftInput.trim()) void applyGift();
+              }}
+            >
+              <input aria-label="Код сертификата" placeholder="Сертификат MJ-…" value={giftInput} onChange={(e) => setGiftInput(e.target.value)} />
+              <button type="submit" disabled={checking || !giftInput.trim()}>
+                {checking ? "…" : "Применить"}
+              </button>
+            </form>
+          )}
+          {giftError && (
+            <div role="alert" className={s.giftError}>
+              {giftError}
+            </div>
+          )}
+        </div>
+
+        {(split.deposit > 0 || split.gift > 0) && (
+          <div className={s.breakdown}>
+            <div>
+              <span>Услуги</span>
+              <span>{somoni(total)}</span>
+            </div>
+            {split.deposit > 0 && (
+              <div>
+                <span>Предоплата онлайн</span>
+                <span>−{somoni(split.deposit)}</span>
+              </div>
+            )}
+            {split.gift > 0 && (
+              <div>
+                <span>Сертификат</span>
+                <span>−{somoni(split.gift)}</span>
+              </div>
+            )}
+          </div>
+        )}
         <div className={s.total}>
-          <span className={s.totalLabel}>Итого</span>
-          <span className={s.totalValue}>{somoni(total)}</span>
+          <span className={s.totalLabel}>{split.deposit || split.gift ? "К оплате" : "Итого"}</span>
+          <span className={s.totalValue}>{somoni(split.paid)}</span>
         </div>
         <div className={s.pay}>
           {METHODS.map((m) => (
@@ -213,7 +288,9 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
               <span className={s.receiptMain}>
                 {r.items.join(", ")}
                 <small>
-                  {clock(r.createdAt)} · {paymentMethod[r.method]}
+                  {clock(r.createdAt)} · {r.paid ? paymentMethod[r.method] : "без доплаты"}
+                  {r.depositAmount ? ` · предоплата ${somoni(r.depositAmount)}` : ""}
+                  {r.giftCardAmount ? ` · сертификат ${somoni(r.giftCardAmount)}` : ""}
                   {r.guest ? ` · ${r.guest}` : ""}
                   {r.staff ? ` · ${r.staff}` : ""}
                 </small>

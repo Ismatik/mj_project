@@ -16,14 +16,23 @@ export function BotSimulator() {
   const list = useRef<HTMLDivElement>(null);
   const started = useRef(false);
 
-  const send = (input: { text?: string; data?: string; contactPhone?: string }, shown: string) =>
+  const send = (
+    input: { text?: string; data?: string; contactPhone?: string },
+    shown: string,
+  ) =>
     start(async () => {
       setMsgs((m) => [...m, { from: "me", text: shown }]);
       try {
         const replies = await simulate(input);
-        setMsgs((m) => [...m, ...replies.map((reply) => ({ from: "bot" as const, reply }))]);
+        setMsgs((m) => [
+          ...m,
+          ...replies.map((reply) => ({ from: "bot" as const, reply })),
+        ]);
       } catch {
-        setMsgs((m) => [...m, { from: "bot", reply: { text: "⚠ Не удалось связаться с сервером" } }]);
+        setMsgs((m) => [
+          ...m,
+          { from: "bot", reply: { text: "⚠ Не удалось связаться с сервером" } },
+        ]);
       }
     });
 
@@ -34,10 +43,15 @@ export function BotSimulator() {
   });
 
   useEffect(() => {
-    list.current?.scrollTo({ top: list.current.scrollHeight, behavior: "smooth" });
+    list.current?.scrollTo({
+      top: list.current.scrollHeight,
+      behavior: "smooth",
+    });
   }, [msgs]);
 
-  const lastBot = [...msgs].reverse().find((m) => m.from === "bot") as { reply: BotReply } | undefined;
+  const lastBot = [...msgs].reverse().find((m) => m.from === "bot") as
+    | { reply: BotReply }
+    | undefined;
   const askContact = !!lastBot?.reply.askContact;
 
   return (
@@ -48,7 +62,9 @@ export function BotSimulator() {
         </span>
         <div>
           <div className={s.botName}>Mavzunai Jovid</div>
-          <div className={s.botSub}>{pending ? "печатает…" : "бот · симулятор"}</div>
+          <div className={s.botSub}>
+            {pending ? "печатает…" : "бот · симулятор"}
+          </div>
         </div>
         <button
           type="button"
@@ -59,7 +75,10 @@ export function BotSimulator() {
               await resetSimulator();
               setMsgs([]);
               const replies = await simulate({ text: "/start" });
-              setMsgs([{ from: "me", text: "/start" }, ...replies.map((reply) => ({ from: "bot" as const, reply }))]);
+              setMsgs([
+                { from: "me", text: "/start" },
+                ...replies.map((reply) => ({ from: "bot" as const, reply })),
+              ]);
             })
           }
         >
@@ -80,11 +99,30 @@ export function BotSimulator() {
                 <div className={s.keyboard}>
                   {m.reply.buttons.map((row, r) => (
                     <div key={r} className={s.kbRow}>
-                      {row.map((b) => (
-                        <button key={b.data + b.text} type="button" data-cb={b.data} disabled={pending} onClick={() => send({ data: b.data }, b.text)}>
-                          {b.text}
-                        </button>
-                      ))}
+                      {row.map((b) =>
+                        b.url ? (
+                          // Link buttons open the page (on this server, whatever the configured domain)
+                          <a
+                            key={b.url}
+                            href={new URL(b.url).pathname}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-url={b.url}
+                          >
+                            {b.text}
+                          </a>
+                        ) : (
+                          <button
+                            key={b.data + b.text}
+                            type="button"
+                            data-cb={b.data}
+                            disabled={pending}
+                            onClick={() => send({ data: b.data }, b.text)}
+                          >
+                            {b.text}
+                          </button>
+                        ),
+                      )}
                     </div>
                   ))}
                 </div>
@@ -96,8 +134,16 @@ export function BotSimulator() {
 
       {askContact && (
         <div className={s.contact}>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} aria-label="Номер, которым поделиться" />
-          <button type="button" disabled={pending} onClick={() => send({ contactPhone: phone }, `📱 ${phone}`)}>
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            aria-label="Номер, которым поделиться"
+          />
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => send({ contactPhone: phone }, `📱 ${phone}`)}
+          >
             {lastBot?.reply.contactLabel ?? "📱 Поделиться номером"}
           </button>
         </div>
@@ -112,7 +158,12 @@ export function BotSimulator() {
           send({ text: t }, t);
         }}
       >
-        <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Сообщение" aria-label="Сообщение боту" />
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Сообщение"
+          aria-label="Сообщение боту"
+        />
         <button type="submit" disabled={pending || !text.trim()}>
           ➤
         </button>

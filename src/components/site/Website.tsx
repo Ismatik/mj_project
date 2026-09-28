@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Brush, Crown, Droplet, Eye, Hand, Scissors, Sparkles, type LucideIcon } from "lucide-react";
 import { dict } from "@/lib/i18n/dict";
+import { moneyDict } from "@/lib/i18n/dict-money";
 import { duration, somoni } from "@/lib/i18n/format";
 import { localePath, type Lang } from "@/lib/i18n/locales";
 import { whatsappLink, type SiteContent } from "@/lib/site-content";
@@ -51,6 +52,7 @@ export function Website({
   lang: Lang;
 }) {
   const t = dict(lang);
+  const mt = moneyDict(lang);
   const reviews = c.reviews.items.filter((r) => r.visible);
   const marquee = [...c.marquee, ...c.marquee];
 
@@ -261,6 +263,24 @@ export function Website({
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={s.giftPromo} aria-labelledby="gift-promo">
+        <div data-reveal className={s.giftPromoInner}>
+          <div className={s.giftCard} aria-hidden="true">
+            <span>MJ</span>
+            <small>{mt.gift.title}</small>
+          </div>
+          <div>
+            <h2 id="gift-promo" className={s.giftTitle}>
+              {mt.gift.homeTitle}
+            </h2>
+            <p className={s.giftText}>{mt.gift.homeText}</p>
+            <Link href={localePath(lang, "/podarok")} className={s.btnCream}>
+              {mt.gift.homeCta}
+            </Link>
           </div>
         </div>
       </section>

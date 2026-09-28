@@ -100,8 +100,11 @@
   display: flex;
   gap: 4px;
 }
-.kbRow button {
+.kbRow button,
+.kbRow a {
   flex: 1;
+  text-align: center;
+  text-decoration: none;
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--mj-line);
   padding: 8px 6px;
@@ -110,6 +113,7 @@
   color: var(--mj-ink);
   cursor: pointer;
 }
+.kbRow a:hover,
 .kbRow button:hover:not(:disabled) {
   background: var(--mj-white);
   border-color: var(--mj-gold);

@@ -351,3 +351,78 @@
     color: var(--mj-gold);
   }
 }
+
+/* Prepayments and gift certificates */
+.deposit {
+  display: block;
+  color: var(--mj-gold-deep);
+}
+.gift {
+  margin-top: 14px;
+}
+.giftForm {
+  display: flex;
+  gap: 6px;
+}
+.giftForm input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--mj-line);
+  background: var(--mj-paper);
+  padding: 9px 11px;
+  font-family: var(--mj-sans);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  outline: none;
+  border-radius: 0;
+}
+.giftForm input:focus {
+  border-color: var(--mj-ink);
+}
+.giftForm button {
+  border: 1px solid var(--mj-ink);
+  background: transparent;
+  padding: 0 14px;
+  font-family: var(--mj-sans);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.giftForm button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.giftApplied {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--mj-sand);
+  border-left: 2px solid var(--mj-gold);
+  font-size: 13px;
+}
+.giftApplied small {
+  display: block;
+  color: var(--mj-text-2);
+  font-size: 12px;
+}
+.giftError {
+  font-size: 12.5px;
+  color: #8c3a2b;
+  margin-top: 6px;
+}
+.breakdown {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--mj-text-2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.breakdown div {
+  display: flex;
+  justify-content: space-between;
+}

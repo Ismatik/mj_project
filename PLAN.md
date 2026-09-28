@@ -98,6 +98,12 @@ Start Meta Business verification during R1 so WhatsApp is ready for R2.
 
 ### R3 — Money (~3 weeks)
 
+| Sprint | Deliverables | Status |
+|---|---|---|
+| 1 | Payments with a test checkout, online prepayments that hold the booked time, gift certificates (website and till, PDF with QR, balance page, paying at the till in parts); WhatsApp templates submitted to Meta from the CMS | done |
+| 2 | Bonus program (earn, spend, tiers, birthday gift), promotions and promo codes (site, bot, booking, till) | |
+| 3 | Master payroll and commissions, end-of-day shift close, Excel and PDF reports | |
+
 - Bonus program.
 - Gift certificates (QR + PDF).
 - Promotions and promo codes.

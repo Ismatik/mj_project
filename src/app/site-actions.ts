@@ -7,7 +7,7 @@ import { formatPhone, normalizePhone } from "@/lib/phone";
 import { BOOKING_HORIZON_DAYS } from "@/lib/slots";
 import { addDays, isClosed, todayYmd } from "@/lib/time";
 import { dict } from "@/lib/i18n/dict";
-import { LANG_NAME, type Lang } from "@/lib/i18n/locales";
+import { LANG_NAME, localePath, type Lang } from "@/lib/i18n/locales";
 import { getCurrentGuest } from "@/server/guest-auth";
 import { getLang } from "@/server/lang";
 import { createGuestBooking, slotsFor } from "@/server/online-booking";
@@ -39,7 +39,7 @@ export async function getSlots(serviceId: string, date: string, staffId?: string
 
 export type OnlineBookingInput = { serviceId: string; staffId?: string | null; date: string; time: string; name: string; phone: string; company?: string };
 export type OnlineBookingResult =
-  | { ok: true; summary: { name: string; service: string; master: string; when: string; phone: string } }
+  | { ok: true; summary: { name: string; service: string; master: string; when: string; phone: string }; payment?: { amount: number; payBy: string; url: string } }
   | { ok: false; field?: "name" | "phone" | "slot"; error: string };
 
 /**
@@ -72,7 +72,12 @@ export async function bookOnline(input: OnlineBookingInput): Promise<OnlineBooki
     revalidatePath("/cms", "layout");
     if (guestId) revalidatePath("/kabinet");
   }
-  return result.ok ? result : { ok: false, field: "slot", error: result.error };
+  if (!result.ok) return { ok: false, field: "slot", error: result.error };
+  return {
+    ok: true,
+    summary: result.summary,
+    ...(result.payment ? { payment: { amount: result.payment.amount, payBy: result.payment.payBy, url: localePath(lang, `/oplata/${result.payment.id}`) } } : {}),
+  };
 }
 
 /** Public: "перезвоните мне" when no time suits. Goes to the CMS dashboard as a website request. */

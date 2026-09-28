@@ -65,6 +65,9 @@ export async function getAppointment(id: string, user: CurrentUser) {
     price: a.price,
     status: a.status,
     source: a.source,
+    depositRequired: a.depositRequired,
+    depositPaid: a.depositPaid,
+    holdUntil: a.holdUntil,
     note: a.note,
     ymd: todayYmd(a.startsAt),
   };

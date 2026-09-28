@@ -19,7 +19,11 @@ export async function getGuestAccount(guestId: string, lang: Lang = "ru") {
       telegramChats: { where: { isStaff: false, NOT: { id: { startsWith: "sim-" } } }, select: { id: true }, take: 1 },
     },
   });
-  const include = { staff: { include: { staff: { select: { id: true, name: true } } } }, service: { select: { id: true, active: true, showOnSite: true } } } as const;
+  const include = {
+    staff: { include: { staff: { select: { id: true, name: true } } } },
+    service: { select: { id: true, active: true, showOnSite: true } },
+    payments: { where: { status: "PENDING", purpose: "DEPOSIT" }, select: { id: true, amount: true }, take: 1 },
+  } as const;
   const [upcoming, past] = await Promise.all([
     db.appointment.findMany({ where: { guestId, startsAt: { gte: now }, status: { in: ["PENDING", "CONFIRMED"] } }, orderBy: { startsAt: "asc" }, include }),
     db.appointment.findMany({ where: { guestId, startsAt: { lt: now }, status: { in: ["DONE", "IN_CHAIR"] } }, orderBy: { startsAt: "desc" }, take: 20, include }),
@@ -33,6 +37,9 @@ export async function getGuestAccount(guestId: string, lang: Lang = "ru") {
     status: a.status,
     masters: a.staff.map((s) => ({ id: s.staff.id, name: name("staff", s.staff.id, s.staff.name) })),
     /** Service can be booked again online with the same master */
+    depositPaid: a.depositPaid,
+    /** Prepayment still to make online (the time is held until then) */
+    pay: a.payments[0] ?? null,
     rebook: a.service?.active && a.service.showOnSite ? { serviceId: a.service.id, staffId: a.staff[0]?.staffId ?? null } : null,
   });
   // Masters she has visited, most frequent first — candidates for "favourite"

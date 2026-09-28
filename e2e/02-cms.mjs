@@ -60,7 +60,7 @@ try {
   await p.waitForURL(/pos\?appt=/);
   await p.waitForSelector('text=по записи'); check('booking loaded into the check', true);
   await p.click('button:has-text("Наличные")');
-  await p.waitForSelector('text=/Оплата 950 c. принята/', { timeout: 10000 });
+  await p.waitForSelector('text=/Оплата 660 c. принята · Наличные/', { timeout: 10000 }); // 290 c. of 950 c. was prepaid online
   await p.goto(BASE + '/cms');
   await p.waitForTimeout(800);
   const leilaTag = await p.locator('a:has-text("Лейла Х.")').textContent();

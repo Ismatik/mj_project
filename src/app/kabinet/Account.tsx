@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { dict } from "@/lib/i18n/dict";
+import { moneyDict } from "@/lib/i18n/dict-money";
 import { MONTHS, somoni, WEEKDAYS } from "@/lib/i18n/format";
 import { LANG_NAME, LANGS, localePath, type Lang } from "@/lib/i18n/locales";
 import { weekdayOf } from "@/lib/time";
@@ -115,6 +116,7 @@ export function Account({ account, dates, masters, botLink, lang }: { account: G
 
 function Upcoming({ a, dates, lang }: { a: GuestAccount["upcoming"][number]; dates: string[]; lang: Lang }) {
   const t = dict(lang).account;
+  const m = moneyDict(lang).pay;
   const fx = useFx();
   const router = useRouter();
   const [mode, setMode] = useState<"view" | "move" | "cancel">("view");
@@ -163,7 +165,13 @@ function Upcoming({ a, dates, lang }: { a: GuestAccount["upcoming"][number]; dat
         <div className={s.itemMeta}>
           {a.masters.map((m) => m.name).join(" + ")} · {somoni(a.price, lang)}
         </div>
-        <span className={`${s.status} ${a.status === "CONFIRMED" ? s.statusOk : ""}`}>{t.status[a.status]}</span>
+        <span className={`${s.status} ${a.status === "CONFIRMED" ? s.statusOk : ""}`}>{a.pay ? m.awaiting(somoni(a.pay.amount, lang)) : t.status[a.status]}</span>
+        {a.pay && (
+          <Link href={localePath(lang, `/oplata/${a.pay.id}`)} className={s.payBtn}>
+            {m.payDeposit(somoni(a.pay.amount, lang))}
+          </Link>
+        )}
+        {!a.pay && a.depositPaid > 0 && <span className={s.hint}>{m.depositPaid(somoni(a.depositPaid, lang))}</span>}
 
         {mode === "view" &&
           (a.canChange ? (

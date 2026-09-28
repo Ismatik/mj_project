@@ -1,7 +1,8 @@
 import "server-only";
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
-import { clock, longDate } from "@/lib/format";
+import { clock, longDate, somoni } from "@/lib/format";
+import { DEPOSIT_HOLD_MIN, depositFor } from "@/lib/money";
 import { formatPhone } from "@/lib/phone";
 import { freeSlots, type BusyInterval } from "@/lib/slots";
 import { nameIn } from "@/lib/i18n/content";
@@ -91,7 +92,13 @@ export async function slotsFor(serviceId: string, date: Ymd, staffId: string | n
 
 export type BookingSourceKind = "WEBSITE" | "TELEGRAM";
 export type GuestBookingResult =
-  | { ok: true; appointmentId: string; summary: { name: string; service: string; master: string; when: string; phone: string } }
+  | {
+      ok: true;
+      appointmentId: string;
+      summary: { name: string; service: string; master: string; when: string; phone: string };
+      /** Prepayment to make online before the time is confirmed */
+      payment?: { id: string; amount: number; payBy: string };
+    }
   | { ok: false; error: string };
 
 const lockDate = (tx: Prisma.TransactionClient, date: Ymd) =>
@@ -138,8 +145,13 @@ export async function createGuestBooking(input: {
         : found
       : await tx.guest.create({ data: { name: input.name, phone: input.phone, tag: "NEW", lang } });
     const startsAt = atSalonTime(input.date, input.time);
+    // Services with a prepayment (weddings, long looks) hold the time until it is paid online
+    const deposit = depositFor(service.price, service.depositPercent);
+    const holdUntil = deposit ? new Date(Date.now() + DEPOSIT_HOLD_MIN * 60_000) : null;
     const appt = await tx.appointment.create({
       data: {
+        depositRequired: deposit,
+        holdUntil,
         guestId: guest.id,
         guestName: shortName(guest.name),
         serviceId: service.id,
@@ -160,19 +172,33 @@ export async function createGuestBooking(input: {
       {
         channel: "telegram",
         to: "reception",
-        body: `Онлайн-запись с ${via}: ${guest.name}, ${formatPhone(guest.phone)} — ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}.${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`} Подтвердите в календаре.`,
+        body: `Онлайн-запись с ${via}: ${guest.name}, ${formatPhone(guest.phone)} — ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}.${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}${deposit ? ` Ждёт предоплату ${somoni(deposit)} до ${clock(holdUntil!)}.` : " Подтвердите в календаре."}`,
         meta: { kind: "online-booking", appointmentId: appt.id },
       },
     ];
-    // Website bookings get a confirmation message; in Telegram the bot confirms in the chat itself.
-    if (input.source === "WEBSITE") {
+    // Website bookings get a confirmation message (after the prepayment, if any); in Telegram the bot confirms in the chat itself.
+    if (input.source === "WEBSITE" && !deposit) {
       messages.push(await guestMessage(tx, ctx, { guest, kind: "booking-confirmation", vars: varsIn, meta: { appointmentId: appt.id } }));
     }
     await tx.outboxMessage.createMany({ data: messages });
     if (input.telegramChatId) await tx.telegramChat.update({ where: { id: input.telegramChatId }, data: { guestId: guest.id } });
+    const payment = deposit
+      ? await tx.payment.create({
+          data: {
+            purpose: "DEPOSIT",
+            amount: deposit,
+            description: `Предоплата: ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}`,
+            appointmentId: appt.id,
+            lang,
+            returnPath: "/kabinet",
+            expiresAt: holdUntil!,
+          },
+        })
+      : null;
     return {
       ok: true as const,
       appointmentId: appt.id,
+      ...(payment ? { payment: { id: payment.id, amount: payment.amount, payBy: clock(holdUntil!) } } : {}),
       summary: { name: input.name, service: vars.service!, master: vars.master!, when: vars.when!, phone: formatPhone(guest.phone) },
     };
   });
@@ -207,12 +233,13 @@ export async function cancelByGuest(appointmentId: string, guestId: string, lang
   if (!a || !["PENDING", "CONFIRMED"].includes(a.status)) return { ok: false, error: e.notFound };
   if (a.startsAt.getTime() - Date.now() < 2 * 3600_000) return { ok: false, error: e.tooLate };
   await db.$transaction([
-    db.appointment.update({ where: { id: a.id }, data: { status: "CANCELLED" } }),
+    db.appointment.update({ where: { id: a.id }, data: { status: "CANCELLED", holdUntil: null } }),
+    db.payment.updateMany({ where: { appointmentId: a.id, status: "PENDING" }, data: { status: "CANCELLED" } }),
     db.outboxMessage.create({
       data: {
         channel: "telegram",
         to: "reception",
-        body: `Гостья отменила запись: ${a.guest?.name ?? a.guestName} — ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}.`,
+        body: `Гостья отменила запись: ${a.guest?.name ?? a.guestName} — ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}.${a.depositPaid ? ` Внесена предоплата ${somoni(a.depositPaid)} — решите с гостьей возврат или перенос.` : ""}`,
         meta: { kind: "guest-cancel", appointmentId: a.id },
       },
     }),
