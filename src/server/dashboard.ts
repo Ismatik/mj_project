@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
-import { addDays, atSalonTime, todayYmd, type Ymd } from "@/lib/time";
+import { addDays, atSalonTime, mondayOf, todayYmd, type Ymd } from "@/lib/time";
 import { changeLabel, dayRange, monthName, monthToDate, previousMonthDative, previousMonthToDate } from "./ranges";
 
 /** Daily revenue for `days` days ending on `today` (oldest first). */
@@ -38,6 +38,57 @@ export async function categoryShares(today: Ymd, days = 30) {
   return [...byCategory.values()]
     .sort((a, b) => b.amount - a.amount)
     .map((c) => ({ ...c, share: total ? c.amount / total : 0 }));
+}
+
+const sum = (span: { gte: Date; lt: Date }) => db.sale.aggregate({ where: { createdAt: span }, _sum: { total: true } });
+const span = (from: Ymd, toIncl: Ymd) => ({ gte: atSalonTime(from), lt: atSalonTime(addDays(toIncl, 1)) });
+
+/**
+ * Money and week-on-week figures for "Мой салон сегодня". Owner only — reception
+ * sees the operational half of the dashboard but not the revenue breakdown.
+ */
+export async function getDashboardMoney(today: Ymd = todayYmd()) {
+  const weekFrom = mondayOf(today);
+  const prevWeekFrom = addDays(weekFrom, -7);
+  const [sales, sameDayLastWeek, thisWeek, prevWeek, monthByDay] = await Promise.all([
+    db.sale.findMany({
+      where: { createdAt: dayRange(today) },
+      select: { total: true, paid: true, method: true, depositAmount: true, giftCardAmount: true, bonusAmount: true },
+    }),
+    sum(dayRange(addDays(today, -7))),
+    sum(span(weekFrom, today)),
+    // same weekday span a week earlier, so a half-finished week compares fairly
+    sum(span(prevWeekFrom, addDays(today, -7))),
+    db.sale.findMany({ where: { createdAt: monthToDate(today) }, select: { total: true, createdAt: true } }),
+  ]);
+
+  const add = (f: (s: (typeof sales)[number]) => number) => sales.reduce((a, s) => a + f(s), 0);
+  const byMethod = { CASH: 0, CARD: 0, QR: 0 };
+  for (const s of sales) byMethod[s.method] += s.paid;
+
+  const revenue = add((s) => s.total);
+  // "средний рабочий день" — Mondays are the day off, so count only days that had receipts
+  const daysWithSales = new Set(monthByDay.map((s) => todayYmd(s.createdAt))).size;
+  const monthRevenue = monthByDay.reduce((a, s) => a + s.total, 0);
+
+  const weekNow = thisWeek._sum.total ?? 0;
+  const weekBefore = prevWeek._sum.total ?? 0;
+  const dayBefore = sameDayLastWeek._sum.total ?? 0;
+
+  return {
+    byMethod,
+    avgCheck: sales.length ? Math.round(revenue / sales.length) : 0,
+    receipts: sales.length,
+    deposits: add((s) => s.depositAmount),
+    giftCards: add((s) => s.giftCardAmount),
+    bonus: add((s) => s.bonusAmount),
+    sameDayLastWeek: dayBefore,
+    sameDayChange: changeLabel(revenue, dayBefore),
+    weekRevenue: weekNow,
+    weekChange: changeLabel(weekNow, weekBefore),
+    avgWorkingDay: daysWithSales ? Math.round(monthRevenue / daysWithSales) : 0,
+    daysWithSales,
+  };
 }
 
 /** Everything "Мой салон сегодня" shows, computed from real records. */
