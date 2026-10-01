@@ -209,3 +209,13 @@
   font-weight: 400;
   text-align: center;
 }
+
+/* Touch targets on a phone: the tag filters and the ghost button need 44px. */
+@media (max-width: 760px) {
+  .tags a,
+  .ghost {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}

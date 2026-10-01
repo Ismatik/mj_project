@@ -518,6 +518,22 @@
   .signIn {
     padding: 44px 16px 64px;
   }
+  /* Guests manage their bookings here from a phone — give the controls a thumb. */
+  .primary,
+  .primarySmall,
+  .ghostSmall,
+  .dangerSmall,
+  .payBtn,
+  .chip,
+  .linkBtn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .small {
+    font-size: 13.5px;
+  }
 }
 .chip[aria-pressed="true"] {
   background: var(--mj-ink);

@@ -89,7 +89,9 @@
 }
 .two {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0,…): a <select> contributes its longest <option> as min-content, and a
+     plain 1fr track grows to fit it, which tore /cms/bridal 200px wide at 360px */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
 }
 .inline {
@@ -212,6 +214,17 @@
 }
 .scroll {
   overflow-x: auto;
+}
+@media (max-width: 760px) {
+  /* Squeezed into 328px every cell wraps to four lines; scroll the table instead. */
+  .scroll .table {
+    min-width: 640px;
+  }
+  /* …and keep the name column readable rather than letting the action buttons eat it */
+  .scroll .table td:first-child,
+  .scroll .table th:first-child {
+    min-width: 150px;
+  }
 }
 .money {
   font-family: var(--mj-serif);
@@ -344,9 +357,51 @@
 }
 @media (max-width: 1100px) {
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .detailGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  /* Dense money screens on a phone: no sideways tear, 16px fields, thumb-sized controls. */
+  .panel {
+    padding: 18px 16px;
+  }
+  .two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .form input,
+  .form select,
+  .form textarea {
+    font-size: 16px;
+    padding: 11px 12px;
+  }
+  .inline input,
+  .inline select,
+  .period input {
+    font-size: 16px;
+    padding: 9px 10px;
+  }
+  .inline button,
+  .small,
+  .toggle button,
+  .download,
+  .presets a,
+  .period input {
+    min-height: 44px;
+  }
+  .download {
+    justify-content: center;
+  }
+  .presets a {
+    display: inline-flex;
+    align-items: center;
+  }
+  .linkBtn,
+  .monthNav a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 }

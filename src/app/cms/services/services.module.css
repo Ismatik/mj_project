@@ -176,3 +176,13 @@
   font-size: 13px;
   text-align: right;
 }
+
+@media (max-width: 600px) {
+  .editorGrid input {
+    font-size: 16px;
+  }
+  .add,
+  .edit {
+    min-height: 44px;
+  }
+}

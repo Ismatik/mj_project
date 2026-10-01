@@ -205,3 +205,15 @@
     height: 620px;
   }
 }
+
+@media (max-width: 600px) {
+  .contact input,
+  .input input {
+    font-size: 16px;
+  }
+  .reset,
+  .kbRow button,
+  .kbRow a {
+    min-height: 44px;
+  }
+}

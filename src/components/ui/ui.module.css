@@ -321,7 +321,8 @@
   margin-bottom: 7px;
 }
 .fieldHint {
-  color: var(--mj-text-muted);
+  /* --mj-text-muted is 1.8:1 on cream — unreadable for a hint that carries meaning */
+  color: var(--mj-text-2);
   letter-spacing: 0.1em;
   text-transform: none;
 }
@@ -351,4 +352,26 @@
 textarea.input {
   resize: vertical;
   line-height: 1.6;
+}
+
+/* ── Touch targets and phone keyboards ───────────────── */
+/* Anything under 16px makes iOS Safari zoom the page on focus, and a 27px button
+   is hard to hit on a phone. Desktop sizing is untouched. */
+@media (max-width: 600px) {
+  .input {
+    font-size: 16px;
+    padding: 12px 14px;
+  }
+  .btn {
+    min-height: 44px;
+  }
+  .sm {
+    padding: 10px 14px;
+    font-size: 10.5px;
+  }
+  .sectionAction {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }

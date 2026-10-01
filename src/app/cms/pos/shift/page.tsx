@@ -135,21 +135,23 @@ export default async function ShiftPage({ searchParams }: PageProps<"/cms/pos/sh
             <SectionHead title={<span id="moves">Внесения и изъятия</span>} />
             {d.movements.length === 0 && <p className={s.muted}>Сегодня наличные не вносили и не изымали.</p>}
             {d.movements.length > 0 && (
-              <table className={s.table}>
-                <tbody>
-                  {d.movements.map((m) => (
-                    <tr key={m.id}>
-                      <td>{m.at}</td>
-                      <td>
-                        {m.note}
-                        {m.by && <small>{m.by}</small>}
-                      </td>
-                      <td className={`${s.num} ${s.money}`}>{signed(m.amount)}</td>
-                      <td className={s.num}>{!z && !m.payout && <RemoveMovement id={m.id} />}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={s.scroll}>
+                <table className={s.table}>
+                  <tbody>
+                    {d.movements.map((m) => (
+                      <tr key={m.id}>
+                        <td>{m.at}</td>
+                        <td>
+                          {m.note}
+                          {m.by && <small>{m.by}</small>}
+                        </td>
+                        <td className={`${s.num} ${s.money}`}>{signed(m.amount)}</td>
+                        <td className={s.num}>{!z && !m.payout && <RemoveMovement id={m.id} />}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
             {!z && (
               <div style={{ marginTop: 14 }}>

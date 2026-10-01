@@ -62,7 +62,7 @@
 .bookings button {
   background: none;
   border: none;
-  color: var(--mj-text-muted);
+  color: var(--mj-text-2);
   cursor: pointer;
   font-size: 15px;
   line-height: 1;
@@ -132,4 +132,18 @@
   font-size: 12px;
   color: #a3533f;
   margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  .form input {
+    font-size: 16px;
+  }
+  .bookings button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .actions button,
+  .form button {
+    min-height: 44px;
+  }
 }

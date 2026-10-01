@@ -51,7 +51,7 @@
   font-size: 10px;
   padding: 5px 0;
   border: 1px solid var(--mj-line);
-  color: var(--mj-text-muted);
+  color: var(--mj-text-2);
   transition:
     background 0.2s,
     color 0.2s;
@@ -99,4 +99,14 @@
   font-family: var(--mj-serif);
   font-weight: 600;
   color: var(--mj-ink);
+}
+
+/* The weekday toggles are 31×27 on a phone — too small to set a schedule with. */
+@media (max-width: 600px) {
+  .dayBtn {
+    min-height: 44px;
+  }
+  .day {
+    padding: 13px 0;
+  }
 }

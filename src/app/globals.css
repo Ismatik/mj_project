@@ -15,7 +15,8 @@
   /* Gold */
   --mj-gold: #b8a06a;
   --mj-gold-hover: #a68d55;
-  --mj-gold-deep: #8f7a4b; /* small text in gold */
+  --mj-gold-deep: #786538; /* small text in gold — 4.5:1 on cream/paper/sand (WCAG AA) */
+  --mj-gold-line: #8f7a4b; /* gold for borders and the focus ring — 3:1 on cream AND on ink */
 
   /* Text & lines */
   --mj-text: #26221d;
@@ -74,8 +75,10 @@ textarea::placeholder {
   color: var(--mj-gold-deep);
 }
 
+/* --mj-gold is only 2.2:1 on cream — too faint to be a focus indicator (WCAG 1.4.11
+   wants 3:1). --mj-gold-line clears 3:1 on every ground in the palette, light and ink. */
 :focus-visible {
-  outline: 2px solid var(--mj-gold);
+  outline: 2px solid var(--mj-gold-line);
   outline-offset: 2px;
 }
 

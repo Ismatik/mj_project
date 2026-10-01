@@ -205,3 +205,14 @@
   color: var(--mj-ink);
   font-weight: 600;
 }
+
+@media (max-width: 600px) {
+  .linkBtn,
+  .seg button,
+  .filters a,
+  .switch {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}

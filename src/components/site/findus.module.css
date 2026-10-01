@@ -149,3 +149,12 @@
     border: none;
   }
 }
+
+@media (max-width: 760px) {
+  .primary,
+  .ghost {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}

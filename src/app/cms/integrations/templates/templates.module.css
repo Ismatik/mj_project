@@ -138,6 +138,15 @@
 .wa code {
   font-size: 12.5px;
 }
+/* The Meta template table is four wide columns; let it scroll inside the page. */
+.scroll {
+  overflow-x: auto;
+}
+@media (max-width: 760px) {
+  .scroll table {
+    min-width: 560px;
+  }
+}
 @media (max-width: 1100px) {
   .langs {
     grid-template-columns: 1fr;
@@ -180,4 +189,15 @@
 .stDISABLED {
   background: #8c3a2b;
   color: var(--mj-cream);
+}
+
+@media (max-width: 600px) {
+  .field textarea {
+    font-size: 16px;
+  }
+  .back a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }

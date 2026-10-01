@@ -45,36 +45,38 @@ export default async function StockPage({ searchParams }: PageProps<"/cms/stock"
           }
         />
         {items.length === 0 && <p className={s.muted}>{onlyLow ? "Всего хватает." : "Склад пуст — добавьте первую позицию."}</p>}
-        <table className={s.table}>
-          <tbody>
-            {items.map((i) => (
-              <tr key={i.id} data-item={i.name} style={i.active ? undefined : { opacity: 0.5 }}>
-                <td>
-                  <b>{i.name}</b>
-                  <small>
-                    {i.category}
-                    {i.supplier ? ` · ${i.supplier}` : ""}
-                    {i.usedBy.length ? ` · ${i.usedBy.join(", ")}` : ""}
-                  </small>
-                </td>
-                <td className={s.num}>
-                  <span className={s.money} data-testid="qty">
-                    {qty(i.quantity, i.unit)}
-                  </span>
-                  <small>
-                    {inPacks(i.quantity, i.packSize, i.unit)} · мин. {qty(i.minQuantity, i.unit)}
-                  </small>
-                </td>
-                <td>
-                  {i.status === "out" ? <Tag tone="chair">Нет</Tag> : i.status === "low" ? <Tag tone="pending">Мало</Tag> : <Tag tone="confirmed">Есть</Tag>}
-                </td>
-                <td style={{ width: 330 }}>
-                  <ItemActions item={i} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className={s.scroll}>
+          <table className={s.table}>
+            <tbody>
+              {items.map((i) => (
+                <tr key={i.id} data-item={i.name} style={i.active ? undefined : { opacity: 0.5 }}>
+                  <td>
+                    <b>{i.name}</b>
+                    <small>
+                      {i.category}
+                      {i.supplier ? ` · ${i.supplier}` : ""}
+                      {i.usedBy.length ? ` · ${i.usedBy.join(", ")}` : ""}
+                    </small>
+                  </td>
+                  <td className={s.num}>
+                    <span className={s.money} data-testid="qty">
+                      {qty(i.quantity, i.unit)}
+                    </span>
+                    <small>
+                      {inPacks(i.quantity, i.packSize, i.unit)} · мин. {qty(i.minQuantity, i.unit)}
+                    </small>
+                  </td>
+                  <td>
+                    {i.status === "out" ? <Tag tone="chair">Нет</Tag> : i.status === "low" ? <Tag tone="pending">Мало</Tag> : <Tag tone="confirmed">Есть</Tag>}
+                  </td>
+                  <td style={{ width: 330 }}>
+                    <ItemActions item={i} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
       <div className={s.grid}>
         <div className={s.stack}>
@@ -100,28 +102,30 @@ export default async function StockPage({ searchParams }: PageProps<"/cms/stock"
             <SectionHead title={<span id="moves">Движение</span>} />
             {d.moves.length === 0 && <p className={s.muted}>Пока ничего не происходило.</p>}
             {d.moves.length > 0 && (
-              <table className={s.table}>
-                <tbody>
-                  {d.moves.map((m) => (
-                    <tr key={m.id}>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        {shortDate(m.at)}, {clock(m.at)}
-                      </td>
-                      <td>
-                        {m.item}
-                        <small>
-                          {KIND[m.kind]}
-                          {m.receipt ? ` · чек №${m.receipt}` : ""}
-                          {m.note ? ` · ${m.note}` : ""}
-                          {m.by ? ` · ${m.by}` : ""}
-                        </small>
-                      </td>
-                      <td className={`${s.num} ${m.delta < 0 ? s.diffMinus : s.diffPlus}`}>{m.delta > 0 ? `+${qty(m.delta, m.unit)}` : m.delta < 0 ? `−${qty(-m.delta, m.unit)}` : "±0"}</td>
-                      <td className={s.num}>{qty(m.balance, m.unit)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={s.scroll}>
+                <table className={s.table}>
+                  <tbody>
+                    {d.moves.map((m) => (
+                      <tr key={m.id}>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          {shortDate(m.at)}, {clock(m.at)}
+                        </td>
+                        <td>
+                          {m.item}
+                          <small>
+                            {KIND[m.kind]}
+                            {m.receipt ? ` · чек №${m.receipt}` : ""}
+                            {m.note ? ` · ${m.note}` : ""}
+                            {m.by ? ` · ${m.by}` : ""}
+                          </small>
+                        </td>
+                        <td className={`${s.num} ${m.delta < 0 ? s.diffMinus : s.diffPlus}`}>{m.delta > 0 ? `+${qty(m.delta, m.unit)}` : m.delta < 0 ? `−${qty(-m.delta, m.unit)}` : "±0"}</td>
+                        <td className={s.num}>{qty(m.balance, m.unit)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
         </div>

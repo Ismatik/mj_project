@@ -98,7 +98,8 @@
   font-weight: 500;
 }
 .userDate {
-  color: var(--mj-gold-deep);
+  /* on the ink sidebar: gold-deep is only 2.8:1 here, --mj-gold is 6.2:1 */
+  color: var(--mj-gold);
 }
 .userActions {
   display: flex;
@@ -256,10 +257,16 @@
     bottom: 0;
     z-index: 200;
     transform: translateX(-100%);
-    transition: transform 0.3s var(--mj-ease);
+    /* visibility:hidden takes the 17 off-screen nav links out of the tab order —
+       without it a keyboard user tabs through an invisible menu before the page */
+    visibility: hidden;
+    transition:
+      transform 0.3s var(--mj-ease),
+      visibility 0.3s;
   }
   .sidebarOpen {
     transform: none;
+    visibility: visible;
     box-shadow: var(--mj-shadow-lg);
   }
   .backdrop {
@@ -302,5 +309,26 @@
     right: 12px;
     top: 64px;
     min-width: 0;
+  }
+  /* Thumb targets and a search box iOS won't zoom into. */
+  .searchInput {
+    font-size: 16px;
+    padding: 12px 14px;
+  }
+  .burger {
+    width: 44px;
+    height: 44px;
+  }
+  .navItem {
+    padding: 12px 24px 12px 21px;
+  }
+  .logout {
+    min-height: 44px;
+  }
+  .userActions {
+    gap: 0;
+  }
+  .result {
+    padding: 12px 14px;
   }
 }

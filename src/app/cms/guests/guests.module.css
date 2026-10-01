@@ -547,3 +547,23 @@ a.row:hover,
     grid-template-columns: 1fr;
   }
 }
+
+/* Phones: 16px fields (iOS zooms below that) and thumb-sized controls. */
+@media (max-width: 600px) {
+  .find input,
+  .bonusAdjust input,
+  .miniForm input,
+  .miniForm select,
+  .miniForm textarea {
+    font-size: 16px;
+    padding: 11px 12px;
+  }
+  .filter,
+  .linkBtn,
+  .miniForm button,
+  .bonusAdjust button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}

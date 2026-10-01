@@ -30,7 +30,8 @@
 .topN {
   font-family: var(--mj-serif);
   font-weight: 600;
-  color: var(--mj-gold);
+  /* the rank is information: --mj-gold is only 2.2:1 on cream */
+  color: var(--mj-gold-deep);
   width: 18px;
 }
 .topName {

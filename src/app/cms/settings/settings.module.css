@@ -102,3 +102,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 600px) {
+  .reset input {
+    font-size: 16px;
+  }
+  .memberActions button,
+  .reset button {
+    min-height: 44px;
+  }
+}

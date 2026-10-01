@@ -37,35 +37,37 @@ export default async function TemplatesPage() {
         </p>
         <SubmitTemplates configured={configured} />
         {listError && <p className={s.small}>Статус из Meta не получен: {listError}</p>}
-        <table>
-          <thead>
-            <tr>
-              <th>Шаблон</th>
-              <th>Язык</th>
-              <th>Текст</th>
-              <th>Статус в Meta</th>
-            </tr>
-          </thead>
-          <tbody>
-            {metaTemplates().map((t) => {
-              const st = statuses.find((x) => x.name === t.name && x.language === t.language);
-              return (
-                <tr key={`${t.name}-${t.language}`}>
-                  <td>
-                    <code>{t.name}</code>
-                    <div className={s.small}>{t.category === "AUTHENTICATION" ? "Authentication" : t.category === "MARKETING" ? "Marketing" : "Utility"}</div>
-                  </td>
-                  <td>{t.language}</td>
-                  <td className={s.waText}>{templatePreview(t)}</td>
-                  <td>
-                    <span className={s[`st${st?.status ?? "NONE"}`] ?? s.stNONE}>{STATUS_LABEL[st?.status ?? "NONE"] ?? st?.status}</span>
-                    {st?.reason && <div className={s.small}>{st.reason}</div>}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className={s.scroll}>
+          <table>
+            <thead>
+              <tr>
+                <th>Шаблон</th>
+                <th>Язык</th>
+                <th>Текст</th>
+                <th>Статус в Meta</th>
+              </tr>
+            </thead>
+            <tbody>
+              {metaTemplates().map((t) => {
+                const st = statuses.find((x) => x.name === t.name && x.language === t.language);
+                return (
+                  <tr key={`${t.name}-${t.language}`}>
+                    <td>
+                      <code>{t.name}</code>
+                      <div className={s.small}>{t.category === "AUTHENTICATION" ? "Authentication" : t.category === "MARKETING" ? "Marketing" : "Utility"}</div>
+                    </td>
+                    <td>{t.language}</td>
+                    <td className={s.waText}>{templatePreview(t)}</td>
+                    <td>
+                      <span className={s[`st${st?.status ?? "NONE"}`] ?? s.stNONE}>{STATUS_LABEL[st?.status ?? "NONE"] ?? st?.status}</span>
+                      {st?.reason && <div className={s.small}>{st.reason}</div>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );

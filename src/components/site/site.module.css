@@ -6,6 +6,9 @@
 }
 .site a {
   transition: all 0.45s var(--mj-ease);
+  /* "all" also animated the focus ring, so it faded in over 0.45s — a focus
+     indicator has to be there the instant the key is pressed */
+  transition-property: color, background-color, border-color, transform, box-shadow, opacity;
 }
 .site ::selection {
   background: var(--mj-ink);
@@ -275,10 +278,12 @@
 }
 .h2 {
   font-family: var(--mj-serif);
-  font-size: 26px;
+  /* "ХИЗМАТРАСОНИҲОИ МО" (tg) is 340px at 26px/0.14em — wider than a 320px phone */
+  font-size: clamp(20px, 5.4vw, 26px);
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  overflow-wrap: break-word;
   margin: 0;
 }
 .rule,
@@ -352,7 +357,9 @@
   max-width: 1100px;
   margin: 56px auto 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  /* min(…, 100%) so the 300px track collapses instead of running past the
+     section padding on a 320px phone — prices must not touch the screen edge */
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: 36px 56px;
 }
 .priceGroup h3 {
@@ -1111,6 +1118,8 @@
   color: var(--mj-cream);
   cursor: pointer;
   padding: 10px;
+  min-width: 44px;
+  min-height: 44px;
 }
 .viewerClose {
   top: 12px;
@@ -1403,5 +1412,68 @@
 @media (max-width: 760px) {
   .footer {
     padding-bottom: 52px;
+  }
+}
+
+/* ── Touch targets ───────────────────────────────────── */
+/* Everything a thumb hits gets 44px. Sizes above 760px are untouched. */
+@media (max-width: 760px) {
+  .btnInk,
+  .btnCream,
+  .btnGhost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .brand {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  /* Footer links are a 20px inline box inside a 29px line — stack them as rows. */
+  .footerCol a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .footerCol {
+    line-height: 1.4;
+  }
+  .navAccount {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+  .menu summary {
+    width: 44px;
+    height: 44px;
+    padding: 0 11px;
+  }
+  .menuPanel .menuLangs a {
+    min-width: 44px;
+    padding: 13px 10px;
+    text-align: center;
+  }
+  .filterRow button {
+    min-height: 44px;
+  }
+  /* Thin underlined links keep their look; the hit area grows behind them. */
+  .textLink,
+  .backLink {
+    position: relative;
+  }
+  .textLink::after,
+  .backLink::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+  /* Long informational copy is body text, not a caption — keep it readable. */
+  .priceNote {
+    font-size: 13.5px;
   }
 }

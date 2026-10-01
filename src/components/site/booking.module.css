@@ -482,6 +482,7 @@
   margin-top: 8px;
 }
 .waitlist select {
+  max-width: 100%;
   border: 1px solid var(--mj-line);
   background: var(--mj-cream);
   padding: 8px 10px;
@@ -489,4 +490,42 @@
   font-size: 13px;
   color: var(--mj-ink);
   border-radius: 0;
+}
+
+/* ── Phone keyboards and touch targets ───────────────── */
+/* Under 16px iOS Safari zooms the page the moment a field is focused, and the
+   guest then has to pinch back out mid-booking. Desktop sizing is untouched. */
+@media (max-width: 760px) {
+  .input,
+  .callback input,
+  .promo input,
+  .waitlist select {
+    font-size: 16px;
+  }
+  .chip,
+  .submit,
+  .time,
+  .callback button,
+  .promo button,
+  .payDeposit {
+    min-height: 44px;
+  }
+  .service {
+    min-height: 56px;
+  }
+  .date {
+    flex-basis: 62px;
+    padding: 10px 0;
+  }
+  /* "Не нашли удобное время?" — a 18px-tall link is the fallback for a guest
+     who found no slot; it has to be hittable. */
+  .linkBtn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    text-align: left;
+  }
+  .hours {
+    font-size: 13.5px;
+  }
 }

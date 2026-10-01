@@ -83,49 +83,53 @@ export default async function ReportsPage({ searchParams }: PageProps<"/cms/repo
       <div className={s.grid}>
         <section className={s.panel} aria-labelledby="masters">
           <SectionHead title={<span id="masters">Мастера</span>} action={<Link href={`/cms/payroll?month=${monthOf(period.from)}`} className={s.linkBtn}>Зарплата →</Link>} />
-          <table className={s.table}>
-            <thead>
-              <tr>
-                <th>Мастер</th>
-                <th className={s.num}>Услуг</th>
-                <th className={s.num}>Выручка</th>
-              </tr>
-            </thead>
-            <tbody>
-              {r.masters.map((m) => (
-                <tr key={m.name}>
-                  <td>{m.name}</td>
-                  <td className={s.num}>{m.services}</td>
-                  <td className={s.num}>{somoni(m.revenue)}</td>
+          <div className={s.scroll}>
+            <table className={s.table}>
+              <thead>
+                <tr>
+                  <th>Мастер</th>
+                  <th className={s.num}>Услуг</th>
+                  <th className={s.num}>Выручка</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {r.masters.map((m) => (
+                  <tr key={m.name}>
+                    <td>{m.name}</td>
+                    <td className={s.num}>{m.services}</td>
+                    <td className={s.num}>{somoni(m.revenue)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {!r.masters.length && <p className={s.muted}>Чеков за период нет.</p>}
         </section>
 
         <section className={s.panel} aria-labelledby="services">
           <SectionHead title={<span id="services">Услуги</span>} />
-          <table className={s.table}>
-            <thead>
-              <tr>
-                <th>Услуга</th>
-                <th className={s.num}>Кол-во</th>
-                <th className={s.num}>Выручка</th>
-                <th className={s.num}>Скидки</th>
-              </tr>
-            </thead>
-            <tbody>
-              {r.services.slice(0, 12).map((sv) => (
-                <tr key={sv.name}>
-                  <td>{sv.name}</td>
-                  <td className={s.num}>{sv.count}</td>
-                  <td className={s.num}>{somoni(sv.revenue)}</td>
-                  <td className={s.num}>{sv.discounts ? somoni(sv.discounts) : "—"}</td>
+          <div className={s.scroll}>
+            <table className={s.table}>
+              <thead>
+                <tr>
+                  <th>Услуга</th>
+                  <th className={s.num}>Кол-во</th>
+                  <th className={s.num}>Выручка</th>
+                  <th className={s.num}>Скидки</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {r.services.slice(0, 12).map((sv) => (
+                  <tr key={sv.name}>
+                    <td>{sv.name}</td>
+                    <td className={s.num}>{sv.count}</td>
+                    <td className={s.num}>{somoni(sv.revenue)}</td>
+                    <td className={s.num}>{sv.discounts ? somoni(sv.discounts) : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {r.services.length > 12 && <p className={s.muted}>Все {r.services.length} услуг — в Excel.</p>}
         </section>
       </div>

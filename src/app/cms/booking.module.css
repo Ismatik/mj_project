@@ -236,4 +236,16 @@
   .row2 {
     grid-template-columns: 1fr;
   }
+  /* Reception books from a phone with a guest waiting — every control gets a thumb. */
+  .chip,
+  .hit,
+  .link,
+  .close {
+    min-height: 44px;
+  }
+  .close {
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
+  }
 }

@@ -205,12 +205,12 @@
 }
 .small {
   font-size: 11px;
-  color: var(--mj-text-muted);
+  color: var(--mj-text-2);
   font-weight: 300;
 }
 .counter {
   font-size: 11px;
-  color: var(--mj-text-muted);
+  color: var(--mj-text-2);
   text-align: right;
 }
 .counterOver {
@@ -446,6 +446,18 @@
   }
   .svcRow {
     grid-template-columns: 1fr auto;
+  }
+  /* 16px keeps iOS from zooming the editor; 44px makes the section tabs tappable. */
+  .input,
+  .inputTitle,
+  .textarea,
+  .workCard .input {
+    font-size: 16px;
+  }
+  .navItem,
+  .headLink,
+  .langTabs button {
+    min-height: 44px;
   }
 }
 

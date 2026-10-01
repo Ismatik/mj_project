@@ -140,4 +140,13 @@
   .title {
     font-size: 26px;
   }
+  .help {
+    font-size: 13.5px;
+  }
+  /* "Показать" sits over the password field — 74×27 is not a thumb target */
+  .showBtn {
+    top: 24px;
+    min-height: 44px;
+    padding: 6px 10px;
+  }
 }

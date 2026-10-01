@@ -33,30 +33,32 @@ export default async function WaitlistPage() {
             <SectionHead title={<span id="queue">Живая очередь · {d.walkIns.length}</span>} />
             {d.walkIns.length === 0 && <p className={s.muted}>Сейчас никто не ждёт.</p>}
             {d.walkIns.length > 0 && (
-              <table className={s.table}>
-                <tbody>
-                  {d.walkIns.map((w) => (
-                    <tr key={w.id} data-walkin={w.name}>
-                      <td>
-                        <b>{w.name}</b>
-                        <small>
-                          {w.service}
-                          {w.master ? ` · к мастеру ${w.master}` : ""}
-                          {w.phone ? ` · ${formatPhone(w.phone)}` : ""}
-                          {w.note ? ` · ${w.note}` : ""}
-                        </small>
-                      </td>
-                      <td className={s.num}>
-                        ждёт {w.waited}
-                        <small>с {w.since}</small>
-                      </td>
-                      <td style={{ minWidth: 220 }}>
-                        <WalkInActions id={w.id} name={w.name} freeNow={w.freeNow} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={s.scroll}>
+                <table className={s.table}>
+                  <tbody>
+                    {d.walkIns.map((w) => (
+                      <tr key={w.id} data-walkin={w.name}>
+                        <td>
+                          <b>{w.name}</b>
+                          <small>
+                            {w.service}
+                            {w.master ? ` · к мастеру ${w.master}` : ""}
+                            {w.phone ? ` · ${formatPhone(w.phone)}` : ""}
+                            {w.note ? ` · ${w.note}` : ""}
+                          </small>
+                        </td>
+                        <td className={s.num}>
+                          ждёт {w.waited}
+                          <small>с {w.since}</small>
+                        </td>
+                        <td style={{ minWidth: 220 }}>
+                          <WalkInActions id={w.id} name={w.name} freeNow={w.freeNow} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
 
@@ -64,55 +66,59 @@ export default async function WaitlistPage() {
             <SectionHead title={<span id="list">Ждут времени · {d.entries.length}</span>} />
             {d.entries.length === 0 && <p className={s.muted}>Лист ожидания пуст.</p>}
             {d.entries.length > 0 && (
-              <table className={s.table}>
-                <tbody>
-                  {d.entries.map((e) => (
-                    <tr key={e.id} data-entry={e.name}>
-                      <td style={{ whiteSpace: "nowrap" }}>{e.dateLabel}</td>
-                      <td>
-                        <b>{e.name}</b>
-                        <small>
-                          {e.service}
-                          {e.master ? ` · ${e.master}` : ""}
-                          {e.window ? ` · ${e.window}` : ""}
-                          {e.phone ? ` · ${formatPhone(e.phone)}` : " · без телефона"} · {SOURCE[e.source] ?? e.source}
-                        </small>
-                        {e.offer && (
-                          <small className={s.diffPlus}>
-                            Предложено {e.offer.at}, {e.offer.master} — ждём ответа до {e.offer.until}
+              <div className={s.scroll}>
+                <table className={s.table}>
+                  <tbody>
+                    {d.entries.map((e) => (
+                      <tr key={e.id} data-entry={e.name}>
+                        <td style={{ whiteSpace: "nowrap" }}>{e.dateLabel}</td>
+                        <td>
+                          <b>{e.name}</b>
+                          <small>
+                            {e.service}
+                            {e.master ? ` · ${e.master}` : ""}
+                            {e.window ? ` · ${e.window}` : ""}
+                            {e.phone ? ` · ${formatPhone(e.phone)}` : " · без телефона"} · {SOURCE[e.source] ?? e.source}
                           </small>
-                        )}
-                      </td>
-                      <td>
-                        <EntryActions id={e.id} name={e.name} status={e.status} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                          {e.offer && (
+                            <small className={s.diffPlus}>
+                              Предложено {e.offer.at}, {e.offer.master} — ждём ответа до {e.offer.until}
+                            </small>
+                          )}
+                        </td>
+                        <td>
+                          <EntryActions id={e.id} name={e.name} status={e.status} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </section>
 
           {d.recent.length > 0 && (
             <section className={s.panel} aria-labelledby="recent">
               <SectionHead title={<span id="recent">За неделю</span>} />
-              <table className={s.table}>
-                <tbody>
-                  {d.recent.map((r) => (
-                    <tr key={r.id}>
-                      <td>{r.updated}</td>
-                      <td>
-                        {r.name}
-                        <small>
-                          {r.service}
-                          {r.at ? ` · ${r.at}` : ""} · {r.kind === "WALK_IN" ? "без записи" : "лист ожидания"}
-                        </small>
-                      </td>
-                      <td className={s.num}>{STATUS[r.status] ?? r.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className={s.scroll}>
+                <table className={s.table}>
+                  <tbody>
+                    {d.recent.map((r) => (
+                      <tr key={r.id}>
+                        <td>{r.updated}</td>
+                        <td>
+                          {r.name}
+                          <small>
+                            {r.service}
+                            {r.at ? ` · ${r.at}` : ""} · {r.kind === "WALK_IN" ? "без записи" : "лист ожидания"}
+                          </small>
+                        </td>
+                        <td className={s.num}>{STATUS[r.status] ?? r.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </section>
           )}
         </div>
