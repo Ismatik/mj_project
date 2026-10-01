@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Коммерческое предложение — платформа салона Mavzunai Jovid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#26221d; --ink-line:#3a342b;
+  --cream:#f2ede3; --paper:#f7f2e7; --sand:#ede6d6;
+  --gold:#b8a06a; --gold-text:#705c33;
+  --text:#26221d; --text-2:#5c5344; --muted:#b9b2a4; --on-ink:#d9cfbb;
+  --line:#ddd3bf;
+  --serif:"Zen Old Mincho",serif; --sans:"Jost",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--text);font-family:var(--sans);font-weight:300;line-height:1.65;font-size:16px}
+.sheet{max-width:860px;margin:0 auto;background:var(--paper);min-height:100vh;box-shadow:0 0 0 1px var(--line)}
+.wrap{padding:0 54px}
+h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:.01em}
+h2{font-size:23px;margin:0 0 4px;line-height:1.25}
+h3{font-size:17px;margin:26px 0 8px}
+p{margin:0 0 13px;color:var(--text-2)}
+a{color:var(--gold-text)}
+.rule{height:2px;background:var(--gold);width:56px;margin:12px 0 22px}
+.kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-text);margin-bottom:8px}
+.block{padding:40px 0;border-top:1px solid var(--line)}
+.block:first-of-type{border-top:0}
+
+/* шапка */
+.head{background:var(--ink);color:var(--on-ink);padding:52px 0 44px}
+.head .wrap{padding-top:0}
+.head h1{color:#fff;font-size:34px;line-height:1.18;margin:16px 0 12px}
+.head p{color:var(--on-ink);max-width:58ch;margin:0}
+.head .rule{background:var(--gold)}
+.mono{display:inline-flex;align-items:center;justify-content:center;width:50px;height:50px;border:1px solid var(--gold);color:var(--gold);font-family:var(--serif);font-size:20px;letter-spacing:.06em}
+
+/* реквизиты */
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:30px;font-size:13.5px}
+.facts div{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--ink-line)}
+.facts dt{color:var(--muted);min-width:130px;letter-spacing:.06em;text-transform:uppercase;font-size:10px;padding-top:4px}
+.facts dd{margin:0;color:#fff;flex:1}
+
+table{width:100%;border-collapse:collapse;margin:8px 0 16px;font-size:14px}
+th{text-align:left;font-family:var(--sans);font-weight:500;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-text);padding:0 12px 9px 0;border-bottom:1px solid var(--line)}
+td{padding:12px 12px 12px 0;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text-2)}
+td strong{color:var(--text);font-weight:500}
+tr:last-child td{border-bottom:0}
+tr.total td{border-top:2px solid var(--ink);border-bottom:0;padding-top:14px;color:var(--text);font-size:15px}
+.r{text-align:right}
+
+ul{margin:0 0 13px;padding-left:0;list-style:none}
+li{position:relative;padding-left:19px;margin-bottom:8px;color:var(--text-2);font-size:14.5px}
+li::before{content:"✦";position:absolute;left:0;color:var(--gold);font-size:10px;top:3px}
+
+.tag{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line);background:var(--sand);color:var(--text-2);white-space:nowrap}
+.tag.ok{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+
+/* поля под заполнение */
+/* Поля под заполнение: пустые, но с высотой — чтобы в распечатке было куда вписать */
+.fill{display:inline-block;min-width:92px;height:1.5em;color:var(--muted);border-bottom:1px dashed var(--muted);padding:0 8px;vertical-align:bottom}
+.fill.s{min-width:62px}
+.fill.l{min-width:100%}
+
+.warn{background:var(--sand);border-left:2px solid var(--ink);padding:15px 17px;margin:16px 0;font-size:14px}
+.note{background:var(--sand);border-left:2px solid var(--gold);padding:15px 17px;margin:16px 0;font-size:14px;color:var(--text-2)}
+
+/* подписи */
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:46px;margin-top:34px}
+.sign .who{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-text);margin-bottom:34px}
+.sign .line{border-bottom:1px solid var(--text-2);height:1px;margin-bottom:7px}
+.sign .cap{font-size:11.5px;color:var(--muted)}
+
+footer{background:var(--ink);color:var(--on-ink);padding:34px 0;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;margin-top:0}
+footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+footer a{color:var(--gold)}
+
+@media (max-width:760px){
+  .wrap{padding:0 22px}
+  .head h1{font-size:27px}
+  .facts{grid-template-columns:1fr;gap:0}
+  .sign{grid-template-columns:1fr;gap:30px}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table thead,table tbody{display:table;width:100%;min-width:500px}
+  th,td{padding-right:14px}
+  .block{padding:32px 0}
+}
+@page{size:A4;margin:14mm}
+@media print{
+  body{background:#fff;font-size:11.5pt}
+  .sheet{box-shadow:none;max-width:none;background:#fff}
+  .wrap{padding:0}
+  .head,footer,.tag.ok{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .head{padding:30px 22px;margin-bottom:0}
+  footer{padding:20px 22px}
+  .block{break-inside:avoid;padding:24px 0}
+  table{break-inside:auto}
+  tr{break-inside:avoid}
+  .sign{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+<header class="head">
+  <div class="wrap">
+    <div class="mono">MJ</div>
+    <h1>Коммерческое предложение</h1>
+    <div class="rule"></div>
+    <p>Платформа управления салоном красоты: публичный сайт, онлайн-запись, личный кабинет гостьи, система управления салоном и каналы связи с гостями.</p>
+
+    <dl class="facts">
+      <div><dt>Заказчик</dt><dd>Gallery of Beauty MJ · Mavzunai Jovid<br>ул. Бухоро, 23/25, Душанбе</dd></div>
+      <div><dt>Исполнитель</dt><dd><span class="fill l"></span></dd></div>
+      <div><dt>Дата</dt><dd><span class="fill"></span></dd></div>
+      <div><dt>Действительно до</dt><dd><span class="fill"></span></dd></div>
+      <div><dt>Валюта</dt><dd><span class="fill s"></span></dd></div>
+      <div><dt>Документ №</dt><dd><span class="fill s"></span></dd></div>
+    </dl>
+  </div>
+</header>
+
+<section class="block">
+  <div class="wrap">
+    <div class="kicker">1</div>
+    <h2>Предмет предложения</h2>
+    <div class="rule"></div>
+    <p>Исполнитель передаёт заказчику готовую программную платформу для управления салоном красоты, разворачивает её на рабочем сервере, подключает каналы связи с гостями, обучает персонал и далее сопровождает работу системы.</p>
+    <p>Разработка платформы на момент настоящего предложения <strong>полностью завершена</strong>. Предметом дальнейших работ являются развёртывание, подключение внешних сервисов, обучение и сопровождение.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="kicker">2</div>
+    <h2>Состав поставки</h2>
+    <div class="rule"></div>
+
+    <table>
+      <thead><tr><th style="width:34%">Часть</th><th>Что входит</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Публичный сайт</strong></td>
+            <td>Главная страница, услуги и цены, мастера и портфолио, свадебный зал, блог, лента Instagram, карта и контакты. Три языка: русский, таджикский, английский. Адаптирован под телефоны.</td></tr>
+        <tr><td><strong>Онлайн-запись</strong></td>
+            <td>Запись по реальным свободным окнам с учётом графика мастера и длительности услуги. Исключены двойные записи. Предоплата для выбранных услуг.</td></tr>
+        <tr><td><strong>Личный кабинет гостьи</strong></td>
+            <td>Вход по одноразовому коду без пароля. Свои записи, перенос и отмена, история визитов, бонусный счёт, любимый мастер, повтор записи в одно касание.</td></tr>
+        <tr><td><strong>Система управления салоном</strong></td>
+            <td>17 разделов: календарь, книга гостей, касса и смены, склад, прокат, зарплата мастеров, лист ожидания, сертификаты, бонусы и акции, аналитика и отчёты.</td></tr>
+        <tr><td><strong>Разграничение доступа</strong></td>
+            <td>Четыре роли: владелица, администратор зала, мастер, контент-менеджер. Каждая видит только свой объём данных.</td></tr>
+        <tr><td><strong>Админка сайта</strong></td>
+            <td>Самостоятельное управление содержимым сайта силами салона: тексты, цены, фотографии, мастера, блог, контакты. Режим черновика с предпросмотром перед публикацией.</td></tr>
+        <tr><td><strong>Каналы связи</strong></td>
+            <td>Telegram-бот, WhatsApp, SMS, лента Instagram. Подтверждения, напоминания за сутки и за два часа, коды входа, уведомления администратору. На языке гостьи.</td></tr>
+        <tr><td><strong>Документация</strong></td>
+            <td>Инструкции по развёртыванию, подключению внешних сервисов и работе с системой.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="kicker">3</div>
+    <h2>Этапы, сроки и стоимость</h2>
+    <div class="rule"></div>
+
+    <div class="warn">
+      <strong>Суммы в таблице не проставлены.</strong> Ставку, валюту и условия оплаты определяет исполнитель — их нужно вписать перед отправкой заказчику. Состав и объём работ по каждому этапу указаны точно.
+    </div>
+
+    <table>
+      <thead><tr><th style="width:30%">Этап</th><th>Состав работ</th><th style="width:108px">Срок</th><th style="width:118px" class="r">Стоимость</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Разработка платформы</strong><br><span class="tag ok">выполнено</span></td>
+          <td>Сайт, онлайн-запись, личный кабинет, система управления салоном на 17 разделов, каналы связи, кассовый и складской учёт, бонусная программа, зарплата, отчётность. Три языка, четыре роли доступа.</td>
+          <td>≈ 14 недель<br><span style="font-size:11.5px;color:var(--muted)">завершено</span></td>
+          <td class="r"><span class="fill"></span></td>
+        </tr>
+        <tr>
+          <td><strong>2. Развёртывание и запуск</strong></td>
+          <td>Установка на рабочий сервер, подключение домена и защищённого соединения, настройка ежедневного резервного копирования, перенос реальных данных салона, подключение Telegram-бота.</td>
+          <td><span class="fill s"></span></td>
+          <td class="r"><span class="fill"></span></td>
+        </tr>
+        <tr>
+          <td><strong>3. Подключение WhatsApp</strong></td>
+          <td>Сопровождение проверки бизнес-аккаунта у Meta, подготовка и подача шаблонов сообщений, доработка по замечаниям, запуск канала.</td>
+          <td>зависит<br>от Meta</td>
+          <td class="r"><span class="fill"></span></td>
+        </tr>
+        <tr>
+          <td><strong>4. Подключение оплаты</strong></td>
+          <td>Интеграция с выбранным банком, настройка боевых платежей, проверка возвратов и сверка поступлений.</td>
+          <td><span class="fill s"></span></td>
+          <td class="r"><span class="fill"></span></td>
+        </tr>
+        <tr>
+          <td><strong>5. Обучение персонала</strong></td>
+          <td>Очные занятия для администраторов и мастеров, краткие инструкции по каждой роли, сопровождение первой недели работы.</td>
+          <td><span class="fill s"></span></td>
+          <td class="r"><span class="fill"></span></td>
+        </tr>
+        <tr class="total">
+          <td colspan="3"><strong>Итого единовременно</strong></td>
+          <td class="r"><span class="fill"></span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Ежемесячное сопровождение</h3>
+    <table>
+      <thead><tr><th style="width:30%">Услуга</th><th>Что входит</th><th style="width:108px">Период</th><th style="width:118px" class="r">Стоимость</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Сопровождение</strong></td>
+          <td>Обновления системы, наблюдение за сервером, проверка резервных копий, устранение неполадок, мелкие правки содержимого и консультации персонала.</td>
+          <td>ежемесячно</td>
+          <td class="r"><span class="fill"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="kicker">4</div>
+    <h2>Расходы, оплачиваемые отдельно</h2>
+    <div class="rule"></div>
+    <p>Это платежи третьим лицам. Они не входят в стоимость работ исполнителя и оплачиваются заказчиком напрямую поставщикам услуг.</p>
+
+    <table>
+      <thead><tr><th style="width:34%">Расход</th><th>Пояснение</th><th style="width:118px" class="r">Примерно</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Сервер</strong></td><td>Аренда сервера. Альтернатива — компьютер в самом салоне: готовая схема подключения есть, белый IP-адрес не требуется, тогда этот расход отпадает.</td><td class="r"><span class="fill"></span></td></tr>
+        <tr><td><strong>Доменное имя</strong></td><td>Регистрация и ежегодное продление адреса сайта.</td><td class="r"><span class="fill"></span></td></tr>
+        <tr><td><strong>Банковская комиссия</strong></td><td>Процент эквайринга с каждой онлайн-оплаты. Появляется только после подключения оплаты на сайте.</td><td class="r">по тарифу банка</td></tr>
+        <tr><td><strong>SMS</strong></td><td>Поштучно, только если канал будет включён. Telegram и WhatsApp бесплатны.</td><td class="r">по тарифу<br>оператора</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>О резервных копиях.</strong> В сопровождение входят ежедневные копии базы данных с хранением: 7 ежедневных, 4 еженедельных и 6 ежемесячных. Восстановление из копии — часть сопровождения и отдельно не оплачивается.
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="kicker">5</div>
+    <h2>Условия</h2>
+    <div class="rule"></div>
+
+    <table>
+      <thead><tr><th style="width:34%">Пункт</th><th>Условие</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Порядок оплаты</strong></td><td><span class="fill l"></span></td></tr>
+        <tr><td><strong>Срок начала работ</strong></td><td><span class="fill l"></span></td></tr>
+        <tr><td><strong>Гарантийный период</strong></td><td><span class="fill l"></span></td></tr>
+        <tr><td><strong>Права на систему</strong></td><td><span class="fill l"></span></td></tr>
+        <tr><td><strong>Срок действия предложения</strong></td><td><span class="fill l"></span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Что требуется от заказчика</h3>
+    <p>Сроки по этапам 2–5 отсчитываются с момента, когда заказчик предоставит:</p>
+    <ul>
+      <li>Выбранное доменное имя и решение о том, где размещается сервер</li>
+      <li>Настоящие имена, должности и фотографии мастеров, примеры работ для портфолио</li>
+      <li>Подтверждённый перечень услуг с актуальными ценами и длительностями</li>
+      <li>Доступ к аккаунту Instagram салона и к бизнес-аккаунту Meta</li>
+      <li>Заключённый договор эквайринга с банком — для этапа 4</li>
+      <li>Утверждённые правила бонусов, предоплат и процентов мастеров</li>
+      <li>Ответственного сотрудника, получающего уведомления о записях</li>
+    </ul>
+
+    <div class="warn">
+      <strong>О сроке подключения WhatsApp.</strong> Проверка бизнес-аккаунта у Meta и одобрение шаблонов сообщений выполняются сторонней компанией, занимают недели и не ускоряются. Исполнитель сопровождает процесс, но не может гарантировать его срок. Запуск платформы от этого не зависит: канал Telegram закрывает все сценарии общения с гостями целиком.
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="kicker">6</div>
+    <h2>Подписи</h2>
+    <div class="rule"></div>
+
+    <div class="sign">
+      <div>
+        <div class="who">Исполнитель</div>
+        <div class="line"></div>
+        <div class="cap">Подпись · ФИО · дата</div>
+      </div>
+      <div>
+        <div class="who">Заказчик</div>
+        <div class="line"></div>
+        <div class="cap">Подпись · ФИО · дата</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Mavzunai Jovid · Gallery of Beauty MJ</span>
+    <span><a href="presentation.html">Презентация платформы</a></span>
+    <span>+992 98 103 11 11</span>
+  </div>
+</footer>
+
+</div>
+
+</body>
+</html>

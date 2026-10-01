@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mavzunai Jovid — платформа салона</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#26221d; --ink-2:#2b2620; --ink-line:#3a342b;
+  --cream:#f2ede3; --paper:#f7f2e7; --sand:#ede6d6; --sand-2:#e4dcc9;
+  --gold:#b8a06a; --gold-deep:#8f7a4b; --gold-text:#705c33;
+  --text:#26221d; --text-2:#5c5344; --muted:#b9b2a4; --on-ink:#d9cfbb;
+  --line:#ddd3bf;
+  --serif:"Zen Old Mincho",serif; --sans:"Jost",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--text);font-family:var(--sans);font-weight:300;line-height:1.65;font-size:16px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 32px}
+h1,h2,h3,.num{font-family:var(--serif);font-weight:400;letter-spacing:.01em}
+h2{font-size:30px;margin:0 0 6px;line-height:1.2}
+h3{font-size:19px;margin:30px 0 10px}
+p{margin:0 0 14px;color:var(--text-2)}
+a{color:var(--gold-text)}
+.rule{height:2px;background:var(--gold);width:64px;margin:14px 0 26px}
+.kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-text);margin-bottom:10px}
+.lead{font-size:18px;color:var(--text);max-width:68ch}
+section{padding:64px 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+section.ink{background:var(--ink);color:var(--on-ink);border-top-color:var(--ink-line)}
+section.ink h2,section.ink h3{color:#fff}
+section.ink p,section.ink li{color:var(--on-ink)}
+section.ink .kicker{color:var(--gold)}
+
+/* cover */
+.cover{background:var(--ink);color:var(--on-ink);padding:92px 0 76px;border:0}
+.cover h1{color:#fff;font-size:52px;line-height:1.12;margin:18px 0 14px}
+.cover p{color:var(--on-ink);max-width:60ch;font-size:18px}
+.cover .rule{background:var(--gold);width:88px}
+.mono{display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border:1px solid var(--gold);color:var(--gold);font-family:var(--serif);font-size:22px;letter-spacing:.06em}
+.meta{margin-top:34px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
+/* grids */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--paper);border:1px solid var(--line);padding:22px}
+.card h4{font-family:var(--serif);font-weight:400;font-size:17px;margin:0 0 8px}
+.card.dark{background:var(--ink);color:var(--on-ink);border-color:var(--ink-line)}
+.card.dark .lbl{color:var(--gold)}
+.card.dark .num{color:#fff}
+.card.dark .sub{color:var(--muted)}
+section.ink .card{background:var(--ink-2);border-color:var(--ink-line);color:var(--on-ink)}
+section.ink .card h4{color:#fff}
+section.ink .card .sub,section.ink .card li{color:var(--on-ink)}
+.lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-text);margin-bottom:8px}
+.num{font-size:36px;line-height:1.1}
+.sub{font-size:13.5px;color:var(--text-2);margin-top:6px}
+
+/* table */
+table{width:100%;border-collapse:collapse;margin:8px 0 18px;font-size:14.5px}
+th{text-align:left;font-family:var(--sans);font-weight:500;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-text);padding:0 12px 10px 0;border-bottom:1px solid var(--line)}
+td{padding:13px 12px 13px 0;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text-2)}
+td strong{color:var(--text);font-weight:500}
+tr:last-child td{border-bottom:0}
+
+/* было / стало */
+.ba th:first-child{color:var(--muted)}
+.ba td:first-child{color:var(--muted);width:44%}
+.ba td:last-child{color:var(--text)}
+.ba td:last-child strong{color:var(--text);font-weight:500}
+
+/* шаги */
+.steps{counter-reset:s;margin:22px 0 0;padding:0;list-style:none}
+.steps li{counter-increment:s;position:relative;padding:0 0 22px 56px;margin:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border:1px solid var(--gold);color:var(--gold-text);font-family:var(--serif);font-size:15px;display:flex;align-items:center;justify-content:center}
+.steps li::after{content:"";position:absolute;left:17px;top:38px;bottom:0;width:1px;background:var(--line)}
+.steps li:last-child{padding-bottom:0}
+.steps li:last-child::after{display:none}
+.steps b{display:block;font-family:var(--serif);font-weight:400;font-size:17px;color:var(--text);margin-bottom:3px}
+section.ink .steps li::before{border-color:var(--gold);color:var(--gold)}
+section.ink .steps li::after{background:var(--ink-line)}
+section.ink .steps b{color:#fff}
+
+/* tags */
+.tag{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;border:1px solid var(--line);background:var(--sand);color:var(--text-2);white-space:nowrap}
+.tag.ok{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.tag.wait{background:transparent;border-color:var(--gold);color:var(--gold-text)}
+.tag.no{background:transparent;border-color:var(--line);color:var(--text-2)}
+
+/* lists */
+ul{margin:0 0 14px;padding-left:0;list-style:none}
+li{position:relative;padding-left:20px;margin-bottom:9px;color:var(--text-2)}
+li::before{content:"✦";position:absolute;left:0;color:var(--gold);font-size:11px;top:3px}
+.card ul{margin:0}
+.card li{font-size:14px;margin-bottom:6px}
+ol{color:var(--text-2);padding-left:20px}
+ol li{padding-left:4px}
+ol li::before{content:none}
+
+.note{background:var(--sand);border-left:2px solid var(--gold);padding:16px 18px;margin:18px 0;font-size:14.5px;color:var(--text-2)}
+.warn{background:var(--sand);border-left:2px solid var(--ink);padding:16px 18px;margin:18px 0;font-size:14.5px}
+.quote{font-family:var(--serif);font-size:23px;line-height:1.45;color:var(--text);max-width:40ch;margin:0}
+.cta{display:inline-block;margin-top:8px;padding:13px 24px;background:var(--ink);color:var(--on-ink);text-decoration:none;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+footer{background:var(--ink);color:var(--on-ink);padding:48px 0;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+footer a{color:var(--gold)}
+
+@media (max-width:860px){
+  .g2,.g3,.g4{grid-template-columns:1fr 1fr}
+  .cover h1{font-size:36px}
+  h2{font-size:26px}
+  .wrap{padding:0 20px}
+  section{padding:48px 0}
+}
+@media (max-width:560px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .quote{font-size:20px}
+  .lead{font-size:17px}
+}
+/* Узкие экраны: широкие таблицы прокручиваются вбок, а не рвут вёрстку */
+@media (max-width:760px){
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table thead,table tbody{display:table;width:100%;min-width:520px}
+  th,td{padding-right:14px}
+  /* «было / стало» — главный блок презентации, на телефоне он складывается
+     в карточки, а не прокручивается вбок */
+  .ba{display:block;overflow:visible}
+  .ba thead{display:none}
+  .ba tbody{display:block;width:100%;min-width:0}
+  .ba tr{display:block;padding:18px 0;border-bottom:1px solid var(--line)}
+  .ba tr:last-child{border-bottom:0}
+  .ba td{display:block;width:auto;padding:0 0 0 16px;border:0}
+  .ba td:first-child{color:var(--text-2);font-size:14.5px;border-left:2px solid var(--line);margin-bottom:12px}
+  .ba td:last-child{border-left:2px solid var(--gold)}
+  .ba td::before{display:block;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px}
+  .ba td:first-child::before{content:"Сейчас";color:var(--muted)}
+  .ba td:last-child::before{content:"Будет";color:var(--gold-text)}
+}
+@media print{
+  body{background:#fff}
+  section{break-inside:avoid;padding:34px 0}
+  .cover,section.ink,.card.dark,.tag.ok,footer{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .cta{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <div class="wrap">
+    <div class="mono">MJ</div>
+    <h1>Весь салон<br>в одном окне</h1>
+    <div class="rule"></div>
+    <p>Гостья записывается сама — ночью, с телефона, на своём языке. Ресепшен видит день целиком. Владелица видит деньги. Тетрадь, директ в Instagram и разрозненные таблицы больше не нужны.</p>
+    <div class="meta">Gallery of Beauty MJ · Душанбе · октябрь 2026</div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Зачем</div>
+    <h2>Что изменится с первого дня</h2>
+    <div class="rule"></div>
+    <p class="lead">Платформа не добавляет салону работы. Она забирает ту, которую сегодня делают руками, на память и в ущерб вечеру.</p>
+
+    <table class="ba" style="margin-top:28px">
+      <thead><tr><th>Как это происходит сейчас</th><th>Как будет</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Записаться можно, только пока кто-то отвечает в директе. Ночью и в выходной гостья уходит к конкуренту.</td>
+          <td><strong>Запись круглосуточно</strong> — на сайте или в Telegram, за минуту, без звонка и без ожидания ответа.</td>
+        </tr>
+        <tr>
+          <td>Двух гостей записали на одно время. Кто-то ждёт, кто-то уходит обиженной.</td>
+          <td><strong>Двойная запись невозможна.</strong> Занятое время просто исчезает из выбора — у всех одновременно.</td>
+        </tr>
+        <tr>
+          <td>«А какой краской мы её красили в прошлый раз?» — вспоминаем или переспрашиваем гостью.</td>
+          <td><strong>Карточка гостьи:</strong> формулы окрашивания, аллергии, фото «до/после», что любит и чего избегать.</td>
+        </tr>
+        <tr>
+          <td>Гостья забыла и не пришла. Два часа мастера простояли впустую.</td>
+          <td><strong>Два напоминания</strong> — за сутки и за два часа. А освободившееся окно само предлагается первой из листа ожидания.</td>
+        </tr>
+        <tr>
+          <td>Сколько заработали сегодня — считаем вечером на калькуляторе и не всегда сходится.</td>
+          <td><strong>Цифра на экране в любой момент:</strong> наличные, карта, QR, средний чек, сравнение с прошлой неделей.</td>
+        </tr>
+        <tr>
+          <td>Про то, что краска кончилась, узнаём в тот момент, когда она кончилась.</td>
+          <td><strong>Склад считает сам.</strong> Расход списывается при оплате чека, предупреждение приходит заранее.</td>
+        </tr>
+        <tr>
+          <td>Зарплата мастеров — вручную, по тетради, в конце месяца, с спорами.</td>
+          <td><strong>Зарплата считается сама</strong> из закрытых чеков. У каждого мастера свой процент или оклад.</td>
+        </tr>
+        <tr>
+          <td>Постоянную гостью и случайную не отличить. Повод вернуться придумывать нечем.</td>
+          <td><strong>Бонусы, уровни, подарок на день рождения</strong> — повод возвращаться появляется сам.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="ink">
+  <div class="wrap">
+    <div class="kicker">Гостья</div>
+    <h2>Путь гостьи — от Instagram до второго визита</h2>
+    <div class="rule"></div>
+    <p>Ни на одном шаге ей не нужно никого ждать.</p>
+
+    <ol class="steps">
+      <li><b>Увидела работу в Instagram</b>Лента публикаций салона стоит прямо на главной странице сайта и обновляется сама. Понравившаяся работа — это ссылка на мастера, который её сделал.</li>
+      <li><b>Открыла сайт на телефоне</b>Услуги и цены, портфолио мастеров, свадебный зал, советы по уходу. На русском, таджикском или английском — сайт сам выбирает язык, но его можно переключить.</li>
+      <li><b>Записалась за минуту</b>Выбрала услугу, мастера и свободное время. Показываются только настоящие свободные окна — с учётом длительности услуги, графика мастера и уже занятого времени.</li>
+      <li><b>Получила подтверждение</b>В Telegram или WhatsApp — сразу. Потом напоминание за сутки и за два часа до визита.</li>
+      <li><b>Пришла — её узнали</b>Ресепшен видит карточку: прошлые визиты, формулу окрашивания, аллергию, любимого мастера. Не нужно объяснять заново.</li>
+      <li><b>Оплатила и получила баллы</b>Наличными, картой, QR, сертификатом или частями. Баллы начислились сразу, уровень вырос.</li>
+      <li><b>Вернулась</b>В личном кабинете — вся история. Повторить прошлую запись можно в одно касание. На день рождения приходят баллы в подарок.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Салон</div>
+    <h2>Что получает салон</h2>
+    <div class="rule"></div>
+    <p class="lead">Семнадцать разделов, но каждый сотрудник видит только то, что нужно именно ему. Мастер — своё расписание. Ресепшен — день и кассу. Владелица — всё, включая деньги.</p>
+
+    <div class="grid g2" style="margin-top:28px">
+      <div class="card">
+        <h4>День под контролем</h4>
+        <ul>
+          <li>Календарь салона и календарь каждого мастера</li>
+          <li>Экран «Мой салон сегодня»: записи, гости, выручка, что осталось до конца дня</li>
+          <li>Лист ожидания и приём гостей без записи</li>
+          <li>Отметки «пришла», «не пришла», перенос в два клика</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Деньги на виду</h4>
+        <ul>
+          <li>Касса: чек, скидка, оплата частями, возврат</li>
+          <li>Открытие и закрытие смены с итоговым отчётом</li>
+          <li>Разбивка по наличным, картам и QR; средний чек</li>
+          <li>Сравнение с прошлой неделей и средним рабочим днём</li>
+          <li>Выгрузка в Excel за любой период</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Книга гостей</h4>
+        <ul>
+          <li>История визитов, сумм и мастеров</li>
+          <li>Аллергии и противопоказания — заметны сразу</li>
+          <li>Формулы окрашивания из прошлых визитов</li>
+          <li>Приватные фото «до/после» — видит только салон</li>
+          <li>Дни рождения и повод написать</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Хозяйство</h4>
+        <ul>
+          <li>Склад: нормы расхода на услугу, автоматическое списание</li>
+          <li>Предупреждение, когда остаток подходит к концу</li>
+          <li>Прокат платьев и аксессуаров</li>
+          <li>Зарплата мастеров по процентам и окладам</li>
+          <li>Аналитика: загрузка, популярные услуги, возвращаемость</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:22px">
+      <strong>Сайтом салон управляет сам.</strong> Цены, тексты, фотографии, мастера, блог, контакты и часы работы меняются в админке без разработчика. Правки сначала видны в предпросмотре и попадают на сайт только после кнопки «Опубликовать» — случайно сломать витрину нельзя.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Возвращаемость</div>
+    <h2>Почему гостья придёт второй раз</h2>
+    <div class="rule"></div>
+    <p class="lead">Привлечь новую гостью дороже, чем вернуть прежнюю. Вся механика возврата уже встроена и работает без участия персонала.</p>
+
+    <div class="grid g3" style="margin-top:26px">
+      <div class="card"><div class="lbl">Баллы и уровни</div><div class="sub">Чем чаще ходит — тем выше процент возврата баллами. Классика, Серебро, Золото. Баллами можно оплатить часть визита.</div></div>
+      <div class="card"><div class="lbl">День рождения</div><div class="sub">Утром в день рождения гостье сами начисляются подарочные баллы и уходит поздравление.</div></div>
+      <div class="card"><div class="lbl">Сертификаты</div><div class="sub">Покупаются на сайте, приходят красивым PDF с кодом. Их дарят — и к вам приходит новый человек.</div></div>
+      <div class="card"><div class="lbl">Напоминания</div><div class="sub">За сутки и за два часа. Меньше неявок — больше отработанных часов у мастеров.</div></div>
+      <div class="card"><div class="lbl">Лист ожидания</div><div class="sub">Кто-то отменил — время тут же предлагается первой в очереди. Окно не простаивает.</div></div>
+      <div class="card"><div class="lbl">Акции и промокоды</div><div class="sub">Скидка на услугу, на период, по коду. Включается в админке, действует везде сразу.</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Отдельное направление</div>
+    <h2>Свадьбы — то, чего нет у соседей</h2>
+    <div class="rule"></div>
+    <p class="lead">Свадебный зал — сильная сторона салона, и под неё сделан отдельный сценарий, а не просто ещё одна строчка в прайсе.</p>
+
+    <div class="grid g2" style="margin-top:26px">
+      <div class="card">
+        <h4>Для невесты</h4>
+        <ul>
+          <li>Отдельная страница зала с портфолио образов</li>
+          <li>Конструктор пакета: услуги + платье из проката + пробный образ</li>
+          <li>Цена собирается на глазах, пока она выбирает</li>
+          <li>Бронь даты с предоплатой — дата держится за ней</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Для салона</h4>
+        <ul>
+          <li>Предоплата защищает от сорвавшейся даты в сезон</li>
+          <li>Прокат платьев учитывается: что выдано, что вернулось</li>
+          <li>Пробный образ и день свадьбы связаны в одну заявку</li>
+          <li>Свадебный чек виден в аналитике отдельно</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Коротко</div>
+    <h2>В цифрах</h2>
+    <div class="rule"></div>
+    <div class="grid g4">
+      <div class="card dark"><div class="lbl">Запись</div><div class="num">24/7</div><div class="sub">без звонка и без ожидания ответа</div></div>
+      <div class="card"><div class="lbl">Языка</div><div class="num">3</div><div class="sub">русский, точикӣ, English — везде</div></div>
+      <div class="card"><div class="lbl">Разделов</div><div class="num">17</div><div class="sub">весь салон в одном окне</div></div>
+      <div class="card"><div class="lbl">Двойных записей</div><div class="num">0</div><div class="sub">не бывает по устройству системы</div></div>
+    </div>
+    <div class="grid g4" style="margin-top:16px">
+      <div class="card"><div class="lbl">Роли</div><div class="num">4</div><div class="sub">у каждой свой доступ: владелица, ресепшен, мастер, контент</div></div>
+      <div class="card"><div class="lbl">Напоминания</div><div class="num">2</div><div class="sub">за сутки и за два часа до визита</div></div>
+      <div class="card"><div class="lbl">Каналы связи</div><div class="num">4</div><div class="sub">Telegram, WhatsApp, SMS, Instagram</div></div>
+      <div class="card dark"><div class="lbl">Готовность</div><div class="num">100%</div><div class="sub">вся разработка закрыта, осталось включить</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Каналы</div>
+    <h2>Как салон говорит с гостьей</h2>
+    <div class="rule"></div>
+    <p class="lead">Все каналы написаны и работают. Сейчас сообщения складываются в папку «Исходящие» — видно текст и адресата, но наружу ничего не уходит. Это нужно, чтобы включить их по одному и ничего не сломать.</p>
+
+    <table style="margin-top:22px">
+      <thead><tr><th style="width:150px">Канал</th><th>Что он делает для салона</th><th style="width:220px">Что нужно, чтобы включить</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Telegram</strong></td>
+          <td>Полноценный помощник в кармане у гостьи: запись, свои записи, перенос, отмена, цены, бонусы, акции. Ресепшену — уведомление о каждой новой записи.</td>
+          <td>Завести бота и нажать одну кнопку. <strong>15 минут.</strong></td>
+        </tr>
+        <tr>
+          <td><strong>WhatsApp</strong></td>
+          <td>То же для тех, у кого нет Telegram: подтверждения, напоминания, коды входа. Что пишет гостья — видит ресепшен.</td>
+          <td>Проверка бизнес-аккаунта у Meta. <strong>Самый долгий пункт — закладывать недели.</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Instagram</strong></td>
+          <td>Свежие публикации салона прямо на главной странице сайта. Обновляются каждый час сами.</td>
+          <td>Перевести профиль в профессиональный и дать доступ.</td>
+        </tr>
+        <tr>
+          <td><strong>SMS</strong></td>
+          <td>Запасной канал, если у гостьи нет ни Telegram, ни WhatsApp.</td>
+          <td>Договор с оператором рассылок.</td>
+        </tr>
+        <tr>
+          <td><strong>Карта и звонок</strong></td>
+          <td>Блок «Как нас найти» с маршрутом и кнопкой звонка на телефоне.</td>
+          <td><span class="tag ok">уже работает</span></td>
+        </tr>
+        <tr>
+          <td><strong>Оплата на сайте</strong></td>
+          <td>Предоплата за свадебные образы и продажа сертификатов без прихода в салон.</td>
+          <td>Договор с банком: Алиф, Душанбе Сити или Корти Милли.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Чего намеренно нет — и почему</h3>
+    <table>
+      <thead><tr><th style="width:150px">Площадка</th><th>Моя оценка</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Facebook</strong></td><td><span class="tag no">не нужен</span> &nbsp; В Душанбе аудитория салона живёт в Instagram и Telegram. Лента Facebook дублировала бы Instagram и не привела бы ни одной новой гостьи.</td></tr>
+        <tr><td><strong>TikTok</strong></td><td><span class="tag no">позже</span> &nbsp; Имеет смысл, когда салон начнёт снимать видео регулярно. Встроить ленту — работа на день, но без контента это пустой блок на главной.</td></tr>
+        <tr><td><strong>ВКонтакте</strong></td><td><span class="tag no">не нужен</span> &nbsp; Нет аудитории в регионе.</td></tr>
+        <tr><td><strong>Email-рассылка</strong></td><td><span class="tag no">позже</span> &nbsp; Гостьи оставляют телефон, а не почту. Смысл появится, только если начать собирать адреса.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Дальше</div>
+    <h2>Дорога до открытия</h2>
+    <div class="rule"></div>
+    <p class="lead">Разработка закрыта полностью. Всё, что осталось, — это в основном не работа программиста, а решения и договоры со стороны салона.</p>
+
+    <table style="margin-top:22px">
+      <thead><tr><th style="width:118px">Шаг</th><th>Что происходит</th><th style="width:155px">Кто делает</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Шаг 1</strong><br><span class="tag">сейчас</span></td>
+            <td>Система переезжает на боевой сервер и получает адрес в интернете. Telegram-бот начинает отвечать по-настоящему. Настоящие имена мастеров, их портреты и работы вместо временных фотографий.</td>
+            <td>Салон — адрес и фото<br>Исполнитель — запуск</td></tr>
+        <tr><td><strong>Шаг 2</strong></td>
+            <td>Вычитка таджикских и английских текстов носителем языка. Сверка всех цен и длительностей по меню. Настоящие тексты вместо демонстрационных.</td>
+            <td>Салон</td></tr>
+        <tr><td><strong>Шаг 3</strong></td>
+            <td>Лента Instagram начинает тянуть реальные публикации. Подаются документы на WhatsApp — заранее, потому что ответа ждать неделями.</td>
+            <td>Салон — аккаунты<br>Исполнитель — подключение</td></tr>
+        <tr><td><strong>Шаг 4</strong></td>
+            <td>Тихий запуск: сайт открыт, записи идут, персонал неделю работает в системе параллельно со старым способом. Смотрим, что мешает.</td>
+            <td>Совместно</td></tr>
+        <tr><td><strong>Шаг 5</strong></td>
+            <td>Договор с банком, и оплата на сайте становится настоящей: предоплаты за свадебные образы и продажа сертификатов.</td>
+            <td>Салон — договор<br>Исполнитель — подключение</td></tr>
+        <tr><td><strong>Шаг 6</strong></td>
+            <td>Полное открытие, обучение персонала, отказ от тетради. Ежедневные резервные копии и наблюдение за сервером.</td>
+            <td>Совместно</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warn">
+      <strong>Одно узкое место — WhatsApp.</strong> Проверка бизнес-аккаунта у Meta не ускоряется деньгами и занимает недели. Подавать документы стоит на шаге 1, а не на шаге 3. При этом запуск от этого не зависит: до одобрения Telegram закрывает все сценарии целиком.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Решения заказчика</div>
+    <h2>Что нужно от салона</h2>
+    <div class="rule"></div>
+    <p class="lead">Это не пожелания, а развилки: пока на них нет ответа, соответствующая часть не может работать по-настоящему. Ни одна из них не требует технических знаний.</p>
+
+    <h3>Без этого нельзя открываться</h3>
+    <table>
+      <thead><tr><th style="width:44%">Вопрос</th><th>Почему это важно</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Какой адрес будет у сайта?</strong></td><td>Нужен до того, как сайт станет доступен снаружи, и до подключения Telegram и WhatsApp.</td></tr>
+        <tr><td><strong>Где стоит сервер — арендованный или компьютер в салоне?</strong></td><td>Оба варианта готовы. Выбор влияет на ежемесячную стоимость и на то, что будет при отключении света.</td></tr>
+        <tr><td><strong>Настоящие имена, должности и фотографии мастеров</strong></td><td>Сейчас в системе временные имена из прототипа. Их видят гостьи на сайте и в боте.</td></tr>
+        <tr><td><strong>Актуальны ли цены и длительности услуг?</strong></td><td>Меню услуг — единственный источник цен. Что стоит в меню, то и на сайте, и в боте, и в кассе. Меняется мгновенно.</td></tr>
+        <tr><td><strong>Кто получает уведомления о новых записях?</strong></td><td>Конкретный человек привязывает свой Telegram. Без этого новые записи никому не приходят.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Решения по деньгам</h3>
+    <table>
+      <thead><tr><th style="width:44%">Вопрос</th><th>Почему это важно</th></tr></thead>
+      <tbody>
+        <tr><td><strong>С каким банком работаем по оплате?</strong></td><td>Алиф, Душанбе Сити, Корти Милли. Подключение одного банка — предсказуемая работа, но начать можно только после договора.</td></tr>
+        <tr><td><strong>Какая предоплата и за какие услуги?</strong></td><td>Сейчас 30% на свадебные образы и пробный. Процент можно задать отдельно для каждой услуги.</td></tr>
+        <tr><td><strong>Правила бонусов</strong></td><td>Сейчас 5% на «Классике», 7% на «Серебре», 10% на «Золоте»; баллами можно закрыть до 30% визита. Цифры меняются легко, но решить нужно до открытия — потом гостьи заметят пересмотр.</td></tr>
+        <tr><td><strong>Сколько живёт сертификат?</strong></td><td>Влияет на учёт и на текст на самом сертификате.</td></tr>
+        <tr><td><strong>Проценты и оклады мастеров</strong></td><td>Сейчас стоят условные. От них считается зарплата, нужны настоящие.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Решения по работе салона</h3>
+    <table>
+      <thead><tr><th style="width:44%">Вопрос</th><th>Почему это важно</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Кто имеет право видеть выручку?</strong></td><td>Сейчас деньги и сравнения видит только владелица, ресепшен — операционную часть. Это решение салона, а не ограничение системы.</td></tr>
+        <tr><td><strong>Может ли ресепшен удалять записи?</strong></td><td>Сейчас может. Вопрос доверия и порядка.</td></tr>
+        <tr><td><strong>За сколько часов гостья может отменить сама?</strong></td><td>Сейчас за 2 часа. Влияет на количество пустых окон.</td></tr>
+        <tr><td><strong>Что делать с теми, кто не пришёл?</strong></td><td>Отметка «не пришла» есть, но последствий нет. Нужна ли предоплата после неявки, предупреждение, чёрный список?</td></tr>
+        <tr><td><strong>Кто ведёт блог и Instagram?</strong></td><td>Для этого есть отдельная роль с доступом только к сайту — без доступа к деньгам и к данным гостей.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Развитие</div>
+    <h2>Куда это можно развивать</h2>
+    <div class="rule"></div>
+    <p class="lead">Платформа построена так, чтобы её можно было наращивать. Порядок ниже — по соотношению пользы и затрат.</p>
+
+    <h3>Ближайшие шаги</h3>
+    <table>
+      <thead><tr><th style="width:38%">Что</th><th>Зачем</th><th style="width:110px">Объём</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Отзывы после визита</strong></td><td>Через день после визита гостье приходит сообщение со ссылкой на карту или Google. Самый дешёвый способ получать поток новых гостей.</td><td>небольшой</td></tr>
+        <tr><td><strong>«Приведи подругу»</strong></td><td>Личный код в кабинете, баллы обеим. Механика бонусов уже готова, нужно только связать.</td><td>небольшой</td></tr>
+        <tr><td><strong>Абонементы</strong></td><td>«Десять маникюров со скидкой»: оплата вперёд, списание по визитам. Деньги в кассе сегодня за работу завтра.</td><td>средний</td></tr>
+        <tr><td><strong>Витрина косметики</strong></td><td>Продажа ухода, который гостьи и так спрашивают после процедур. Склад уже умеет считать остатки.</td><td>средний</td></tr>
+        <tr><td><strong>Умные напоминания</strong></td><td>«Пора обновить окрашивание» — через привычный интервал именно этой гостьи. Данные о визитах уже копятся.</td><td>средний</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Крупные направления</h3>
+    <table>
+      <thead><tr><th style="width:38%">Что</th><th>Зачем</th><th style="width:110px">Объём</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Второй филиал</strong></td><td>Сейчас система рассчитана на один салон. Многофилиальность — это выбор точки при записи, раздельные кассы и общая сводка для владелицы.</td><td>большой</td></tr>
+        <tr><td><strong>Приложение для мастера</strong></td><td>Телефон вместо компьютера: своё расписание, карточка гостьи, формулы и съёмка «до/после» прямо с камеры.</td><td>большой</td></tr>
+        <tr><td><strong>Показатели по мастерам</strong></td><td>Возвращаемость к конкретному мастеру, средний чек, доля повторных визитов — основа для честного пересмотра процентов.</td><td>средний</td></tr>
+        <tr><td><strong>Заказ поставщикам</strong></td><td>Склад знает расход; следующий шаг — сама заявка поставщику, когда остаток подходит к норме.</td><td>средний</td></tr>
+        <tr><td><strong>Выгрузка в бухгалтерию</strong></td><td>Если появится требование сдавать отчётность — выгрузка в нужном формате.</td><td>средний</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>С чего бы я начал.</strong> Отзывы после визита. Это несколько дней работы, а влияние прямое: каждый новый отзыв на карте приводит гостей, которые салон ещё не видели.
+    </div>
+  </div>
+</section>
+
+<section class="ink">
+  <div class="wrap">
+    <p class="quote" style="color:#fff">Всё уже построено и проверено.<br>Осталось включить.</p>
+    <div class="rule" style="margin-top:22px"></div>
+    <p>Коммерческое предложение со сроками и стоимостью — отдельным документом.</p>
+    <a class="cta" href="kp.html">Открыть коммерческое предложение</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Mavzunai Jovid · Gallery of Beauty MJ</span>
+    <span>ул. Бухоро, 23/25 · Душанбе</span>
+    <span>+992 98 103 11 11</span>
+  </div>
+</footer>
+
+</body>
+</html>
