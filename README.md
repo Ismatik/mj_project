@@ -65,12 +65,12 @@ Demo sign-in accounts — password from `SEED_OWNER_PASSWORD`:
 ## Website and site admin
 
 - `/` — the public website. It shows the **published** content; `/?preview=1` shows the draft to signed-in editors.
-- `/admin` — texts, prices on the site, photos, reviews, contacts, SEO. Edits autosave to a draft; **Опубликовать** makes them live.
+- `/admin` — texts, prices on the site, the bridal hall, masters, reviews, blog, photos, contacts, SEO. Sections follow the order they appear on the website; service ones (photos, contacts, SEO) sit at the end. Edits autosave to a draft; **Опубликовать** makes them live.
 - Prices and durations come from the CMS menu (`/cms/services`). The admin only chooses which services appear on the site.
 - Uploaded photos (JPG/PNG/WebP up to 8 MB) are stored in `MEDIA_DIR` and served from `/media/…`.
 - **Онлайн-запись**: guests pick a service, a master (or "любой"), a day and a free time. Free times come from the masters' schedules and existing bookings (`src/lib/slots.ts`); each booking is re-checked under a per-date lock, so two guests can't take the same slot. The booking appears in the CMS calendar as "Ожидание" (source: сайт) for reception to confirm.
 - "Не нашли удобное время?" leaves a callback request, shown on the CMS dashboard ("Заявки с сайта").
-- `/mastera`, `/mastera/<name>` and `/portfolio` — the team, each master's page (bio, prices, works, booking with that master) and all works with filters. Names, titles and services come from the CMS; portraits, bios, page addresses and portfolio photos are edited in `/admin` → «Мастера и портфолио» (a hidden master disappears from the site).
+- `/mastera`, `/mastera/<name>` and `/portfolio` — the team, each master's page (bio, prices, works, booking with that master) and all works with filters. Names, titles and services come from the CMS; portraits, bios, page addresses and portfolio photos are edited in `/admin` → «Наши мастера» (a hidden master disappears from the site).
 
 ## Guest account (`/kabinet`)
 

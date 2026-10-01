@@ -81,12 +81,6 @@ export function TextsSection({ c, onChange }: Props) {
             onChange={(v) => edit((d) => void (d.marquee = v.split(",").map((x) => x.trim()).filter(Boolean)))}
           />
         </Box>
-        <Box label="Свадебный зал">
-          <Text label="Надпись" value={c.bridal.kicker} onChange={(v) => edit((d) => void (d.bridal.kicker = v))} />
-          <Text label="Заголовок" title rows={2} value={c.bridal.title} onChange={(v) => edit((d) => void (d.bridal.title = v))} />
-          <Text label="Текст" rows={4} value={c.bridal.body} onChange={(v) => edit((d) => void (d.bridal.body = v))} />
-          <Text label="Кнопка" value={c.bridal.cta} onChange={(v) => edit((d) => void (d.bridal.cta = v))} />
-        </Box>
         <Box label="О салоне">
           <Text label="Заголовок" title value={c.about.title} onChange={(v) => edit((d) => void (d.about.title = v))} />
           <Text label="Текст" rows={4} value={c.about.body} onChange={(v) => edit((d) => void (d.about.body = v))} />
@@ -253,6 +247,49 @@ function PhotoCard({ label, place, photo, onChange }: { label: string; place: st
   );
 }
 
+// ── Свадебный зал ──────────────────────────────────────────
+/**
+ * Тексты переводятся, поэтому идут через `c`/`onChange` (вид текущего языка).
+ * Фотография общая для всех языков — она правится в русском черновике `draft`.
+ */
+export function BridalSection({
+  c,
+  onChange,
+  draft,
+  onDraft,
+  translating,
+}: Props & { draft: SiteContent; onDraft: (c: SiteContent) => void; translating?: boolean }) {
+  const edit = editor(c, onChange);
+  const editDraft = editor(draft, onDraft);
+  return (
+    <>
+      <Head title="Свадебный зал" lead="Секция «Невестам» на главной странице: текст и фотография. Кнопка ведёт на страницу свадебных пакетов." />
+      <div className={s.stack}>
+        <Box label="Текст секции">
+          <Text label="Надпись" value={c.bridal.kicker} onChange={(v) => edit((d) => void (d.bridal.kicker = v))} />
+          <Text label="Заголовок" title rows={2} value={c.bridal.title} onChange={(v) => edit((d) => void (d.bridal.title = v))} />
+          <Text label="Текст" rows={4} value={c.bridal.body} onChange={(v) => edit((d) => void (d.bridal.body = v))} />
+          <Text label="Кнопка" value={c.bridal.cta} onChange={(v) => edit((d) => void (d.bridal.cta = v))} />
+        </Box>
+        <Box label="Фотография">
+          {translating ? (
+            <p className={s.lead}>Фотография общая для всех языков — меняйте её на русской вкладке.</p>
+          ) : (
+            <div className={s.photos}>
+              <PhotoCard
+                label="Свадебный зал"
+                place="секция «Невестам»"
+                photo={draft.photos.bridal}
+                onChange={(p) => editDraft((d) => void (d.photos.bridal = p))}
+              />
+            </div>
+          )}
+        </Box>
+      </div>
+    </>
+  );
+}
+
 export function PhotosSection({ c, onChange }: Props) {
   const edit = editor(c, onChange);
   return (
@@ -260,7 +297,6 @@ export function PhotosSection({ c, onChange }: Props) {
       <Head title="Фотографии" lead="JPG, PNG или WebP до 8 МБ. На сайте фото показываются в чёрно-белом стиле MJ. Сейчас часть снимков — временные стоковые." />
       <div className={s.photos}>
         <PhotoCard label="Hero — главный экран" place="верх страницы" photo={c.photos.hero} onChange={(p) => edit((d) => void (d.photos.hero = p))} />
-        <PhotoCard label="Свадебный зал" place="секция «Невестам»" photo={c.photos.bridal} onChange={(p) => edit((d) => void (d.photos.bridal = p))} />
         <PhotoCard label="Интерьер" place="секция «О салоне»" photo={c.photos.interior} onChange={(p) => edit((d) => void (d.photos.interior = p))} />
         {c.reviews.items.map((r, i) => (
           <PhotoCard key={r.id} label={`Отзыв — ${r.author}`} place="аватар" photo={r.photo} onChange={(p) => edit((d) => void (d.reviews.items[i]!.photo = p))} />

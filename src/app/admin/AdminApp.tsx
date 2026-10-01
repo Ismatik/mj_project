@@ -13,16 +13,19 @@ import { discardDraft, publishSite, saveDraft } from "./actions";
 import type { AdminPost } from "@/server/blog";
 import { BlogSection } from "./BlogSection";
 import { MastersSection, type AdminCategory, type AdminStaff } from "./MastersSection";
-import { ContactsSection, PhotosSection, ReviewsSection, SeoSection, ServicesSection, TextsSection, type AdminService } from "./sections";
+import { BridalSection, ContactsSection, PhotosSection, ReviewsSection, SeoSection, ServicesSection, TextsSection, type AdminService } from "./sections";
 import s from "./admin.module.css";
 
+// Порядок — как секции идут на сайте: тексты → услуги → свадебный зал →
+// мастера → отзывы → советы. Служебные разделы собраны в конце.
 const SECTIONS = [
   { id: "texts", label: "Тексты секций" },
   { id: "prices", label: "Услуги и цены" },
-  { id: "photos", label: "Фотографии" },
-  { id: "masters", label: "Мастера и портфолио" },
+  { id: "bridal", label: "Свадебный зал" },
+  { id: "masters", label: "Наши мастера" },
   { id: "reviews", label: "Отзывы" },
   { id: "blog", label: "Блог и советы" },
+  { id: "photos", label: "Фотографии" },
   { id: "contacts", label: "Контакты и часы" },
   { id: "seo", label: "SEO" },
 ] as const;
@@ -191,6 +194,7 @@ export function AdminApp(props: {
           </div>
           {section === "texts" && <TextsSection c={view} onChange={change} />}
           {section === "prices" && <ServicesSection c={view} services={props.services} onChange={change} names={names} onName={setName} />}
+          {section === "bridal" && <BridalSection c={view} onChange={change} draft={draft} onDraft={update} translating={!!translating} />}
           {section === "photos" &&
             (translating ? <p className={s.lead}>Фотографии общие для всех языков — меняйте их на русской вкладке.</p> : <PhotosSection c={draft} onChange={update} />)}
           {section === "masters" && (

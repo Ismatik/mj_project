@@ -24,7 +24,7 @@ type Props = {
   onName?: (kind: keyof Names, id: string, v: string) => void;
 };
 
-// ── Мастера и портфолио ────────────────────────────────────
+// ── Наши мастера ───────────────────────────────────────────
 export function MastersSection({ c, onChange, staff, categories, translating, names, onName }: Props) {
   const edit = editor(c, onChange);
   const slugs = masterSlugs(staff, c.masters);
@@ -38,7 +38,7 @@ export function MastersSection({ c, onChange, staff, categories, translating, na
   return (
     <>
       <Head
-        title="Мастера и портфолио"
+        title="Наши мастера"
         lead="Страницы «Мастера» и «Портфолио» на сайте. Имена, должности и услуги мастеров берутся из CMS; здесь — фото, рассказ о мастере и его работы."
       />
       <div className={s.stack}>
