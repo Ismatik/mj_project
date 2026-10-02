@@ -37,12 +37,12 @@ const BODIES: Record<Exclude<MessageKind, "login-code" | "whatsapp-reply">, Reco
   },
   "booking-confirmation": {
     ru: {
-      text: "Mavzunai Jovid: {{1}}, вы записаны — {{2}}, {{3}}, мастер {{4}}. Ждём вас по адресу: ул. Бухоро, 23/25, Душанбе. Если планы изменятся, просто ответьте на это сообщение.",
-      example: ["Марта", "Ламинирование ресниц", "Ср, 30 сентября 2026, 12:00", "Мира"],
+      text: "Mavzunai Jovid: {{1}}, вы записаны — {{2}}, {{3}}, мастер {{4}}. Ждём вас по адресу: ул. Бухоро, 23/25, Душанбе. Перенести или отменить визит можно здесь: {{5}} — там же ваши записи и бонусы.",
+      example: ["Марта", "Ламинирование ресниц", "Ср, 30 сентября 2026, 12:00", "Мира", "https://t.me/mavzunaijovid_bot"],
     },
     en: {
-      text: "Mavzunai Jovid: {{1}}, you're booked — {{2}}, {{3}}, with {{4}}. We're at 23/25 Bukhoro St, Dushanbe. If your plans change, just reply to this message.",
-      example: ["Marta", "Lash lamination", "Wednesday, 30 September 2026, 12:00", "Mira"],
+      text: "Mavzunai Jovid: {{1}}, you're booked — {{2}}, {{3}}, with {{4}}. We're at 23/25 Bukhoro St, Dushanbe. Reschedule or cancel here: {{5}} — it also keeps your bookings and points.",
+      example: ["Marta", "Lash lamination", "Wednesday, 30 September 2026, 12:00", "Mira", "https://t.me/mavzunaijovid_bot"],
     },
   },
   "reminder-day": {

@@ -6,6 +6,7 @@ import { localize, nameIn } from "../../lib/i18n/content";
 import { when as whenIn } from "../../lib/i18n/format";
 import { asLang, type Lang } from "../../lib/i18n/locales";
 import { messageText, normalizeTemplates, WHATSAPP_LANG, WHATSAPP_TEMPLATES, type MessageKind, type MessageVars, type Templates } from "../../lib/messages";
+import { selfServiceLink } from "../../lib/site-url";
 import { DEFAULT_CONTENT, normalizeContent, type SiteContent } from "../../lib/site-content";
 
 type Db = PrismaClient | Prisma.TransactionClient;
@@ -32,6 +33,7 @@ export function appointmentVars(ctx: MessageContext, lang: Lang, a: ApptLike, gu
     time: clock(a.startsAt),
     master: a.staff.map((m) => nameIn(ctx.content, lang, "staff", m.id, m.name)).join(" + "),
     address: c.contacts.address,
+    link: selfServiceLink(lang),
   };
 }
 

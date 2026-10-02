@@ -9,7 +9,7 @@ export type MessageVars = Partial<Record<"name" | "service" | "when" | "time" | 
 export type Templates = Partial<Record<MessageKind, Partial<Record<Lang, string>>>>;
 
 export const MESSAGE_KINDS: { kind: MessageKind; title: string; hint: string; vars: (keyof MessageVars)[] }[] = [
-  { kind: "booking-confirmation", title: "Подтверждение онлайн-записи", hint: "Сразу после записи на сайте", vars: ["name", "service", "when", "master", "address"] },
+  { kind: "booking-confirmation", title: "Подтверждение онлайн-записи", hint: "Сразу после записи на сайте; ссылка ведёт в бот, а пока он не подключён — в личный кабинет", vars: ["name", "service", "when", "master", "address", "link"] },
   { kind: "reminder-day", title: "Напоминание за день", hint: "За 20–26 часов до визита", vars: ["name", "service", "when", "time", "master", "address"] },
   { kind: "reminder-hours", title: "Напоминание в день визита", hint: "За 1–3 часа до визита", vars: ["name", "service", "time", "master", "address"] },
   { kind: "login-code", title: "Код входа в личный кабинет", hint: "Вход на сайте по номеру телефона", vars: ["code"] },
@@ -20,9 +20,9 @@ export const MESSAGE_KINDS: { kind: MessageKind; title: string; hint: string; va
 
 export const DEFAULT_TEMPLATES: Record<MessageKind, Record<Lang, string>> = {
   "booking-confirmation": {
-    ru: "Mavzunai Jovid: {name}, вы записаны — {service}, {when}, мастер {master}. {address}. Если планы изменятся, напишите нам.",
-    tg: "Mavzunai Jovid: {name}, шумо сабт шудед — {service}, {when}, усто {master}. {address}. Агар нақшаҳо тағйир ёбанд, ба мо нависед.",
-    en: "Mavzunai Jovid: {name}, you're booked — {service}, {when}, with {master}. {address}. If your plans change, just message us.",
+    ru: "Mavzunai Jovid: {name}, вы записаны — {service}, {when}, мастер {master}. {address}. Перенести или отменить визит можно здесь: {link} — там же ваши записи и бонусы.",
+    tg: "Mavzunai Jovid: {name}, шумо сабт шудед — {service}, {when}, усто {master}. {address}. Ташрифро дар ин ҷо гузаронидан ё бекор кардан мумкин аст: {link} — дар ҳамон ҷо сабтҳо ва бонусҳои шумо.",
+    en: "Mavzunai Jovid: {name}, you're booked — {service}, {when}, with {master}. {address}. Reschedule or cancel here: {link} — it also keeps your bookings and points.",
   },
   "reminder-day": {
     ru: "Mavzunai Jovid ✦ Напоминаем: {when} — {service}, мастер {master}. {address}. Если планы изменились, перенесите или отмените запись в боте («Мои записи») или напишите нам.",
@@ -60,7 +60,9 @@ export const DEFAULT_TEMPLATES: Record<MessageKind, Record<Lang, string>> = {
  * it answers within 24 hours of her message, when free text is allowed. */
 export const WHATSAPP_TEMPLATES: Partial<Record<MessageKind, { name: string; category: "UTILITY" | "AUTHENTICATION" | "MARKETING"; params: (keyof MessageVars)[] }>> = {
   birthday: { name: "mj_birthday", category: "MARKETING", params: ["name", "points", "percent"] },
-  "booking-confirmation": { name: "mj_booking_confirmation", category: "UTILITY", params: ["name", "service", "when", "master"] },
+  // The link is last on purpose: a guest reached over WhatsApp has no Telegram chat yet, and this
+  // is the one message she is certain to open. Tapping it makes her reachable for free afterwards.
+  "booking-confirmation": { name: "mj_booking_confirmation", category: "UTILITY", params: ["name", "service", "when", "master", "link"] },
   "reminder-day": { name: "mj_reminder_day", category: "UTILITY", params: ["when", "service", "master"] },
   "reminder-hours": { name: "mj_reminder_hours", category: "UTILITY", params: ["time", "service", "master"] },
   "waitlist-offer": { name: "mj_waitlist_offer", category: "UTILITY", params: ["name", "service", "when", "master", "link"] },

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SitePage } from "@/components/site/SiteChrome";
 import { localize } from "@/lib/i18n/content";
 import { dict } from "@/lib/i18n/dict";
+import { botLink } from "@/lib/site-url";
 import { bookableDates } from "@/lib/slots";
 import { addDays, todayYmd } from "@/lib/time";
 import { getGuestAccount } from "@/server/guest-account";
@@ -42,8 +43,3 @@ export default async function AccountPage() {
   );
 }
 
-/** t.me link for "подключить Telegram" (TELEGRAM_BOT_USERNAME, set when the bot goes live). */
-function botLink(): string | null {
-  const name = process.env.TELEGRAM_BOT_USERNAME?.replace(/^@/, "").trim();
-  return name && /^\w{5,}$/.test(name) ? `https://t.me/${name}` : null;
-}
