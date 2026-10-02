@@ -18,14 +18,26 @@ or a VPS — nothing in the app changes, only `SITE_DOMAIN`.
 
 ```bash
 sudo pacman -Syu docker docker-compose git tailscale
-sudo systemctl enable --now docker tailscaled
-sudo usermod -aG docker $USER          # log out and back in for this to take effect
+sudo usermod -aG docker $USER
 ```
 
-Check the group took effect — `docker ps` must work without `sudo`:
+**Now reboot, before starting anything.** `pacman -Syu` upgrades the whole system, kernel included.
+When it does, the running kernel's modules are gone from disk and the new ones are not in use yet —
+so `docker.service` fails to start with nothing obviously wrong, because it cannot load `overlay`
+and `br_netfilter`. The reboot also applies the `docker` group to your user. If you skip it and
+`systemctl enable --now docker` fails, this is why; `uname -r` disagreeing with `pacman -Q linux`
+confirms it.
 
 ```bash
-docker ps
+sudo reboot
+```
+
+After it comes back:
+
+```bash
+sudo systemctl enable --now docker tailscaled
+systemctl status docker --no-pager      # "active (running)"
+docker ps                               # must work without sudo
 ```
 
 ## 2. The project

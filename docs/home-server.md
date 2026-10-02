@@ -34,8 +34,19 @@ On a VPS or a line with a static IP you don't need any of this — see "Run on a
 
 ```bash
 sudo pacman -Syu docker docker-compose git
+sudo usermod -aG docker $USER
+sudo reboot                            # see the note below — do not skip this
+```
+
+`pacman -Syu` upgrades the whole system, kernel included. When it does, the running kernel can no
+longer load modules (they were replaced on disk), so `docker.service` fails to start until you
+reboot — it cannot load `overlay` and `br_netfilter`. The reboot also applies the `docker` group.
+`uname -r` disagreeing with `pacman -Q linux` is the tell.
+
+```bash
 sudo systemctl enable --now docker
-sudo usermod -aG docker $USER          # then log out and back in
+systemctl status docker --no-pager     # "active (running)"
+docker ps                              # must work without sudo
 git clone https://github.com/Ismatik/mj_project && cd mj_project
 cp .env.example .env
 ```
