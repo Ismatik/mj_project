@@ -1,0 +1,18 @@
+# Laptop with no domain of its own: the site is published through Tailscale Funnel,
+# which gives a free, permanent HTTPS address like https://mj.tail1234.ts.net
+# No domain, no open ports, no static IP. Setup: docs/laptop-free-url.md
+#
+# Used together with docker-compose.yml — put this line in .env and plain `docker compose …` picks both up:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.laptop.yml
+
+services:
+  web:
+    # Funnel runs on the host and proxies into this port. Bound to 127.0.0.1 on purpose:
+    # the laptop must not serve the app to the café wifi it happens to be on.
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  # Caddy terminates HTTPS for a real domain on ports 80/443. Funnel already does that,
+  # and those ports are not reachable on a home line anyway, so keep it out of the way.
+  caddy:
+    profiles: ["caddy"]

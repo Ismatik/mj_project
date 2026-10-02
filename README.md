@@ -32,6 +32,7 @@ docker compose run --rm migrate npx prisma db seed   # optional: demo data
 - Database dumps are written daily to `./backups`.
 - Uploaded photos live in the `media` Docker volume.
 - **No public IP (a laptop or computer at home)?** Use a Cloudflare Tunnel instead of Caddy: `docker-compose.tunnel.yml`, step by step in **`docs/home-server.md`** (Arch Linux, keeping the laptop awake, off-site backups).
+- **No domain either?** Tailscale Funnel gives a free permanent HTTPS address (`mj.tail1234.ts.net`) with nothing to buy: `docker-compose.laptop.yml`, step by step in **`docs/laptop-free-url.md`**. Read its "Honest limits" first.
 
 ## Local development
 
