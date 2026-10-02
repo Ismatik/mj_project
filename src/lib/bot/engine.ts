@@ -432,7 +432,7 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
 
     case "prices": {
       const cats = await deps.menu(lang);
-      const lines = cats.map((c) => `${c.name.toUpperCase()}\n${c.services.map((s) => `• ${s.name} — ${money(s.price)}`).join("\n")}`);
+      const lines = cats.map((c) => `${c.name.toUpperCase()}\n${c.services.map((s) => `• ${s.name} - ${money(s.price)}`).join("\n")}`);
       out.push({ text: `${t.pricesTitle}\n\n${lines.join("\n\n")}`, buttons: [[{ text: t.book, data: "book" }], backToMenu()] });
       break;
     }

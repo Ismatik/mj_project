@@ -245,7 +245,7 @@ describe("Telegram bot: bonus and offers", () => {
   it("shows offers to anyone and points to a known guest", async () => {
     const { deps } = makeDeps();
     const offers = await handleUpdate({ chatId: "8", data: "offers" }, deps);
-    expect(texts(offers)).toContain("−20% — Осенний маникюр");
+    expect(texts(offers)).toContain("−20% - Осенний маникюр");
     const ask = await handleUpdate({ chatId: "8", data: "bonus" }, deps);
     expect(ask[0]!.askContact).toBe(true);
   });
