@@ -133,7 +133,10 @@ Funnel survives reboots once set with `--bg`; Docker brings the containers back 
 
 ## 5. Keep the laptop awake
 
-The site, the till and the reminders all stop when the laptop sleeps.
+**Do this one before anyone relies on the salon being online.** Until you do, closing the lid
+suspends the laptop and the whole salon goes offline: the website stops answering, the till is
+unreachable, reminders are not sent. Nothing is lost — it is a pause, not a crash — but guests see
+nothing at all while it lasts.
 
 ```bash
 # Closing the lid must not suspend
@@ -153,6 +156,45 @@ No inbound ports are needed, so block everything incoming:
 ```bash
 sudo pacman -S ufw && sudo ufw default deny incoming && sudo ufw enable
 ```
+
+### If it did go to sleep (or was switched off)
+
+Nothing has to be set up again. Open the lid, or press the power button, and sign in — Docker
+starts with the machine and brings every container back (`restart: unless-stopped`), and Funnel
+comes back with `tailscaled` because it was published with `--bg`. The site answers again on its
+own, usually within a minute.
+
+Check it really did, rather than assuming:
+
+```bash
+cd ~/mj_project
+docker compose ps                  # postgres, web, worker, backup: "running"
+tailscale funnel status            # "(Funnel on)" and the proxy line
+curl -I http://127.0.0.1:3000      # HTTP/1.1 200 OK
+```
+
+Each line has one thing that fixes it, and only one:
+
+| What is wrong | What to run |
+|---|---|
+| Containers are missing or `exited` | `docker compose up -d` |
+| `docker ps` says the daemon is not running | `sudo systemctl start docker`, then `docker compose up -d` |
+| `funnel status` is empty or says Funnel off | `sudo systemctl start tailscaled && tailscale funnel --bg 3000` |
+| All three are fine but the phone cannot open the site | The laptop's internet is down, not the salon's software |
+
+Nothing in the database is lost by a sleep, and messages already sitting in the outbox go out
+within a minute of the worker coming back. Two things do not survive it, though:
+
+- **Guests could not reach the salon** for as long as it lasted. A booking nobody could make is not
+  queued anywhere; the guest saw a site that did not answer and went elsewhere.
+- **Reminders whose moment passed are skipped, not sent late.** They are not queued in advance:
+  every 10 minutes the worker looks for visits starting in 20–26 hours and in 1–3 hours
+  (`src/lib/reminders.ts:8`). Sleep through the whole of one of those windows and that guest simply
+  never gets reminded — a three-hour nap is enough to lose the "2 hours before" message for
+  everyone due that afternoon.
+
+Which is the real argument for the commands above: it is not about uptime as a number, it is that a
+closed lid quietly drops reminders nobody will notice are missing.
 
 ## 6. Backups off the laptop
 

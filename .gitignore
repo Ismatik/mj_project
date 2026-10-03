@@ -43,7 +43,8 @@ next-env.d.ts
 # local
 /src/generated/
 !.env.example
-backups/
-media/
+/backups/
+# Uploaded photos. Anchored: unanchored "media/" also swallowed src/app/media/, the route serving them.
+/media/
 /e2e-output/
 /run-output/
