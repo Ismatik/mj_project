@@ -19,7 +19,8 @@ type Done = Extract<OnlineBookingResult, { ok: true }>;
 /** Automatic offers shown in the form (the server applies them again when booking) */
 export type Offer = PromoLike & { title: string };
 /** Pre-selected service and master ("Записаться снова", a master's page) */
-export type BookingPreset = { serviceId?: string; staffId?: string | null };
+/** `lock` means the whole form belongs to one master (her own page): no choosing another. */
+export type BookingPreset = { serviceId?: string; staffId?: string | null; lock?: boolean };
 
 /** "+992981031111" → "98 103 11 11" for the phone field */
 const localPhone = (e164: string) => e164.replace(/^\+992(\d{2})(\d{3})(\d{2})(\d{2})$/, "$1 $2 $3 $4");
@@ -52,6 +53,7 @@ export function OnlineBooking({
   const [catId, setCatId] = useState(presetCat?.id ?? menu[0]?.id ?? "");
   const [serviceId, setServiceId] = useState(presetCat ? preset!.serviceId! : "");
   const [staffId, setStaffId] = useState<string | null>(preset?.staffId ?? null);
+  const lockedStaff = Boolean(preset?.lock && preset.staffId);
   const [date, setDate] = useState(dates[0] ?? "");
   const [slots, setSlots] = useState<{ time: string; staffIds: string[] }[] | null>(null);
   const [time, setTime] = useState("");
@@ -260,9 +262,13 @@ export function OnlineBooking({
               <span>2</span> {b.master}
             </legend>
             <div className={s.chips}>
-              <button type="button" aria-pressed={!staffId} className={`${s.chip} ${!staffId ? s.chipOn : ""}`} onClick={() => reset(() => setStaffId(null))}>
-                {b.anyMaster}
-              </button>
+              {/* On a master's own page "any" would quietly hand the guest to a colleague: the menu
+                  here is narrowed to this master, but the server reads null as "whoever is free". */}
+              {!lockedStaff && (
+                <button type="button" aria-pressed={!staffId} className={`${s.chip} ${!staffId ? s.chipOn : ""}`} onClick={() => reset(() => setStaffId(null))}>
+                  {b.anyMaster}
+                </button>
+              )}
               {[...service.staff]
                 .sort((a, b) => Number(b.id === guest?.favouriteStaffId) - Number(a.id === guest?.favouriteStaffId))
                 .map((m) => (

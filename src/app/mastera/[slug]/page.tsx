@@ -140,7 +140,7 @@ export default async function MasterPage({ params }: PageProps<"/mastera/[slug]"
             </h2>
             <div className={s.rule} />
             <p className={s.bookingIntro}>{t.masters.bookingIntro}</p>
-            <OnlineBooking menu={ownMenu} dates={bookableDates(today, 14, addDays)} preset={{ staffId: master.id }}
+            <OnlineBooking menu={ownMenu} dates={bookableDates(today, 14, addDays)} preset={{ staffId: master.id, lock: true }}
               guest={guest}
               lang={lang}
               offers={offers.booking.map((o) => ({ ...o, title: o.titles[lang] }))}
