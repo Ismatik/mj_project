@@ -54,7 +54,10 @@ model Staff {
   salary      Int      @default(0)
   sortOrder   Int      @default(0)
   active      Boolean  @default(true)
+  /// Personal code she sends the bot once as "/master CODE" to get her own bookings there
+  botCode     String?  @unique
   user        User?
+  telegramChats TelegramChat[]
   appointments AppointmentStaff[]
   sales       Sale[]
   services    Service[] @relation("ServiceStaff")
@@ -373,12 +376,16 @@ model TelegramChat {
   /// Conversation state of the bot (current step and choices)
   state     Json     @default("{}")
   isStaff   Boolean  @default(false)
+  /// Set by "/master CODE": this chat is a master's own, and receives her bookings
+  staff     Staff?   @relation(fields: [staffId], references: [id])
+  staffId   String?
   /// Bot language chosen by the guest (null = not chosen yet, taken from Telegram)
   lang      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([guestId])
+  @@index([staffId])
 }
 
 // ─── Integrations (mock first) ───────────────────────────

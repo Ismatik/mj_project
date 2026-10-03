@@ -8,6 +8,7 @@ import { clock, shortDate } from "@/lib/format";
 import { normalizePhone } from "@/lib/phone";
 import { addDays, atSalonTime, todayYmd, type Ymd } from "@/lib/time";
 import { getCurrentUser } from "@/server/auth";
+import { newBookingAlert } from "@/server/integrations/master-alerts";
 
 async function requireBooker() {
   const user = await getCurrentUser();
@@ -128,7 +129,7 @@ export async function createBooking(raw: BookingInput): Promise<CreateBookingRes
   const shortName = last ? `${first} ${last[0]}.` : first!;
 
   const startsAt = atSalonTime(input.date, input.time.padStart(5, "0"));
-  await db.appointment.create({
+  const appt = await db.appointment.create({
     data: {
       guestId,
       guestName: shortName,
@@ -143,6 +144,12 @@ export async function createBooking(raw: BookingInput): Promise<CreateBookingRes
       staff: { create: input.staffIds.map((staffId) => ({ staffId })) },
     },
   });
+  // Reception booked this one, so nobody has told the master yet.
+  const phone = (await db.guest.findUnique({ where: { id: guestId }, select: { phone: true } }))?.phone ?? null;
+  for (const staffId of input.staffIds) {
+    const row = await newBookingAlert(db, staffId, { guestName: guestName!, phone, serviceLabel: service!.name, startsAt }, { appointmentId: appt.id });
+    if (row) await db.outboxMessage.create({ data: row });
+  }
 
   revalidatePath("/cms", "layout");
   return { ok: true, message: `${shortName} · ${service!.name} · ${shortDate(startsAt)}, ${clock(startsAt)}` };

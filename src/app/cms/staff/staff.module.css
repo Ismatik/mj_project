@@ -101,6 +101,55 @@
   color: var(--mj-ink);
 }
 
+/* Her own Telegram: whether she is connected, and the code that connects her. */
+.bot {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--mj-line);
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--mj-text-2);
+}
+.botRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.botRow + .botRow {
+  margin-top: 8px;
+}
+.botBtn {
+  border: 1px solid var(--mj-line);
+  background: var(--mj-paper);
+  color: var(--mj-gold-deep);
+  font: inherit;
+  letter-spacing: 0.04em;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: border-color 0.2s var(--mj-ease);
+}
+.botBtn:hover:not(:disabled) {
+  border-color: var(--mj-gold-line);
+}
+.botBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.botCode {
+  margin: 10px 0;
+  padding: 10px 12px;
+  background: var(--mj-sand);
+  word-break: break-word;
+}
+.botCode code {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 13px;
+  color: var(--mj-ink);
+  user-select: all;
+}
+
 /* The weekday toggles are 31×27 on a phone — too small to set a schedule with. */
 @media (max-width: 600px) {
   .dayBtn {
@@ -108,5 +157,12 @@
   }
   .day {
     padding: 13px 0;
+  }
+}
+
+/* Tap targets on a phone: the bot buttons sit next to each other on one line. */
+@media (max-width: 600px) {
+  .botBtn {
+    min-height: 44px;
   }
 }

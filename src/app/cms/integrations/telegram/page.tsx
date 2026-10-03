@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PageHead } from "@/components/ui/Headings";
 import { requirePage } from "@/server/auth";
 import { telegramConfigured } from "@/server/integrations/telegram-api";
@@ -27,6 +28,11 @@ export default async function TelegramSimulatorPage() {
           <h3>Уведомления ресепшену</h3>
           <p>
             Сотрудник пишет боту <code>/staff {code}</code> — и этот чат получает сообщения о новых записях, переносах и отменах.
+          </p>
+          <h3>Уведомления мастеру</h3>
+          <p>
+            У каждой мастерицы свой код, он выдаётся на её карточке в <Link href="/cms/staff">Мастерах</Link>. Она пишет его боту как <code>/master КОД</code> — и
+            получает только свои записи, а в 8:30 план на день.
           </p>
           <h3>Подключение к Telegram</h3>
           <ol>

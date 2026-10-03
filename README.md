@@ -91,6 +91,7 @@ Guests book, see, move and cancel their visits in Telegram; reception gets alert
 
 - The conversation logic lives in `src/lib/bot/engine.ts` (tested without Telegram). The same engine answers real Telegram updates (`/api/telegram/webhook`) and the **simulator** in the CMS (`/cms/integrations/telegram`), where the owner can try every flow before the bot is connected.
 - Staff link a chat for reception alerts by sending the bot `/staff CODE` (the code is on `/cms/integrations`).
+- A master links her own chat with `/master CODE` and gets just her bookings: new ones, cancellations, reschedules, and her day at 08:30. Her code is personal — one code per master, issued on her card in `/cms/staff` — so nobody can subscribe to another master's guests, who come with names and phone numbers. "Новый код" revokes the old one and unlinks every chat on it.
 - Going live: create the bot with @BotFather, put `TELEGRAM_BOT_TOKEN` and a long random `TELEGRAM_WEBHOOK_SECRET` in `.env`, restart, then CMS → Интеграции → Telegram → "Подключить webhook" and switch to "Живой". Requires the public HTTPS domain in `SITE_DOMAIN`.
 
 - The bot speaks Russian, Tajik and English: the language comes from the Telegram app on first contact and can be changed with "🌐 Язык · Забон · Language" or `/lang`. It also becomes the language of that guest's reminders.

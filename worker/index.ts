@@ -1,6 +1,7 @@
 // Background worker: every minute releases unpaid prepayment holds, passes unanswered waitlist offers on
 // and delivers queued outbox messages;
-// every 10 minutes queues visit reminders; every hour refreshes the Instagram feed; every morning gives birthday points.
+// every 10 minutes queues visit reminders; every hour refreshes the Instagram feed;
+// every morning sends each master her day and gives birthday points.
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PgBoss } from "pg-boss";
@@ -11,6 +12,8 @@ import { releaseExpired } from "../src/server/payments/core";
 import { queueReminders } from "../src/server/integrations/reminders";
 import { closePastEntries, expireOffers } from "../src/server/waitlist/core";
 import { refreshInstagram } from "../src/server/integrations/instagram";
+import { queueMasterDayPlans } from "../src/server/integrations/master-alerts";
+import { addDays, atSalonTime, todayYmd } from "../src/lib/time";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL is not set");
@@ -22,6 +25,7 @@ const SWEEP = "outbox-sweep";
 const REMINDERS = "reminders";
 const BIRTHDAYS = "birthdays";
 const INSTAGRAM = "instagram";
+const MASTER_DAY = "master-day";
 
 async function main() {
   boss.on("error", (e) => console.error("[worker]", e));
@@ -58,6 +62,14 @@ async function main() {
   await boss.work(BIRTHDAYS, async () => {
     const n = await awardBirthdays(db);
     if (n) console.log(`[worker] birthdays: ${n}`);
+  });
+  // Each master's day, to her own chat, before the salon opens
+  await boss.createQueue(MASTER_DAY);
+  await boss.schedule(MASTER_DAY, "30 8 * * *", undefined, { tz: "Asia/Dushanbe" });
+  await boss.work(MASTER_DAY, async () => {
+    const today = todayYmd();
+    const n = await queueMasterDayPlans(db, atSalonTime(today), atSalonTime(addDays(today, 1)));
+    if (n) console.log(`[worker] master day plans: ${n}`);
   });
   console.log("[worker] ready");
 

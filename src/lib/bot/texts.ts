@@ -79,6 +79,8 @@ const ru = {
   phone: "Телефон",
   staffOk: "Готово: этот чат будет получать уведомления ресепшена о новых записях, отменах и переносах.",
   staffBad: "Код не подошёл. Возьмите актуальный код в CMS → Интеграции.",
+  masterOk: (name: string) => `Готово, ${name}. Сюда будут приходить ваши записи - новые, отменённые и перенесённые, а утром план на день.`,
+  masterBad: "Код не подошёл. Личный код мастера выдают в CMS → Мастера.",
 };
 
 export type BotTexts = typeof ru;
@@ -157,6 +159,8 @@ const tg: BotTexts = {
   phone: "Телефон",
   staffOk: "Тайёр: ин чат огоҳиҳои ресепшенро дар бораи сабтҳои нав, бекоркунӣ ва гузаронидан мегирад.",
   staffBad: "Рамз мувофиқ нест. Рамзи навро дар CMS → Интеграции гиред.",
+  masterOk: (name) => `Тайёр, ${name}. Сабтҳои шумо ба ин ҷо меоянд - нав, бекоршуда ва гузаронидашуда, саҳарӣ бошад нақшаи рӯз.`,
+  masterBad: "Рамз мувофиқ нест. Рамзи шахсии усторо дар CMS → Мастера медиҳанд.",
 };
 
 const en: BotTexts = {
@@ -233,6 +237,8 @@ const en: BotTexts = {
   phone: "Phone",
   staffOk: "Done: this chat will receive reception alerts about new bookings, cancellations and changes.",
   staffBad: "That code didn't work. Take the current code from CMS → Интеграции.",
+  masterOk: (name) => `Done, ${name}. Your bookings will arrive here - new, cancelled and moved ones, and your plan each morning.`,
+  masterBad: "That code didn't work. A master's personal code is issued in CMS → Мастера.",
 };
 
 const TEXTS: Record<Lang, BotTexts> = { ru, tg, en };

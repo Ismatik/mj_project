@@ -56,6 +56,8 @@ export interface BotDeps {
   contacts(lang: Lang): Promise<{ phone: string; whatsapp: string; address: string; district: string; hours: string; dayOff: string }>;
   /** Code that links a chat as a reception chat (shown on /cms/integrations) */
   staffCode(): Promise<string>;
+  /** Links this chat to the master whose personal code it is (shown on /cms/staff). Her name back, or null. */
+  linkMaster(chatId: string, code: string): Promise<string | null>;
   formatWhen(d: Date, lang: Lang): string;
   /** Her bonus points (null when the program is off) */
   bonus(guestId: string, lang: Lang): Promise<{ balance: number; tier: string; percent: number; maxSpendPercent: number } | null>;
@@ -234,6 +236,11 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
       } else {
         out.push({ text: t.staffBad });
       }
+      return out;
+    }
+    if (text.startsWith("/master")) {
+      const name = await deps.linkMaster(u.chatId, text.split(/\s+/)[1] ?? "");
+      out.push({ text: name ? t.masterOk(name) : t.masterBad });
       return out;
     }
     if (text === "/start") {

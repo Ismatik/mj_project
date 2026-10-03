@@ -13,6 +13,7 @@ import { when } from "@/lib/i18n/format";
 import { LANG_NAME, type Lang } from "@/lib/i18n/locales";
 import { addDays, atSalonTime, todayYmd, type Ymd } from "@/lib/time";
 import { appointmentVars, guestMessage, messageContext } from "./integrations/guest-messages";
+import { cancelAlert, newBookingAlert, rescheduleAlert } from "./integrations/master-alerts";
 import { promotionsBetween } from "./loyalty/core";
 import { onBookingCancelled } from "./waitlist/core";
 import { namerFor } from "./names";
@@ -207,6 +208,8 @@ export async function createGuestBooking(input: {
     if (input.source === "WEBSITE" && !deposit) {
       messages.push(await guestMessage(tx, ctx, { guest, kind: "booking-confirmation", vars: varsIn, meta: { appointmentId: appt.id } }));
     }
+    const forMaster = await newBookingAlert(tx, staffId, { guestName: guest.name, phone: guest.phone, serviceLabel: service.name, startsAt }, { appointmentId: appt.id, deposit });
+    if (forMaster) messages.push(forMaster);
     await tx.outboxMessage.createMany({ data: messages });
     if (input.telegramChatId) await tx.telegramChat.update({ where: { id: input.telegramChatId }, data: { guestId: guest.id } });
     const payment = deposit
@@ -257,9 +260,11 @@ export async function upcomingForGuest(guestId: string, lang: Lang = "ru") {
 /** Guest cancels her own booking (at least 2 hours ahead). Reception is notified. */
 export async function cancelByGuest(appointmentId: string, guestId: string, lang: Lang = "ru"): Promise<{ ok: boolean; error?: string }> {
   const e = dict(lang).errors;
-  const a = await db.appointment.findFirst({ where: { id: appointmentId, guestId }, include: { guest: true } });
+  const a = await db.appointment.findFirst({ where: { id: appointmentId, guestId }, include: { guest: true, staff: { select: { staffId: true } } } });
   if (!a || !["PENDING", "CONFIRMED"].includes(a.status)) return { ok: false, error: e.notFound };
   if (a.startsAt.getTime() - Date.now() < 2 * 3600_000) return { ok: false, error: e.tooLate };
+  const visit = { guestName: a.guest?.name ?? a.guestName, phone: a.guest?.phone ?? null, serviceLabel: a.serviceLabel, startsAt: a.startsAt };
+  const forMaster = await cancelAlert(db, a.staff[0]?.staffId ?? null, visit, a.id);
   await db.$transaction([
     db.appointment.update({ where: { id: a.id }, data: { status: "CANCELLED", holdUntil: null } }),
     db.payment.updateMany({ where: { appointmentId: a.id, status: "PENDING" }, data: { status: "CANCELLED" } }),
@@ -271,6 +276,7 @@ export async function cancelByGuest(appointmentId: string, guestId: string, lang
         meta: { kind: "guest-cancel", appointmentId: a.id },
       },
     }),
+    ...(forMaster ? [db.outboxMessage.create({ data: forMaster })] : []),
   ]);
   await onBookingCancelled(db, a); // the freed time goes to the waitlist
   return { ok: true };
@@ -298,6 +304,9 @@ export async function rescheduleByGuest(appointmentId: string, guestId: string, 
         meta: { kind: "guest-reschedule", appointmentId: a.id },
       },
     });
+    const visit = { guestName: a.guest?.name ?? a.guestName, phone: a.guest?.phone ?? null, serviceLabel: a.serviceLabel, startsAt };
+    const forMaster = await rescheduleAlert(tx, staffId, visit, freed.startsAt, a.id);
+    if (forMaster) await tx.outboxMessage.create({ data: forMaster });
     return {
       ok: true as const,
       appointmentId: a.id,

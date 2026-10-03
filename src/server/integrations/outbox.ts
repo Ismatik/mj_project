@@ -2,6 +2,7 @@
 // No "server-only" import: the worker (plain Node) uses this file too.
 import type { OutboxMessage, PrismaClient } from "@/generated/prisma/client";
 import { channelFor, type ChannelKey, type DeliveryResult, type OutgoingMeta } from "./channels";
+import { linkedChats, staffIdFromAddress } from "./master-alerts";
 
 type Modes = Map<string, "MOCK" | "LIVE" | null>;
 
@@ -22,6 +23,14 @@ async function deliver(db: PrismaClient, msg: OutboxMessage, modeOf: Modes): Pro
     if (!staff.length) result = { ok: false, error: "Нет чата ресепшена: отправьте боту /staff КОД из CMS → Интеграции" };
     else {
       const all = await Promise.all(staff.map((c) => channel.send(c.id, msg.body)));
+      result = all.find((r) => !r.ok) ?? { ok: true };
+    }
+  } else if (mode === "LIVE" && msg.channel === "telegram" && staffIdFromAddress(msg.to)) {
+    // One master's own alerts, to every chat she linked with "/master CODE"
+    const chats = await linkedChats(db, staffIdFromAddress(msg.to)!);
+    if (!chats.length) result = { ok: false, error: "Мастер отвязала свой чат: код можно выдать заново в CMS → Мастера" };
+    else {
+      const all = await Promise.all(chats.map((c) => channel.send(c.id, msg.body)));
       result = all.find((r) => !r.ok) ?? { ok: true };
     }
   } else if (mode === "LIVE" && msg.channel === "telegram" && msg.to.startsWith("sim-")) {

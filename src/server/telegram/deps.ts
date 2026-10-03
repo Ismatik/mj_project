@@ -28,6 +28,52 @@ export async function getStaffCode(): Promise<string> {
   return code;
 }
 
+/**
+ * A master's own code, made on first sight and kept. Personal rather than one code for everyone:
+ * a code that only works for its owner cannot subscribe the wrong person to another master's
+ * bookings, which carry guests' names and phone numbers.
+ */
+export async function getMasterCode(staffId: string): Promise<string> {
+  const row = await db.staff.findUnique({ where: { id: staffId }, select: { botCode: true } });
+  if (row?.botCode) return row.botCode;
+  return rotateMasterCode(staffId);
+}
+
+/** A fresh code; the old one stops working. Every chat linked with it is unlinked. */
+export async function rotateMasterCode(staffId: string): Promise<string> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const code = `MJ-${randomInt(1000, 9999)}-${randomInt(1000, 9999)}`;
+    try {
+      await db.$transaction([
+        db.staff.update({ where: { id: staffId }, data: { botCode: code } }),
+        db.telegramChat.updateMany({ where: { staffId }, data: { staffId: null } }),
+      ]);
+      return code;
+    } catch {
+      // botCode is unique; on the rare collision just draw again
+    }
+  }
+  throw new Error("Не удалось выдать код мастеру");
+}
+
+export async function unlinkMaster(staffId: string): Promise<void> {
+  await db.telegramChat.updateMany({ where: { staffId }, data: { staffId: null } });
+}
+
+/** "/master CODE" in the bot: ties this chat to that master. Her name back, or null if no match. */
+export async function linkMasterChat(chatId: string, code: string): Promise<string | null> {
+  const trimmed = code.trim();
+  if (!trimmed) return null;
+  const staff = await db.staff.findUnique({ where: { botCode: trimmed }, select: { id: true, name: true, active: true } });
+  if (!staff || !staff.active) return null;
+  await db.telegramChat.upsert({
+    where: { id: chatId },
+    update: { staffId: staff.id },
+    create: { id: chatId, staffId: staff.id },
+  });
+  return staff.name;
+}
+
 export async function rotateStaffCode(): Promise<string> {
   const row = await db.integration.findUnique({ where: { key: "telegram" } });
   const config = (row?.config ?? {}) as Record<string, unknown>;
@@ -87,6 +133,7 @@ export function botDeps(): BotDeps {
       return localize(await getSiteContent("published"), lang).contacts;
     },
     staffCode: getStaffCode,
+    linkMaster: linkMasterChat,
     formatWhen: (d, lang) => when(d, lang),
     async bonus(guestId, lang) {
       const b = await guestBonus(db, guestId, lang);

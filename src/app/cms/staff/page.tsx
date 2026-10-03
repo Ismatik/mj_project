@@ -4,6 +4,7 @@ import { canSeeRevenue } from "@/lib/access";
 import { somoni } from "@/lib/format";
 import { requirePage } from "@/server/auth";
 import { getStaffBoard } from "@/server/staff";
+import { BotLink } from "./BotLink";
 import { WorkDays } from "./WorkDays";
 import s from "./staff.module.css";
 
@@ -41,6 +42,7 @@ export default async function StaffPage() {
                 Выручка в {board.monthPrep}: <b>{somoni(m.revenue)}</b>
               </div>
             )}
+            <BotLink staffId={m.id} name={m.name} chats={m.botChats} editable={owner} />
           </article>
         ))}
       </div>

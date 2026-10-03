@@ -65,6 +65,7 @@ function makeDeps() {
       return { phone: "+992 98 103 11 11", whatsapp: "992981031111", address: "ул. Бухоро, 23/25", district: "Душанбе", hours: "Вт–Вс 09:00–18:00", dayOff: "Понедельник — выходной" };
     },
     staffCode: async () => "MJ-4821",
+    linkMaster: async (_chatId, code) => (code === "MJ-1111-2222" ? "Мира" : null),
     formatWhen: (d) => d.toISOString(),
     bonus: async () => ({ balance: 120, tier: "Серебро", percent: 7, maxSpendPercent: 30 }),
     offers: async () => [{ title: "Осенний маникюр", description: "", label: "−20%", until: "31 октября 2026", code: null }],
@@ -201,6 +202,15 @@ describe("Telegram bot", () => {
     expect(texts(await send({ text: "/staff 0000" }))).toContain("Код не подошёл");
     expect(texts(await send({ text: "/staff MJ-4821" }))).toContain("уведомления ресепшена");
     expect(t.chats.get("c1")!.isStaff).toBe(true);
+  });
+
+  it("links a master to her own chat, and names her back", async () => {
+    expect(texts(await send({ text: "/master MJ-1111-2222" }))).toContain("Готово, Мира");
+  });
+
+  // Her code is the only thing standing between a stranger and another master's guest list.
+  it.each(["/master", "/master MJ-9999-9999", "/master MJ-4821"])("refuses %s", async (text) => {
+    expect(texts(await send({ text }))).toContain("Код не подошёл");
   });
 
   it("answers free text with the menu", async () => {
