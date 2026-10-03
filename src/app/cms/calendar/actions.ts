@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { clock } from "@/lib/format";
 import { addDays, atSalonTime, todayYmd } from "@/lib/time";
 import { getCurrentUser } from "@/server/auth";
+import { cancelAlert, forEachMaster, rescheduleAlert } from "@/server/integrations/master-alerts";
 import { onBookingCancelled } from "@/server/waitlist/core";
 
 type Status = "PENDING" | "CONFIRMED" | "IN_CHAIR" | "CANCELLED" | "NO_SHOW";
@@ -16,14 +17,21 @@ export async function setAppointmentStatus(id: string, status: Status): Promise<
   const user = await getCurrentUser();
   if (!user || !canOpen(user.role, "calendar")) return { ok: false, error: "Нет доступа" };
   if (!["PENDING", "CONFIRMED", "IN_CHAIR", "CANCELLED", "NO_SHOW"].includes(status)) return { ok: false, error: "Неизвестный статус" };
-  const a = await db.appointment.findUnique({ where: { id }, include: { staff: true } });
+  const a = await db.appointment.findUnique({ where: { id }, include: { staff: true, guest: { select: { phone: true } } } });
   if (!a) return { ok: false, error: "Запись не найдена" };
   if (a.status === "DONE") return { ok: false, error: "Запись уже оплачена" };
   if (user.role === "MASTER") {
     if (!a.staff.some((s) => s.staffId === user.staffId) || status !== "IN_CHAIR") return { ok: false, error: "Мастер может только отметить «в кресле»" };
   }
   await db.appointment.update({ where: { id }, data: { status, ...(status === "CANCELLED" ? { holdUntil: null } : {}) } });
-  if (status === "CANCELLED" && a.status !== "CANCELLED") await onBookingCancelled(db, a); // offer the time to the waitlist
+  if (status === "CANCELLED" && a.status !== "CANCELLED") {
+    // Cancelled at the desk, so nobody has told the master. Without this she only finds out from
+    // the 8:30 plan the next morning - too late if the visit was this afternoon.
+    const visit = { guestName: a.guestName, phone: a.guest?.phone ?? null, serviceLabel: a.serviceLabel, startsAt: a.startsAt };
+    const rows = await forEachMaster(a.staff.map((s) => s.staffId), (staffId) => cancelAlert(db, staffId, visit, a.id));
+    if (rows.length) await db.outboxMessage.createMany({ data: rows });
+    await onBookingCancelled(db, a); // offer the time to the waitlist
+  }
   revalidatePath("/cms", "layout");
   return { ok: true };
 }
@@ -31,7 +39,7 @@ export async function setAppointmentStatus(id: string, status: Status): Promise<
 export async function rescheduleAppointment(id: string, date: string, time: string): Promise<{ ok: boolean; error?: string }> {
   const user = await getCurrentUser();
   if (!user || !canBook(user.role)) return { ok: false, error: "Нет доступа" };
-  const a = await db.appointment.findUnique({ where: { id }, include: { staff: { include: { staff: true } } } });
+  const a = await db.appointment.findUnique({ where: { id }, include: { staff: { include: { staff: true } }, guest: { select: { phone: true } } } });
   if (!a) return { ok: false, error: "Запись не найдена" };
   if (a.status === "DONE" || a.status === "CANCELLED") return { ok: false, error: "Эту запись уже нельзя перенести" };
 
@@ -67,7 +75,12 @@ export async function rescheduleAppointment(id: string, date: string, time: stri
   const first = errors.date ?? errors.time ?? errors.staff;
   if (first) return { ok: false, error: first };
 
-  await db.appointment.update({ where: { id }, data: { startsAt: atSalonTime(date, time.padStart(5, "0")) } });
+  const startsAt = atSalonTime(date, time.padStart(5, "0"));
+  await db.appointment.update({ where: { id }, data: { startsAt } });
+  // a.startsAt is still the old time here: that is what the master needs to stop expecting.
+  const visit = { guestName: a.guestName, phone: a.guest?.phone ?? null, serviceLabel: a.serviceLabel, startsAt };
+  const rows = await forEachMaster(staffIds, (staffId) => rescheduleAlert(db, staffId, visit, a.startsAt, a.id));
+  if (rows.length) await db.outboxMessage.createMany({ data: rows });
   await onBookingCancelled(db, a); // its old time is free now
   revalidatePath("/cms", "layout");
   return { ok: true };

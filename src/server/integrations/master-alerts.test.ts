@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PrismaClient } from "@/generated/prisma/client";
-import { cancelAlert, masterAddress, newBookingAlert, queueMasterDayPlans, rescheduleAlert, staffIdFromAddress } from "./master-alerts";
+import { cancelAlert, forEachMaster, masterAddress, newBookingAlert, queueMasterDayPlans, rescheduleAlert, staffIdFromAddress } from "./master-alerts";
 
 const AT = (hhmm: string) => new Date(`2026-10-05T${hhmm}:00+05:00`); // Dushanbe
 const VISIT = { guestName: "Фарзона", phone: "+992981031111", serviceLabel: "Маникюр", startsAt: AT("14:00") };
@@ -86,6 +86,31 @@ describe("an alert is only built when there is somewhere to send it", () => {
   it("includes the phone number", async () => {
     const { db } = fakeDb({ linked: ["mira"] });
     expect((await newBookingAlert(db, "mira", VISIT, { appointmentId: "a1" }))?.body).toContain("+992 98 103-11-11");
+  });
+});
+
+// A pair service - the bride's hair and her make-up - puts two masters on one appointment.
+describe("every master on a booking, not just the first", () => {
+  it("writes to both of them", async () => {
+    const { db } = fakeDb({ linked: ["mira", "zarina"] });
+    const rows = await forEachMaster(["mira", "zarina"], (id) => cancelAlert(db, id, VISIT, "a1"));
+    expect(rows.map((r) => r.to)).toEqual(["staff:mira", "staff:zarina"]);
+  });
+
+  it("leaves out the one who never linked a chat", async () => {
+    const { db } = fakeDb({ linked: ["zarina"] });
+    const rows = await forEachMaster(["mira", "zarina"], (id) => newBookingAlert(db, id, VISIT, { appointmentId: "a1" }));
+    expect(rows.map((r) => r.to)).toEqual(["staff:zarina"]);
+  });
+
+  it("writes once to a master the booking lists twice", async () => {
+    const { db } = fakeDb({ linked: ["mira"] });
+    expect(await forEachMaster(["mira", "mira"], (id) => rescheduleAlert(db, id, VISIT, AT("11:00"), "a1"))).toHaveLength(1);
+  });
+
+  it("writes nothing when none of them is linked", async () => {
+    const { db } = fakeDb({ linked: [] });
+    expect(await forEachMaster(["mira", "zarina"], (id) => cancelAlert(db, id, VISIT, "a1"))).toEqual([]);
   });
 });
 

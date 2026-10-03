@@ -12,6 +12,7 @@ import { freeSlots, type BusyInterval } from "../../lib/slots";
 import { addDays, atSalonTime, todayYmd, type Ymd } from "../../lib/time";
 import { offerExpiry, pickOffer } from "../../lib/waitlist";
 import { appointmentVars, guestMessage, messageContext } from "../integrations/guest-messages";
+import { forEachMaster, newBookingAlert } from "../integrations/master-alerts";
 import { promotionsBetween } from "../loyalty/core";
 
 type Db = PrismaClient;
@@ -186,6 +187,10 @@ export async function acceptOffer(db: Db, token: string): Promise<{ ok: boolean;
       },
     ];
     if (guest) messages.push(await guestMessage(tx, ctx, { guest, kind: "booking-confirmation", vars: (l) => appointmentVars(ctx, l, { ...a, staff }, e.name), meta: { appointmentId: a.id } }));
+    // Told now that she has said yes, not when the time was offered: most offers expire unanswered,
+    // and a booking that evaporates in half an hour is worse than no message at all.
+    const visit = { guestName: e.name, phone: e.phone, serviceLabel: a.serviceLabel, startsAt: a.startsAt };
+    messages.push(...(await forEachMaster(a.staff.map((s) => s.staffId), (staffId) => newBookingAlert(tx, staffId, visit, { appointmentId: a.id }))));
     await tx.outboxMessage.createMany({ data: messages });
     return { ok: true };
   });

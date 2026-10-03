@@ -25,6 +25,16 @@ async function alert(tx: Tx, staffId: string | null | undefined, body: string, m
   return chats.length ? { channel: "telegram", to: masterAddress(staffId), body, meta } : null;
 }
 
+/**
+ * The same alert for every master on a booking, skipping the ones who never linked a chat.
+ * A pair service (the bride's hair and her make-up) has two, and taking only the first left the
+ * second to find out from the morning plan.
+ */
+export async function forEachMaster(staffIds: string[], make: (staffId: string) => Promise<Row | null>): Promise<Row[]> {
+  const rows = await Promise.all([...new Set(staffIds)].map(make));
+  return rows.filter((r): r is Row => r !== null);
+}
+
 type Visit = { guestName: string; phone: string | null; serviceLabel: string; startsAt: Date };
 
 const line = (v: Visit) => `${v.guestName}${v.phone ? `, ${formatPhone(v.phone)}` : ""} - ${v.serviceLabel}\n${longDate(v.startsAt)}, ${clock(v.startsAt)}`;

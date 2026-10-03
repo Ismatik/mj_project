@@ -7,6 +7,7 @@ import { asLang } from "../../lib/i18n/locales";
 import { GIFT_VALID_DAYS } from "../../lib/money";
 import { formatPhone } from "../../lib/phone";
 import { appointmentVars, guestMessage, messageContext } from "../integrations/guest-messages";
+import { cancelAlert, forEachMaster } from "../integrations/master-alerts";
 import { onBookingCancelled } from "../waitlist/core";
 
 type Db = PrismaClient;
@@ -38,8 +39,9 @@ export async function markPaid(db: Db, paymentId: string, externalId?: string): 
           meta: { kind: "deposit-paid", appointmentId: a.id, paymentId: p.id },
         },
       });
-      // Her confirmation waited for the prepayment
-      if (a.guest && a.source === "WEBSITE") {
+      // Her confirmation waited for the prepayment. Telegram counts too: the bot said "записано"
+      // before she paid, so without this the one message that matters never arrives.
+      if (a.guest && a.source !== "CMS") {
         const ctx = await messageContext(tx);
         const staff = a.staff.map((s) => s.staff);
         const msg = await guestMessage(tx, ctx, {
@@ -76,7 +78,7 @@ export async function cancelPayment(db: Db | Tx, paymentId: string, reason: "can
   if (!p || p.status !== "PENDING") return false;
   await db.payment.update({ where: { id: p.id }, data: { status: "CANCELLED" } });
   if (p.purpose === "DEPOSIT" && p.appointmentId) {
-    const a = await db.appointment.findUnique({ where: { id: p.appointmentId }, include: { guest: true } });
+    const a = await db.appointment.findUnique({ where: { id: p.appointmentId }, include: { guest: true, staff: { select: { staffId: true } } } });
     // Only release a booking still waiting for its prepayment (reception may have confirmed it by phone)
     if (a && a.holdUntil && a.depositPaid < a.depositRequired && ["PENDING"].includes(a.status)) {
       await db.appointment.update({ where: { id: a.id }, data: { status: "CANCELLED", holdUntil: null, note: reason === "expired" ? "Предоплата не внесена вовремя" : "Гостья отменила оплату" } });
@@ -88,6 +90,10 @@ export async function cancelPayment(db: Db | Tx, paymentId: string, reason: "can
           meta: { kind: "deposit-expired", appointmentId: a.id },
         },
       });
+      // She was told the time was hers until the prepayment landed; it did not, so close the loop.
+      const visit = { guestName: a.guest?.name ?? a.guestName, phone: a.guest?.phone ?? null, serviceLabel: a.serviceLabel, startsAt: a.startsAt };
+      const rows = await forEachMaster(a.staff.map((s) => s.staffId), (staffId) => cancelAlert(db, staffId, visit, a.id));
+      if (rows.length) await db.outboxMessage.createMany({ data: rows });
       if ("$transaction" in db) await onBookingCancelled(db as PrismaClient, a);
     }
   }
