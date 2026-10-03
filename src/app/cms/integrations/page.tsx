@@ -7,6 +7,7 @@ import { CHANNEL_LABEL, INTEGRATIONS } from "@/lib/integrations";
 import { requirePage } from "@/server/auth";
 import { telegramConfigured } from "@/server/integrations/telegram-api";
 import { instagramStatus } from "@/server/integrations/instagram";
+import { staffIdFromAddress } from "@/server/integrations/master-alerts";
 import { getStaffCode } from "@/server/telegram/deps";
 import { DeliverNow, InstagramTools, IntegrationControls, TelegramTools } from "./IntegrationControls";
 import s from "./integrations.module.css";
@@ -32,6 +33,9 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
     getStaffCode(),
     db.telegramChat.count({ where: { isStaff: true, NOT: { id: { startsWith: "sim-" } } } }),
   ]);
+  // A master's alerts are addressed "staff:<id>", which is unreadable in a list meant to be read.
+  const staffNames = new Map((await db.staff.findMany({ select: { id: true, name: true } })).map((m) => [m.id, m.name]));
+  const addressee = (to: string) => (to === "reception" ? "ресепшен" : staffNames.get(staffIdFromAddress(to) ?? "") ?? to);
 
   return (
     <div>
@@ -105,7 +109,7 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
               </span>
               <span className={s.msgMain}>
                 <span className={s.msgTo}>
-                  {CHANNEL_LABEL[m.channel] ?? m.channel} → {m.to === "reception" ? "ресепшен" : m.to}
+                  {CHANNEL_LABEL[m.channel] ?? m.channel} → {addressee(m.to)}
                   {metaOf(m.meta).lang && metaOf(m.meta).lang !== "ru" ? ` · ${String(metaOf(m.meta).lang).toUpperCase()}` : ""}
                   {metaOf(m.meta).template ? ` · шаблон ${metaOf(m.meta).template!.name}` : ""}
                 </span>
