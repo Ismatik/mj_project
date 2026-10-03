@@ -48,7 +48,7 @@ export function WaitlistJoin({ serviceId, staffId, date, name: initialName, phon
             ))}
           </select>{" "}
           <select aria-label={w.to} value={to} onChange={(e) => setTo(e.target.value)}>
-            <option value="">—</option>
+            <option value="">-</option>
             {HOURS.slice(1).map((h) => (
               <option key={h} value={h}>
                 {w.to} {h}

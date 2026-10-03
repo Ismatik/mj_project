@@ -35,7 +35,7 @@ function ServiceMaster({ services, staff, serviceId, setServiceId, staffId, setS
       <label>
         Услуга
         <select name="service" value={serviceId} onChange={(e) => (setServiceId(e.target.value), setStaffId(""))}>
-          <option value="">—</option>
+          <option value="">-</option>
           {services.map((x) => (
             <option key={x.id} value={x.id}>
               {x.name}
@@ -118,7 +118,7 @@ export function EntryForm({ services, staff, dates }: { services: Services; staf
         e.preventDefault();
         run(
           () => newEntry({ name, phone, serviceId, staffId: staffId || null, date, timeFrom: from, timeTo: to, note }),
-          (res: { offered: boolean }) => (res.offered ? "Время уже свободно — предложили гостье" : `${name} в листе ожидания`),
+          (res: { offered: boolean }) => (res.offered ? "Время уже свободно - предложили гостье" : `${name} в листе ожидания`),
           () => (setName(""), setPhone(""), setNote("")),
         );
       }}
@@ -193,7 +193,7 @@ export function WalkInActions({ id, name, freeNow }: { id: string; name: string;
               </option>
             ))}
           </select>
-          <button type="button" disabled={pending} onClick={() => run(() => seat(id, staffId || null), (res: { master: string; time: string }) => `${name} — к мастеру ${res.master}, ${res.time}`)}>
+          <button type="button" disabled={pending} onClick={() => run(() => seat(id, staffId || null), (res: { master: string; time: string }) => `${name} - к мастеру ${res.master}, ${res.time}`)}>
             Посадить
           </button>
         </>

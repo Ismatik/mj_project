@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getLang();
   const c = localize(await getSiteContent("published"), lang);
-  return { title: `${c.team.title} — Mavzunai Jovid`, description: c.team.intro, alternates: alternates(lang, "/mastera") };
+  return { title: `${c.team.title} - Mavzunai Jovid`, description: c.team.intro, alternates: alternates(lang, "/mastera") };
 }
 
 export default async function MastersPage() {

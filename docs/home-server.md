@@ -7,11 +7,11 @@ the IP changes, or ports 80/443 are closed. Guests' phones, Telegram and WhatsAp
 No open ports, no static IP, HTTPS certificate by Cloudflare. Free.
 
 ```
-guest / Telegram / WhatsApp ──HTTPS──▶ Cloudflare ◀══ tunnel (outgoing) ══ laptop: cloudflared → web:3000
+guest / Telegram / WhatsApp  HTTPS ▶ Cloudflare ◀  tunnel (outgoing)   laptop: cloudflared → web:3000
 ```
 
 In this mode the `cloudflared` container replaces Caddy (`docker-compose.tunnel.yml`).
-On a VPS or a line with a static IP you don't need any of this — see "Run on a server" in the README.
+On a VPS or a line with a static IP you don't need any of this - see "Run on a server" in the README.
 
 ## 1. Domain in Cloudflare
 
@@ -24,7 +24,7 @@ On a VPS or a line with a static IP you don't need any of this — see "Run on a
 ## 2. The tunnel
 
 1. dash.cloudflare.com → **Zero Trust** → Networks → **Tunnels** → **Create a tunnel** → *Cloudflared* → name it `mj-laptop`.
-2. On "Install and run a connector" choose **Docker**. The command shown ends with `--token eyJhIjoi…` — copy only that long token.
+2. On "Install and run a connector" choose **Docker**. The command shown ends with `--token eyJhIjoi…` - copy only that long token.
 3. **Next** → *Public hostname*:
    - Subdomain: empty · Domain: `mavzunaijovid.tj`
    - Service: type **HTTP**, URL **`web:3000`**
@@ -35,12 +35,12 @@ On a VPS or a line with a static IP you don't need any of this — see "Run on a
 ```bash
 sudo pacman -Syu docker docker-compose git
 sudo usermod -aG docker $USER
-sudo reboot                            # see the note below — do not skip this
+sudo reboot                            # see the note below - do not skip this
 ```
 
 `pacman -Syu` upgrades the whole system, kernel included. When it does, the running kernel can no
 longer load modules (they were replaced on disk), so `docker.service` fails to start until you
-reboot — it cannot load `overlay` and `br_netfilter`. The reboot also applies the `docker` group.
+reboot - it cannot load `overlay` and `br_netfilter`. The reboot also applies the `docker` group.
 `uname -r` disagreeing with `pacman -Q linux` is the tell.
 
 ```bash
@@ -69,10 +69,10 @@ docker compose ps                      # all "running"; migrate "exited (0)"
 docker compose logs cloudflared | tail # "Registered tunnel connection" ×4
 ```
 
-In the Cloudflare tunnel page the status turns **Healthy**. Open `https://mavzunaijovid.tj` — the website;
-`/login` — the CMS (login `mavzuna`, the password from `SEED_OWNER_PASSWORD`; change it after the first sign-in).
+In the Cloudflare tunnel page the status turns **Healthy**. Open `https://mavzunaijovid.tj` - the website;
+`/login` - the CMS (login `mavzuna`, the password from `SEED_OWNER_PASSWORD`; change it after the first sign-in).
 
-The first time only, load the starting data — it creates the sign-in accounts (owner, reception, content manager,
+The first time only, load the starting data - it creates the sign-in accounts (owner, reception, content manager,
 a master), the service menu, website texts and settings, **plus demo guests, bookings and sales** for trying things out:
 
 ```bash
@@ -99,7 +99,7 @@ sudo timedatectl set-ntp true
 ```
 
 If you use a desktop environment (GNOME, KDE), also turn off "Automatic suspend" in its power settings.
-Keep the laptop plugged in — its battery covers short power cuts; a small UPS for the **router** keeps the internet up too.
+Keep the laptop plugged in - its battery covers short power cuts; a small UPS for the **router** keeps the internet up too.
 After a reboot Docker starts by itself and brings all containers back (`restart: unless-stopped`); nobody needs to log in.
 
 No inbound ports are needed, so a firewall can block everything incoming (`sudo pacman -S ufw && sudo ufw default deny incoming && sudo ufw enable`).
@@ -107,7 +107,7 @@ The database listens only on the laptop itself (127.0.0.1).
 
 ## 5. Backups off the laptop
 
-Dumps are written daily to `./backups` — on the same disk. Copy them, and the uploaded photos, elsewhere:
+Dumps are written daily to `./backups` - on the same disk. Copy them, and the uploaded photos, elsewhere:
 
 ```bash
 sudo pacman -S rclone

@@ -15,7 +15,7 @@ export const staffIdFromAddress = (to: string) => (to.startsWith("staff:") ? to.
 export const linkedChats = (tx: Tx, staffId: string) => tx.telegramChat.findMany({ where: { staffId, NOT: { id: { startsWith: "sim-" } } }, select: { id: true } });
 
 /**
- * A message for the master, or null when she has not linked a chat — which is most of them, most
+ * A message for the master, or null when she has not linked a chat - which is most of them, most
  * of the time. Returning null rather than queueing keeps the CMS outbox free of rows that could
  * never be delivered; whether she is linked at all is shown on her row in CMS → Мастера.
  */

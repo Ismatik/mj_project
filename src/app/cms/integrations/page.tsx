@@ -19,7 +19,7 @@ const STATUS = {
 
 const metaOf = (v: unknown) => (v && typeof v === "object" ? (v as { lang?: string; template?: { name: string } }) : {});
 
-// "Интеграции" — connectors in mock or live mode, and the outbox of every message the system sends.
+// "Интеграции" - connectors in mock or live mode, and the outbox of every message the system sends.
 export default async function IntegrationsPage({ searchParams }: PageProps<"/cms/integrations">) {
   await requirePage("integrations", "/cms/integrations");
   const sp = await searchParams;
@@ -35,13 +35,13 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
 
   return (
     <div>
-      <PageHead title="Интеграции" meta="Каждый канал работает в режиме «мок» до подключения — всё видно в «Исходящих»" />
+      <PageHead title="Интеграции" meta="Каждый канал работает в режиме «мок» до подключения - всё видно в «Исходящих»" />
       <p className={s.notice}>
-        <b>Вход гостей в личный кабинет.</b> Код уходит в Telegram-бот, если гостья им пользуется, иначе — в WhatsApp или по SMS. Пока канал в режиме «мок», код
+        <b>Вход гостей в личный кабинет.</b> Код уходит в Telegram-бот, если гостья им пользуется, иначе - в WhatsApp или по SMS. Пока канал в режиме «мок», код
         показывается гостье прямо на экране: на сервере это включается переменной DEMO_LOGIN_CODES=1 (для демо и staging). Без неё вход откроется, когда канал
         станет «Живым». Отправленные коды в «Исходящих» скрываются.
         <br />
-        <b>Языки.</b> Гостьи получают сообщения на своём языке (русский, таджикский, английский) — тексты правятся в{" "}
+        <b>Языки.</b> Гостьи получают сообщения на своём языке (русский, таджикский, английский) - тексты правятся в{" "}
         <Link href="/cms/integrations/templates">шаблонах сообщений</Link>.
       </p>
       <div className={s.grid}>
@@ -61,7 +61,7 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
                 <div>
                   <dt>Ключи</dt>
                   <dd>
-                    {info.envKeys.join(", ")} — {keysSet ? "заданы" : "не заданы"}
+                    {info.envKeys.join(", ")} - {keysSet ? "заданы" : "не заданы"}
                   </dd>
                 </div>
                 <div>
@@ -70,7 +70,7 @@ export default async function IntegrationsPage({ searchParams }: PageProps<"/cms
                 </div>
                 <div>
                   <dt>Живой режим</dt>
-                  <dd>{info.liveReady ? (keysSet ? "готов — можно включать" : "готов, нужны ключи") : `в ${info.liveIn}`}</dd>
+                  <dd>{info.liveReady ? (keysSet ? "готов - можно включать" : "готов, нужны ключи") : `в ${info.liveIn}`}</dd>
                 </div>
               </dl>
               {info.key === "telegram" && <TelegramTools staffCode={staffCode} staffChats={staffChats} configured={telegramConfigured()} />}

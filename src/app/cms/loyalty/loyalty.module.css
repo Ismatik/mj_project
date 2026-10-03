@@ -222,7 +222,7 @@
   }
 }
 @media (max-width: 600px) {
-  /* 100px + 1fr + 100px needs 295px inside the panel — 7px more than a 320px screen has */
+  /* 100px + 1fr + 100px needs 295px inside the panel - 7px more than a 320px screen has */
   .tierHead,
   .tier {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);

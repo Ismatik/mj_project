@@ -109,7 +109,7 @@ export async function submitBridal(input: BridalInput, lang: Lang, guestId?: str
       data: {
         channel: "telegram",
         to: "reception",
-        body: `Свадебный пакет №${pkg.number} с сайта: ${input.name}, ${formatPhone(input.phone)} — свадьба ${longDate(atSalonTime(wedding, "12:00"))}. Услуги: ${services.map((s) => s.name).join(", ")}${dress ? `; платье «${dress.name.replace(/^Платье\s*/, "").replace(/[«»]/g, "")}» (${rules.dressDays} дн.)` : ""}. Итого ${somoni(price.total)}${price.discount ? ` со скидкой ${price.discountPercent}%` : ""}. Свяжитесь и поставьте время в день свадьбы.`,
+        body: `Свадебный пакет №${pkg.number} с сайта: ${input.name}, ${formatPhone(input.phone)} - свадьба ${longDate(atSalonTime(wedding, "12:00"))}. Услуги: ${services.map((s) => s.name).join(", ")}${dress ? `; платье «${dress.name.replace(/^Платье\s*/, "").replace(/[«»]/g, "")}» (${rules.dressDays} дн.)` : ""}. Итого ${somoni(price.total)}${price.discount ? ` со скидкой ${price.discountPercent}%` : ""}. Свяжитесь и поставьте время в день свадьбы.`,
         meta: { kind: "bridal-package", packageId: pkg.id },
       },
     });
@@ -145,7 +145,7 @@ export async function submitBridal(input: BridalInput, lang: Lang, guestId?: str
   return { ok: true, number: created.pkg.number, total: created.pkg.total, ...(trial ? { trial } : {}) };
 }
 
-// ─── CMS ─────────────────────────────────────────────────
+// CMS
 
 export async function getBridalAdmin() {
   const today = todayYmd();

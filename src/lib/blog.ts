@@ -4,7 +4,7 @@ import type { Lang } from "./i18n/locales";
 export type Inline = { t: "text"; v: string } | { t: "b"; v: string } | { t: "a"; v: string; href: string };
 export type Block = { t: "h2"; v: string } | { t: "p"; v: Inline[] } | { t: "ul"; items: Inline[][] } | { t: "quote"; v: Inline[] };
 
-/** Only web links and site paths — nothing that could run script */
+/** Only web links and site paths - nothing that could run script */
 export function safeHref(href: string): string | null {
   const h = href.trim();
   if (/^https?:\/\/[^\s]+$/i.test(h)) return h;

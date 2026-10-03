@@ -34,7 +34,7 @@ function makeDeps() {
     },
     async book(i) {
       calls.push(`book ${i.serviceId} ${i.date} ${i.time} ${i.name} ${i.phone}`);
-      if (booked.some((b) => b.date === i.date && b.time === i.time)) return { ok: false, error: "Это время только что заняли — выберите другое" };
+      if (booked.some((b) => b.date === i.date && b.time === i.time)) return { ok: false, error: "Это время только что заняли - выберите другое" };
       let g = guests.find((x) => x.phone === i.phone);
       if (!g) guests.push((g = { id: `g${guests.length}`, name: i.name, phone: i.phone }));
       await deps.saveChat(i.chatId, { guestId: g.id });
@@ -62,7 +62,7 @@ function makeDeps() {
       return guests.find((g) => g.phone === phone) ?? null;
     },
     async contacts() {
-      return { phone: "+992 98 103 11 11", whatsapp: "992981031111", address: "ул. Бухоро, 23/25", district: "Душанбе", hours: "Вт–Вс 09:00–18:00", dayOff: "Понедельник — выходной" };
+      return { phone: "+992 98 103 11 11", whatsapp: "992981031111", address: "ул. Бухоро, 23/25", district: "Душанбе", hours: "Вт-Вс 09:00-18:00", dayOff: "Понедельник - выходной" };
     },
     staffCode: async () => "MJ-4821",
     linkMaster: async (_chatId, code) => (code === "MJ-1111-2222" ? "Мира" : null),

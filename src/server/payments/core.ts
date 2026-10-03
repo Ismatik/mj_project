@@ -35,7 +35,7 @@ export async function markPaid(db: Db, paymentId: string, externalId?: string): 
         data: {
           channel: "telegram",
           to: "reception",
-          body: `Предоплата ${somoni(p.amount)} получена: ${a.guest?.name ?? a.guestName} — ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}. Подтвердите в календаре.`,
+          body: `Предоплата ${somoni(p.amount)} получена: ${a.guest?.name ?? a.guestName} - ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}. Подтвердите в календаре.`,
           meta: { kind: "deposit-paid", appointmentId: a.id, paymentId: p.id },
         },
       });
@@ -63,7 +63,7 @@ export async function markPaid(db: Db, paymentId: string, externalId?: string): 
         data: {
           channel: "telegram",
           to: "reception",
-          body: `Продан сертификат на сайте: ${g.code} на ${somoni(g.amount)} — для ${g.recipientName}, покупатель ${g.buyerName}${g.buyerPhone ? `, ${formatPhone(g.buyerPhone)}` : ""}.`,
+          body: `Продан сертификат на сайте: ${g.code} на ${somoni(g.amount)} - для ${g.recipientName}, покупатель ${g.buyerName}${g.buyerPhone ? `, ${formatPhone(g.buyerPhone)}` : ""}.`,
           meta: { kind: "gift-card-sold", giftCardId: g.id },
         },
       });
@@ -86,7 +86,7 @@ export async function cancelPayment(db: Db | Tx, paymentId: string, reason: "can
         data: {
           channel: "telegram",
           to: "reception",
-          body: `Запись снята — предоплата не внесена: ${a.guest?.name ?? a.guestName}, ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}. Время снова свободно.`,
+          body: `Запись снята - предоплата не внесена: ${a.guest?.name ?? a.guestName}, ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}. Время снова свободно.`,
           meta: { kind: "deposit-expired", appointmentId: a.id },
         },
       });

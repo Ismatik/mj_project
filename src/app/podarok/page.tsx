@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getLang();
   const g = moneyDict(lang).gift;
-  return { title: `${g.title} — Mavzunai Jovid`, description: g.lead, alternates: alternates(lang, "/podarok") };
+  return { title: `${g.title} - Mavzunai Jovid`, description: g.lead, alternates: alternates(lang, "/podarok") };
 }
 
 // Gift certificate bought online: amount, recipient, message → checkout → PDF with a QR code.

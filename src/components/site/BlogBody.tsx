@@ -2,7 +2,7 @@ import Link from "next/link";
 import { parseBody, type Inline } from "@/lib/blog";
 import s from "./blog.module.css";
 
-// Renders the article markup as React elements — never raw HTML.
+// Renders the article markup as React elements - never raw HTML.
 
 function Inlines({ parts }: { parts: Inline[] }) {
   return (

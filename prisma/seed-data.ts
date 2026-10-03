@@ -15,7 +15,7 @@ export type StaffKey = (typeof staff)[number]["key"];
 /** Website profiles of the masters (placeholder texts until the salon writes its own). Photos: temporary stock from the design. */
 export const masterProfiles: Record<StaffKey, { bio: string; works?: { url: string; caption: string; category: string }[] }> = {
   mavzuna: {
-    bio: "Основательница Mavzunai Jovid и стилист. Подбирает образ под характер и черты лица, ведёт свадебные причёски и стрижки. Гостьи ценят её честный совет — она сама скажет, что пойдёт именно вам.",
+    bio: "Основательница Mavzunai Jovid и стилист. Подбирает образ под характер и черты лица, ведёт свадебные причёски и стрижки. Гостьи ценят её честный совет - она сама скажет, что пойдёт именно вам.",
     works: [
       {
         url: "https://images.unsplash.com/photo-1688395199230-ab7c7170a4b6?q=75&w=900&auto=format&fit=crop&sat=-100",
@@ -26,7 +26,7 @@ export const masterProfiles: Record<StaffKey, { bio: string; works?: { url: stri
   },
   ines: { bio: "Колорист: окрашивание в один тон, балаяж и шатуш, уход за кожей. Подбирает оттенок под тон кожи и бережёт длину." },
   mira: {
-    bio: "Брови, ресницы и макияж — от дневного до свадебного. Архитектура бровей по пропорциям лица, ламинирование ресниц и пробные свадебные образы.",
+    bio: "Брови, ресницы и макияж - от дневного до свадебного. Архитектура бровей по пропорциям лица, ламинирование ресниц и пробные свадебные образы.",
     works: [
       {
         url: "https://images.unsplash.com/photo-1708134128589-0dfd38b2203a?q=75&w=900&auto=format&fit=crop&sat=-100",
@@ -129,7 +129,7 @@ export type SeedAppt = {
   status?: Status;
 };
 
-/** "Кто сегодня в кресле" — today's list from the dashboard. */
+/** "Кто сегодня в кресле" - today's list from the dashboard. */
 export const today: SeedAppt[] = [
   { time: "09:00", guest: "marta", label: "Балаяж + стрижка", service: "balayage", staff: ["ines"], price: 880, status: "DONE" },
   { time: "10:30", guest: "sofia", label: "Гель-лак, пыльная роза", service: "gel", staff: ["petra"], price: 280, status: "DONE" },
@@ -179,31 +179,31 @@ export const week: SeedAppt[][] = [
 export const revenue14 = [420, 510, 380, 640, 720, 560, 480, 690, 750, 610, 530, 820, 700, 486].map((v) => v * 10);
 
 export const dresses = [
-  { name: "Платье «Амира»", type: "WEDDING", size: "42–44", price: 900, status: "AVAILABLE", bookedInDays: null },
-  { name: "Платье «Ситора»", type: "WEDDING", size: "46–48", price: 850, status: "AVAILABLE", bookedInDays: 6 },
+  { name: "Платье «Амира»", type: "WEDDING", size: "42-44", price: 900, status: "AVAILABLE", bookedInDays: null },
+  { name: "Платье «Ситора»", type: "WEDDING", size: "46-48", price: 850, status: "AVAILABLE", bookedInDays: 6 },
   { name: "Платье «Лола»", type: "EVENING", size: "42", price: 400, status: "AVAILABLE", bookedInDays: null },
-  { name: "Платье «Малика»", type: "WEDDING", size: "40–42", price: 1100, status: "AVAILABLE", bookedInDays: 13 },
+  { name: "Платье «Малика»", type: "WEDDING", size: "40-42", price: 1100, status: "AVAILABLE", bookedInDays: 13 },
   { name: "Платье «Наргис»", type: "EVENING", size: "44", price: 350, status: "CLEANING", bookedInDays: null },
   { name: "Платье «Гуландом»", type: "EVENING", size: "46", price: 380, status: "AVAILABLE", bookedInDays: null },
 ] as const;
 
 export const reminders = [
-  "День рождения Марты в четверг — маленький подарок?",
+  "День рождения Марты в четверг - маленький подарок?",
   "Гель-лак «розовое золото» заканчивается (3 шт.)",
   "Отправить советы по уходу гостьям после чисток",
 ];
 
 export const settings: Record<string, string> = {
-  "salon.name": "Mavzunai Jovid — Gallery of Beauty MJ",
+  "salon.name": "Mavzunai Jovid - Gallery of Beauty MJ",
   "salon.branch": "Студия на Бухоро",
-  "salon.address": "ул. Бухоро, 23/25, 1–2 этаж, Шохмансур, Душанбе",
+  "salon.address": "ул. Бухоро, 23/25, 1-2 этаж, Шохмансур, Душанбе",
   "salon.phone": "+992 98 103 11 11",
   "salon.whatsapp": "wa.me/992981031111",
   "salon.instagram": "@mavzunai.jovid.official",
   "salon.instagramGallery": "@mavzunai_jovid_gallery_beauty",
-  "salon.hours": "Вт–Вс 09:00–18:00 · Пн — выходной",
+  "salon.hours": "Вт-Вс 09:00-18:00 · Пн - выходной",
   "salon.currency": "сомони (TJS)",
-  "site.seoTitle": "Mavzunai Jovid — салон красоты и свадебный зал в Душанбе",
+  "site.seoTitle": "Mavzunai Jovid - салон красоты и свадебный зал в Душанбе",
   "site.seoDescription":
     "Gallery of Beauty MJ: волосы, ногти, макияж, свадебные образы и прокат платьев. ул. Бухоро 23/25. Запись в WhatsApp +992 98 103 11 11.",
 };
@@ -241,16 +241,16 @@ export const translations = {
   } as Record<string, { tg: string; en: string }>,
   staff: {
     mavzuna: {
-      en: { name: "Mavzuna", specialty: "Owner · stylist", bio: "Founder of Mavzunai Jovid and a stylist. She chooses a look to suit your character and features, and does bridal hairstyles and cuts. Guests value her honest advice — she'll tell you herself what suits you." },
-      tg: { specialty: "Соҳиби салон · стилист", bio: "Асосгузори Mavzunai Jovid ва стилист. Ороишро мувофиқи хислат ва симои шумо интихоб мекунад, мӯйороии арӯсӣ ва мӯйсаргирӣ мекунад. Меҳмонон маслиҳати самимии ӯро қадр мекунанд — худаш мегӯяд, ки маҳз ба шумо чӣ мувофиқ аст." },
+      en: { name: "Mavzuna", specialty: "Owner · stylist", bio: "Founder of Mavzunai Jovid and a stylist. She chooses a look to suit your character and features, and does bridal hairstyles and cuts. Guests value her honest advice - she'll tell you herself what suits you." },
+      tg: { specialty: "Соҳиби салон · стилист", bio: "Асосгузори Mavzunai Jovid ва стилист. Ороишро мувофиқи хислат ва симои шумо интихоб мекунад, мӯйороии арӯсӣ ва мӯйсаргирӣ мекунад. Меҳмонон маслиҳати самимии ӯро қадр мекунанд - худаш мегӯяд, ки маҳз ба шумо чӣ мувофиқ аст." },
     },
     ines: {
       en: { name: "Ines", specialty: "Colourist", bio: "Colourist: single-tone colour, balayage and ombré, skin care. She matches the shade to your skin tone and protects your length." },
       tg: { specialty: "Колорист", bio: "Колорист: рангкунии якранга, балаяж ва шатуш, нигоҳубини пӯст. Рангро мувофиқи ранги пӯст интихоб мекунад ва дарозии мӯйро нигоҳ медорад." },
     },
     mira: {
-      en: { name: "Mira", specialty: "Brows · lashes · makeup", bio: "Brows, lashes and makeup — from everyday to bridal. Brow design to your facial proportions, lash lamination and bridal trial looks." },
-      tg: { specialty: "Абрӯ · мижгон · ороиш", bio: "Абрӯ, мижгон ва ороиш — аз рӯзона то арӯсӣ. Меъмории абрӯ мувофиқи таносуби рӯй, ламинатсияи мижгон ва ороишҳои озмоишии арӯсӣ." },
+      en: { name: "Mira", specialty: "Brows · lashes · makeup", bio: "Brows, lashes and makeup - from everyday to bridal. Brow design to your facial proportions, lash lamination and bridal trial looks." },
+      tg: { specialty: "Абрӯ · мижгон · ороиш", bio: "Абрӯ, мижгон ва ороиш - аз рӯзона то арӯсӣ. Меъмории абрӯ мувофиқи таносуби рӯй, ламинатсияи мижгон ва ороишҳои озмоишии арӯсӣ." },
     },
     petra: {
       en: { name: "Petra", specialty: "Nail technician", bio: "Nails: gel manicure, pedicure, nude and bold designs. Sterile tools and careful cuticle work." },

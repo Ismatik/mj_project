@@ -44,7 +44,7 @@ const sum = (span: { gte: Date; lt: Date }) => db.sale.aggregate({ where: { crea
 const span = (from: Ymd, toIncl: Ymd) => ({ gte: atSalonTime(from), lt: atSalonTime(addDays(toIncl, 1)) });
 
 /**
- * Money and week-on-week figures for "Мой салон сегодня". Owner only — reception
+ * Money and week-on-week figures for "Мой салон сегодня". Owner only - reception
  * sees the operational half of the dashboard but not the revenue breakdown.
  */
 export async function getDashboardMoney(today: Ymd = todayYmd()) {
@@ -67,7 +67,7 @@ export async function getDashboardMoney(today: Ymd = todayYmd()) {
   for (const s of sales) byMethod[s.method] += s.paid;
 
   const revenue = add((s) => s.total);
-  // "средний рабочий день" — Mondays are the day off, so count only days that had receipts
+  // "средний рабочий день" - Mondays are the day off, so count only days that had receipts
   const daysWithSales = new Set(monthByDay.map((s) => todayYmd(s.createdAt))).size;
   const monthRevenue = monthByDay.reduce((a, s) => a + s.total, 0);
 

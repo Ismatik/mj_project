@@ -26,7 +26,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         <div className={s.formBox}>
           <div className={s.kicker}>Вход для команды</div>
           <h1 className={s.title}>Добро пожаловать</h1>
-          <p className={s.lead}>CMS салона и админка сайта — один вход для всех.</p>
+          <p className={s.lead}>CMS салона и админка сайта - один вход для всех.</p>
           <LoginForm next={nextPath} />
           <p className={s.help}>Забыли пароль? Обратитесь к владелице салона.</p>
         </div>

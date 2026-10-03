@@ -8,7 +8,7 @@ import { BotLink } from "./BotLink";
 import { WorkDays } from "./WorkDays";
 import s from "./staff.module.css";
 
-// "Мастера и график" — design isStaff.
+// "Мастера и график" - design isStaff.
 export default async function StaffPage() {
   const user = await requirePage("staff", "/cms/staff");
   const board = await getStaffBoard();

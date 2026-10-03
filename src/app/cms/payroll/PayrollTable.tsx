@@ -9,7 +9,7 @@ import { removeAdjustment, removePayout, saveAdjustment, savePayout, saveRate } 
 import s from "../money.module.css";
 
 type Row = Payroll["rows"][number];
-const bonusFines = (b: number, f: number) => [b ? `+${somoni(b)}` : "", f ? `−${somoni(f)}` : ""].filter(Boolean).join(" / ") || "—";
+const bonusFines = (b: number, f: number) => [b ? `+${somoni(b)}` : "", f ? `−${somoni(f)}` : ""].filter(Boolean).join(" / ") || "-";
 const signed = (n: number) => (n > 0 ? `+${somoni(n)}` : n < 0 ? `−${somoni(-n)}` : somoni(0));
 
 export function PayrollTable({ payroll, editable }: { payroll: Payroll; editable: boolean }) {
@@ -151,7 +151,7 @@ function Detail({ row, month, editable }: { row: Row; month: string; editable: b
 
       <div>
         <h4>Премии и штрафы</h4>
-        {row.adjustments.length === 0 && <div className={s.entry}>—</div>}
+        {row.adjustments.length === 0 && <div className={s.entry}>-</div>}
         {row.adjustments.map((a) => (
           <div key={a.id} className={s.entry}>
             <span>

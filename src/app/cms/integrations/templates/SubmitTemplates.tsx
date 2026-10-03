@@ -24,7 +24,7 @@ export function SubmitTemplates({ configured }: { configured: boolean }) {
       >
         {pending ? "Отправляем…" : "Отправить шаблоны в Meta"}
       </Button>
-      {!configured && <span className={s.small}>Нужны WHATSAPP_TOKEN и WHATSAPP_WABA_ID в .env — см. docs/whatsapp-setup.md</span>}
+      {!configured && <span className={s.small}>Нужны WHATSAPP_TOKEN и WHATSAPP_WABA_ID в .env - см. docs/whatsapp-setup.md</span>}
       {result && (
         <div role="status" className={s.small}>
           {result.error ??

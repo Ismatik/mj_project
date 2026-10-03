@@ -48,7 +48,7 @@ describe("validateBooking", () => {
   });
 
   it("catches overlaps with the master's other bookings", () => {
-    expect(validateBooking({ ...base, time: "11:30" }, ctx).time).toBe("Мира: занято 12:00–13:00 (Ламинирование ресниц)");
+    expect(validateBooking({ ...base, time: "11:30" }, ctx).time).toBe("Мира: занято 12:00-13:00 (Ламинирование ресниц)");
     expect(validateBooking({ ...base, time: "13:00" }, ctx)).toEqual({});
   });
 });

@@ -15,10 +15,10 @@ function weekLabel(monday: string) {
   const m2 = Number(sunday.slice(5, 7)) - 1;
   const d1 = Number(monday.slice(8));
   const d2 = Number(sunday.slice(8));
-  return m1 === m2 ? `${d1}–${d2} ${MONTHS_GEN[m2]}` : `${d1} ${MONTHS_GEN[m1]} – ${d2} ${MONTHS_GEN[m2]}`;
+  return m1 === m2 ? `${d1}-${d2} ${MONTHS_GEN[m2]}` : `${d1} ${MONTHS_GEN[m1]} - ${d2} ${MONTHS_GEN[m2]}`;
 }
 
-// "Календарь записей" — design isCalendar: 7 day columns, Monday closed.
+// "Календарь записей" - design isCalendar: 7 day columns, Monday closed.
 export default async function CalendarPage({ searchParams }: PageProps<"/cms/calendar">) {
   const user = await requirePage("calendar", "/cms/calendar");
   const sp = await searchParams;

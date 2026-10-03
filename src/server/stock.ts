@@ -18,7 +18,7 @@ async function move(db: Db, itemId: string, delta: number, kind: StockMoveKind, 
       data: {
         channel: "telegram",
         to: "reception",
-        body: `Заканчивается на складе: ${item.name} — осталось ${qty(item.quantity, item.unit)} (минимум ${qty(item.minQuantity, item.unit)}). Пора заказать${item.supplier ? ` у «${item.supplier}»` : ""}.`,
+        body: `Заканчивается на складе: ${item.name} - осталось ${qty(item.quantity, item.unit)} (минимум ${qty(item.minQuantity, item.unit)}). Пора заказать${item.supplier ? ` у «${item.supplier}»` : ""}.`,
         meta: { kind: "stock-low", itemId },
       },
     });
@@ -61,7 +61,7 @@ export async function saveItem(db: Db, input: ItemInput, by: string): Promise<{ 
   const name = input.name.trim().slice(0, 80);
   if (name.length < 2) return { ok: false, error: "Название позиции" };
   if (!["мл", "г", "шт"].includes(input.unit)) return { ok: false, error: "Единица: мл, г или шт" };
-  if (![input.minQuantity, input.packSize, input.packPrice].every((n) => whole(n) && n >= 0) || input.packSize < 1) return { ok: false, error: "Проверьте числа: упаковка от 1, цена и минимум — не меньше 0" };
+  if (![input.minQuantity, input.packSize, input.packPrice].every((n) => whole(n) && n >= 0) || input.packSize < 1) return { ok: false, error: "Проверьте числа: упаковка от 1, цена и минимум - не меньше 0" };
   const data = {
     name,
     unit: input.unit,
@@ -91,7 +91,7 @@ export async function saveNorms(db: Db, serviceId: string, norms: { itemId: stri
   return { ok: true };
 }
 
-// ─── Stock page ──────────────────────────────────────────
+// Stock page
 
 export async function getStockPage(db: PrismaClient) {
   const [items, services, moves] = await Promise.all([
@@ -112,7 +112,7 @@ export async function getStockPage(db: PrismaClient) {
     active: i.active,
     status: stockStatus(i.quantity, i.minQuantity),
     value: stockValue(i.quantity, i.packSize, i.packPrice),
-    usedBy: i.consumption.map((c) => `${c.service.name} — ${c.amount} ${i.unit}`),
+    usedBy: i.consumption.map((c) => `${c.service.name} - ${c.amount} ${i.unit}`),
   }));
   const active = rows.filter((r) => r.active);
   return {

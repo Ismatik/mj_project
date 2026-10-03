@@ -13,7 +13,7 @@ const apiVersion = () => process.env.WHATSAPP_API_VERSION || "v22.0";
 export const waNumber = (phone: string) => phone.replace(/\D/g, "");
 
 /** Template parameters may not contain line breaks, tabs or long runs of spaces. */
-const param = (v: string) => ({ type: "text", text: v.replace(/\s+/g, " ").trim() || "—" });
+const param = (v: string) => ({ type: "text", text: v.replace(/\s+/g, " ").trim() || "-" });
 
 /**
  * Message body for the API. With a template (required to write first, or 24 h after her last message) the approved
@@ -99,7 +99,7 @@ export function parseWebhook(body: unknown): { statuses: WaStatus[]; messages: W
   return { statuses, messages };
 }
 
-// ─── Message templates (WhatsApp Business Account) ────────────────────────────
+// Message templates (WhatsApp Business Account)
 
 export type TemplateStatus = { name: string; language: string; status: string; category?: string; reason?: string };
 

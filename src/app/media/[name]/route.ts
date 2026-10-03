@@ -5,7 +5,7 @@ import { readMedia } from "@/server/media";
  * Photos uploaded in the site admin. saveUpload() hands back /media/<uuid>.<ext> and writes the
  * file into MEDIA_DIR, so without this route every picture the salon uploads is a 404.
  *
- * Public on purpose — these are the website's own images. Guest before/after photos are private
+ * Public on purpose - these are the website's own images. Guest before/after photos are private
  * and live in MEDIA_DIR/private, which readMedia() cannot reach: MEDIA_NAME admits a bare uuid
  * plus extension, so "private/x.jpg" and "../.env" never match.
  */

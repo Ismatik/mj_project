@@ -1,4 +1,4 @@
-# Instagram feed — setup
+# Instagram feed - setup
 
 The home page shows a strip of the salon's latest Instagram posts. The platform uses Meta's **Instagram API with Instagram Login**. It reads the salon's own posts; nothing is posted on its behalf. Until it is connected, the strip shows photos from the masters' portfolio with a link to the profile (mock mode).
 
@@ -25,5 +25,5 @@ App review is not needed: the app only reads the account that authorised it. Kee
 | On the Instagram card | What to do |
 |---|---|
 | *Error validating access token* / *Session has expired* | The token was not refreshed for 60 days (the worker was stopped). Generate a new one (step 4), put it in `.env`, restart, press «Обновить ленту». |
-| *(#10) Application does not have permission* | The account was not added in step 3, or it is a personal account — switch it to professional. |
+| *(#10) Application does not have permission* | The account was not added in step 3, or it is a personal account - switch it to professional. |
 | Feed loads but some posts are missing | Carousels show their first image; posts without an image are skipped. Only the latest 18 are fetched and 6 are shown. |

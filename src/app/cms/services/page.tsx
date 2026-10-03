@@ -5,7 +5,7 @@ import { getServiceMenu } from "@/server/catalog";
 import { NewService, ServiceRow } from "./ServiceRow";
 import s from "./services.module.css";
 
-// "Меню услуг и цены" — design isServices. Only the owner edits prices.
+// "Меню услуг и цены" - design isServices. Only the owner edits prices.
 export default async function ServicesPage() {
   const user = await requirePage("services", "/cms/services");
   const menu = await getServiceMenu();

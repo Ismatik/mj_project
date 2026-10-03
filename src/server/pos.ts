@@ -43,7 +43,7 @@ export async function getPos(today: Ymd = todayYmd()) {
       serviceId: a.serviceId,
       service: a.serviceLabel,
       price: a.price,
-      /** Paid online in advance — counted in the receipt */
+      /** Paid online in advance - counted in the receipt */
       depositPaid: a.depositPaid,
       startsAt: a.startsAt,
       staffId: a.staff[0]?.staffId ?? null,

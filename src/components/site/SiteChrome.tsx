@@ -36,7 +36,7 @@ export type NavId = (typeof LINKS)[number]["id"] | "account" | "home";
 
 export type NavGuest = { name: string } | null;
 
-/** Рус · Тоҷ · Eng — full page loads, so the whole page (and <html lang>) switches */
+/** Рус · Тоҷ · Eng - full page loads, so the whole page (and <html lang>) switches */
 function LangSwitch({ lang, path, className, short }: { lang: Lang; path: string; className: string; short?: boolean }) {
   const t = dict(lang);
   return (

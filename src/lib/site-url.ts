@@ -16,7 +16,7 @@ export function botLink(): string | null {
 }
 
 /**
- * Where a guest manages her own bookings. The bot when it is live — a guest who opens it
+ * Where a guest manages her own bookings. The bot when it is live - a guest who opens it
  * becomes reachable in Telegram for free, which is the whole point of putting this link in
  * the confirmation she gets over paid WhatsApp. Her account on the site until then.
  * Never returns an empty string: Meta rejects a template parameter with no value.

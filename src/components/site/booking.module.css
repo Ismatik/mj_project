@@ -1,4 +1,4 @@
-/* "Онлайн-запись" form — floating labels and inline validation from the prototype */
+/* "Онлайн-запись" form - floating labels and inline validation from the prototype */
 .form {
   margin-top: 40px;
   display: flex;
@@ -492,7 +492,7 @@
   border-radius: 0;
 }
 
-/* ── Phone keyboards and touch targets ───────────────── */
+/* Phone keyboards and touch targets */
 /* Under 16px iOS Safari zooms the page the moment a field is focused, and the
    guest then has to pinch back out mid-booking. Desktop sizing is untouched. */
 @media (max-width: 760px) {
@@ -517,7 +517,7 @@
     flex-basis: 62px;
     padding: 10px 0;
   }
-  /* "Не нашли удобное время?" — a 18px-tall link is the fallback for a guest
+  /* "Не нашли удобное время?" - a 18px-tall link is the fallback for a guest
      who found no slot; it has to be hittable. */
   .linkBtn {
     min-height: 44px;

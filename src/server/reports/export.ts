@@ -15,14 +15,14 @@ export const dmy = (ymd: Ymd) => ymd.split("-").reverse().join(".");
 const generated = () => `${dmy(todayYmd())}, ${clock(new Date())}`;
 const PURPOSE: Record<string, string> = { DEPOSIT: "Предоплата за запись", GIFT_CARD: "Подарочный сертификат" };
 const PROVIDER = (p: string) => (p === "pos" ? "касса" : p === "test" ? "тестовая оплата" : p);
-const signed = (n: number) => (n > 0 ? `+${somoni(n)}` : n < 0 ? `–${somoni(-n)}` : somoni(0));
-const periodLabel = (r: { from: Ymd; to: Ymd }) => `${dmy(r.from)} — ${dmy(addDays(r.to, -1))}`;
+const signed = (n: number) => (n > 0 ? `+${somoni(n)}` : n < 0 ? `-${somoni(-n)}` : somoni(0));
+const periodLabel = (r: { from: Ymd; to: Ymd }) => `${dmy(r.from)} - ${dmy(addDays(r.to, -1))}`;
 
-// ─── Period report ───────────────────────────────────────
+// Period report
 
 export function periodXlsx(r: PeriodReport): Buffer {
   const s = r.summary;
-  const title = "Mavzunai Jovid — отчёт за период";
+  const title = "Mavzunai Jovid - отчёт за период";
   const sub = periodLabel(r);
   const sheets: Sheet[] = [
     {
@@ -81,7 +81,7 @@ export function periodXlsx(r: PeriodReport): Buffer {
     {
       name: "Мастера",
       title,
-      subtitle: `${sub} · процент — по текущей ставке мастера`,
+      subtitle: `${sub} · процент - по текущей ставке мастера`,
       columns: [
         { header: "Мастер", width: 18 },
         { header: "Чеков", width: 8, type: "number" },
@@ -142,7 +142,7 @@ export function periodXlsx(r: PeriodReport): Buffer {
     {
       name: "Склад",
       title,
-      subtitle: `${sub} · расход по услугам и списания — по цене упаковки`,
+      subtitle: `${sub} · расход по услугам и списания - по цене упаковки`,
       columns: [
         { header: "Позиция", width: 32 },
         { header: "Ед.", width: 6 },
@@ -266,20 +266,20 @@ export async function periodPdf(r: PeriodReport): Promise<Uint8Array> {
       { header: "Оплачено", width: 2, align: "right" },
       { header: "Способ", width: 2 },
     ],
-    r.receipts.map((x) => [String(x.number), `${dmy(todayYmd(x.at))} ${clock(x.at)}`, x.guest || "—", x.master || "—", x.services, somoni(x.total), somoni(x.paid), paymentMethod[x.method]!]),
+    r.receipts.map((x) => [String(x.number), `${dmy(todayYmd(x.at))} ${clock(x.at)}`, x.guest || "-", x.master || "-", x.services, somoni(x.total), somoni(x.paid), paymentMethod[x.method]!]),
     { totals: ["", "", "", "", "Итого", somoni(s.revenue), somoni(s.cash + s.card + s.qr), ""], size: 7.5, empty: "Чеков нет" },
   );
   return pdf.save();
 }
 
-// ─── Payroll ─────────────────────────────────────────────
+// Payroll
 
 export function payrollXlsx(p: Payroll): Buffer {
   const t = p.totals;
   return xlsx([
     {
       name: "Зарплата",
-      title: `Mavzunai Jovid — зарплата мастеров, ${monthTitle(p.month).toLowerCase()}`,
+      title: `Mavzunai Jovid - зарплата мастеров, ${monthTitle(p.month).toLowerCase()}`,
       subtitle: "Начислено = оклад + процент от выручки + премии − штрафы. К выплате = начислено − выплачено.",
       columns: [
         { header: "Мастер", width: 16 },
@@ -352,7 +352,7 @@ export async function payrollPdf(p: Payroll): Promise<Uint8Array> {
   return pdf.save();
 }
 
-// ─── Z-report ────────────────────────────────────────────
+// Z-report
 
 export async function shiftPdf(s: NonNullable<Awaited<ReturnType<typeof getShift>>>): Promise<Uint8Array> {
   const d = s.details;
@@ -383,7 +383,7 @@ export async function shiftPdf(s: NonNullable<Awaited<ReturnType<typeof getShift
     { label: "На начало дня", value: somoni(s.openingCash) },
     { label: "+ наличные за день", value: somoni(s.cashSales) },
     { label: "+ внесено", value: somoni(s.cashIn) },
-    { label: "– изъято и выплачено", value: somoni(s.cashOut) },
+    { label: "- изъято и выплачено", value: somoni(s.cashOut) },
     { label: "Должно быть", value: somoni(s.expectedCash), bold: true },
     { label: "Посчитано", value: somoni(s.countedCash), bold: true },
     { label: s.difference > 0 ? "Излишек" : s.difference < 0 ? "Недостача" : "Разница", value: signed(s.difference), bold: true },

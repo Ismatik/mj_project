@@ -30,7 +30,7 @@ export function IntegrationControls({ k, title, mode, enabled, channel }: { k: s
         </button>
       </div>
       <label className={s.switch}>
-        <input type="checkbox" checked={enabled} disabled={pending} onChange={(e) => run(() => setIntegrationEnabled(k, e.target.checked), e.target.checked ? "Канал включён" : "Канал выключен — сообщения ждут в очереди")} />
+        <input type="checkbox" checked={enabled} disabled={pending} onChange={(e) => run(() => setIntegrationEnabled(k, e.target.checked), e.target.checked ? "Канал включён" : "Канал выключен - сообщения ждут в очереди")} />
         {enabled ? "Включено" : "Выключено"}
       </label>
       {channel && (
@@ -138,7 +138,7 @@ export function InstagramTools({ status, mode }: { status: { updatedAt: string |
     <div className={s.tg}>
       <div className={s.tgRow}>
         <span>
-          {mode === "LIVE" ? (when ? `Лента обновлена ${when} · публикаций: ${status.count}` : "Лента ещё не загружалась") : "На сайте — фото из портфолио со ссылкой на профиль"}
+          {mode === "LIVE" ? (when ? `Лента обновлена ${when} · публикаций: ${status.count}` : "Лента ещё не загружалась") : "На сайте - фото из портфолио со ссылкой на профиль"}
           {status.error && mode === "LIVE" && <b className={s.msgError}> · ошибка: {status.error}</b>}
         </span>
         {mode === "LIVE" && (

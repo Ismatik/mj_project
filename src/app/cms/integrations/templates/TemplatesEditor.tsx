@@ -10,9 +10,9 @@ import s from "./templates.module.css";
 
 /** Example values for the preview */
 const SAMPLE: Record<Lang, MessageVars> = {
-  ru: { name: "Марта", service: "Ламинирование ресниц", when: "Ср, 30 сентября 2026, 12:00", time: "12:00", master: "Мира", address: "ул. Бухоро, 23/25, 1–2 этаж", code: "4821", link: "mavzunai-jovid.tj", points: "100", percent: "30" },
-  tg: { name: "Марта", service: "Ламинатсияи мижгон", when: "Чоршанбе, 30 сентябр 2026, 12:00", time: "12:00", master: "Мира", address: "кӯчаи Бухоро, 23/25, ошёнаҳои 1–2", code: "4821", link: "mavzunai-jovid.tj/tj", points: "100", percent: "30" },
-  en: { name: "Marta", service: "Lash lamination", when: "Wednesday, 30 September 2026, 12:00", time: "12:00", master: "Mira", address: "23/25 Bukhoro St, 1st–2nd floor", code: "4821", link: "mavzunai-jovid.tj/en", points: "100", percent: "30" },
+  ru: { name: "Марта", service: "Ламинирование ресниц", when: "Ср, 30 сентября 2026, 12:00", time: "12:00", master: "Мира", address: "ул. Бухоро, 23/25, 1-2 этаж", code: "4821", link: "mavzunai-jovid.tj", points: "100", percent: "30" },
+  tg: { name: "Марта", service: "Ламинатсияи мижгон", when: "Чоршанбе, 30 сентябр 2026, 12:00", time: "12:00", master: "Мира", address: "кӯчаи Бухоро, 23/25, ошёнаҳои 1-2", code: "4821", link: "mavzunai-jovid.tj/tj", points: "100", percent: "30" },
+  en: { name: "Marta", service: "Lash lamination", when: "Wednesday, 30 September 2026, 12:00", time: "12:00", master: "Mira", address: "23/25 Bukhoro St, 1st-2nd floor", code: "4821", link: "mavzunai-jovid.tj/en", points: "100", percent: "30" },
 };
 
 type Kind = { kind: MessageKind; title: string; hint: string; vars: (keyof MessageVars)[] };
@@ -54,7 +54,7 @@ export function TemplatesEditor({ kinds, defaults, initial }: { kinds: Kind[]; d
                     {text.trim() ? <em> · изменён</em> : <em> · стандартный</em>}
                   </span>
                   <textarea
-                    aria-label={`${title} — ${LANG_NAME[lang]}`}
+                    aria-label={`${title} - ${LANG_NAME[lang]}`}
                     lang={lang}
                     rows={4}
                     value={text}
@@ -83,7 +83,7 @@ export function TemplatesEditor({ kinds, defaults, initial }: { kinds: Kind[]; d
         >
           {pending ? "Сохраняем…" : "Сохранить шаблоны"}
         </Button>
-        <span className={s.small}>Пустое поле — стандартный текст (серым в поле). Переменные в фигурных скобках подставляются автоматически.</span>
+        <span className={s.small}>Пустое поле - стандартный текст (серым в поле). Переменные в фигурных скобках подставляются автоматически.</span>
       </div>
     </div>
   );

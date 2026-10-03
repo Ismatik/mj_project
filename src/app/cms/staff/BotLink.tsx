@@ -50,7 +50,7 @@ export function BotLink({ staffId, name, chats, editable }: { staffId: string; n
       {code ? (
         <p className={s.botCode}>
           <code>/master {code}</code>
-          <span> — {name} отправляет это боту один раз</span>
+          <span> - {name} отправляет это боту один раз</span>
         </p>
       ) : null}
       <div className={s.botRow}>

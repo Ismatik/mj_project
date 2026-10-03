@@ -54,7 +54,7 @@ export async function getGuestBook({ q = "", tag = "all", limit = 50 }: { q?: st
         birthdayIn: bd && bd.days <= BIRTHDAY_DAYS ? bd : null,
         visits: v?.count ?? 0,
         last: v?.last ?? null,
-        fav: fav?.serviceId ? (services.get(fav.serviceId) ?? "—") : "—",
+        fav: fav?.serviceId ? (services.get(fav.serviceId) ?? "-") : "-",
       };
     })
     .filter((g) => tag !== "birthdays" || g.birthdayIn)

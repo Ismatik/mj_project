@@ -22,7 +22,7 @@ export default async function StockPage({ searchParams }: PageProps<"/cms/stock"
   const categories = [...new Set(d.items.map((i) => i.category))];
   return (
     <div>
-      <PageHead title="Склад" meta="Расходники списываются сами, когда услугу оплачивают в кассе · ниже минимума — сообщение ресепшену" />
+      <PageHead title="Склад" meta="Расходники списываются сами, когда услугу оплачивают в кассе · ниже минимума - сообщение ресепшену" />
       <StatGrid
         stats={[
           { label: "Позиций", value: String(d.stats.items), dark: true },
@@ -44,7 +44,7 @@ export default async function StockPage({ searchParams }: PageProps<"/cms/stock"
             </span>
           }
         />
-        {items.length === 0 && <p className={s.muted}>{onlyLow ? "Всего хватает." : "Склад пуст — добавьте первую позицию."}</p>}
+        {items.length === 0 && <p className={s.muted}>{onlyLow ? "Всего хватает." : "Склад пуст - добавьте первую позицию."}</p>}
         <div className={s.scroll}>
           <table className={s.table}>
             <tbody>

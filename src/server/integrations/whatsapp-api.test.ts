@@ -10,7 +10,7 @@ describe("WhatsApp payloads", () => {
     const p = waPayload("+992981031111", "…", { name: "mj_reminder_day", lang: "ru", params: ["Ср, 30 сентября\n12:00", ""] });
     expect(p).toMatchObject({
       type: "template",
-      template: { name: "mj_reminder_day", language: { code: "ru" }, components: [{ type: "body", parameters: [{ type: "text", text: "Ср, 30 сентября 12:00" }, { type: "text", text: "—" }] }] },
+      template: { name: "mj_reminder_day", language: { code: "ru" }, components: [{ type: "body", parameters: [{ type: "text", text: "Ср, 30 сентября 12:00" }, { type: "text", text: "-" }] }] },
     });
   });
   it("authentication template repeats the code for the copy button", () => {

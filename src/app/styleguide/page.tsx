@@ -47,7 +47,7 @@ export default async function StyleguidePage() {
           <Kicker>R1 · Sprint 1</Kicker>
           <h1 className={s.title}>Компоненты и эффекты MJ</h1>
           <p className={s.lead}>
-            Токены, компоненты и эффекты из прототипов. Данные ниже — живые, из базы ({longDate(date)}).
+            Токены, компоненты и эффекты из прототипов. Данные ниже - живые, из базы ({longDate(date)}).
           </p>
         </div>
       </header>
@@ -70,10 +70,10 @@ export default async function StyleguidePage() {
         <div className={s.type}>
           <Kicker>Доброе утро, Мавзуна</Kicker>
           <div className={s.display}>
-            Ваш салон сегодня — <em>всё занято до 17:00</em>
+            Ваш салон сегодня - <em>всё занято до 17:00</em>
           </div>
           <PageHead title="Книга гостей" meta={`${d.guestsTotal} гостий · ${d.guestsNewThisMonth} новых в этом месяце`} />
-          <p className={s.body}>Jost 300 — основной текст интерфейса. Zen Old Mincho — заголовки и цифры.</p>
+          <p className={s.body}>Jost 300 - основной текст интерфейса. Zen Old Mincho - заголовки и цифры.</p>
         </div>
       </section>
 

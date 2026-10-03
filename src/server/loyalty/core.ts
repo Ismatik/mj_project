@@ -22,7 +22,7 @@ export async function spentLastYear(db: Db, guestId: string, now = new Date()): 
 
 /**
  * Changes her points and writes the ledger line. A negative change fails (returns false)
- * rather than taking the balance below zero — two tills can't spend the same points.
+ * rather than taking the balance below zero - two tills can't spend the same points.
  */
 export async function addPoints(
   db: Db,
@@ -91,7 +91,7 @@ export async function awardBirthdays(db: PrismaClient, now = new Date()): Promis
   return n;
 }
 
-// ─── Promotions ──────────────────────────────────────────────
+// Promotions
 
 const ymdOf = (d: Date) => d.toISOString().slice(0, 10);
 

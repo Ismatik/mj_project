@@ -5,7 +5,7 @@ import fontkit from "@pdf-lib/fontkit";
 import type { PDFDocument, PDFFont, PDFPage, RGB } from "pdf-lib";
 
 // Fonts for PDFs (subsets in assets/fonts, SIL Open Font License).
-// Each style is a stack: the brand font first, Noto for the letters it lacks —
+// Each style is a stack: the brand font first, Noto for the letters it lacks -
 // Zen Old Mincho has only Latin and digits here (its Cyrillic is full-width), Jost lacks Tajik letters.
 const FILES = {
   mincho: "ZenOldMincho-SemiBold-subset.ttf",

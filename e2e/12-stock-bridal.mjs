@@ -17,7 +17,7 @@ const addDays = (d, n) => new Date(Date.parse(`${d}T00:00:00Z`) + n * 864e5).toI
 
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 const ctxOf = async () => {
   const c = await b.newContext({ viewport: { width: 1360, height: 900 }, locale: 'ru-RU', timezoneId: 'Asia/Dushanbe', extraHTTPHeaders: { 'x-forwarded-for': '203.0.113.12' } });
   await c.route(/unsplash|mino\.tj/, (r) => r.fulfill({ status: 200, contentType: 'image/png', body: png }));

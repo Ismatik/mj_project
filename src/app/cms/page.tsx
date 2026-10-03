@@ -31,7 +31,7 @@ const plural = (n: number, one: string, few: string, many: string) => {
   return many;
 };
 
-// "Мой салон сегодня" — design/Salon CMS Dashboard Main.dc.html, isDashboard.
+// "Мой салон сегодня" - design/Salon CMS Dashboard Main.dc.html, isDashboard.
 export default async function DashboardPage() {
   const user = await requirePage("dashboard", "/cms");
   const d = await getDashboard();
@@ -47,8 +47,8 @@ export default async function DashboardPage() {
   const guestsWord = plural(d.appointments.length, "гостья записана", "гостьи записаны", "гостей записано");
 
   const leadParts = [`${d.appointments.length} ${guestsWord}`, `${ahead.length} ещё впереди`];
-  if (d.busiest.length === 2) leadParts.push(`${d.busiest[0]} и ${d.busiest[1]} — самые загруженные кресла`);
-  else if (d.busiest.length === 1) leadParts.push(`${d.busiest[0]} — самое загруженное кресло`);
+  if (d.busiest.length === 2) leadParts.push(`${d.busiest[0]} и ${d.busiest[1]} - самые загруженные кресла`);
+  else if (d.busiest.length === 1) leadParts.push(`${d.busiest[0]} - самое загруженное кресло`);
 
   const first = d.revenue14[0]!;
   const last = d.revenue14.at(-1)!;
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
           {greeting(hour)}, {firstName}
         </Kicker>
         <h1 className={s.title}>
-          Ваш салон сегодня — <em>{lastEnd ? `всё занято до ${clock(lastEnd)}` : "свободный день"}</em>
+          Ваш салон сегодня - <em>{lastEnd ? `всё занято до ${clock(lastEnd)}` : "свободный день"}</em>
         </h1>
         <div className={s.lead}>{leadParts.join(" · ")}</div>
       </div>
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
               .join(" · ") || "весь день закрыт наличными, картой и QR"}
           </p>
           <p className={m.muted} style={{ marginBottom: 0 }}>
-            Этот день неделю назад — {somoni(money.sameDayLastWeek)} ({money.sameDayChange}). Средний рабочий день {d.monthName} — {somoni(money.avgWorkingDay)} по{" "}
+            Этот день неделю назад - {somoni(money.sameDayLastWeek)} ({money.sameDayChange}). Средний рабочий день {d.monthName} - {somoni(money.avgWorkingDay)} по{" "}
             {money.daysWithSales} {plural(money.daysWithSales, "дню", "дням", "дням")}.
           </p>
         </section>
@@ -186,7 +186,7 @@ export default async function DashboardPage() {
             </div>
           </form>
           <p className={m.muted} style={{ marginTop: 10, marginBottom: 0 }}>
-            В файле — сводка, чеки, услуги, мастера, выручка по дням, онлайн-оплаты и смены, каждый раздел на своём листе.
+            В файле - сводка, чеки, услуги, мастера, выручка по дням, онлайн-оплаты и смены, каждый раздел на своём листе.
           </p>
         </section>
       )}

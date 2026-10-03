@@ -33,7 +33,7 @@ export type SendCodeResult =
 
 /**
  * On-screen codes while a channel is in mock mode: always in development, and on a server only with DEMO_LOGIN_CODES=1
- * (staging) — otherwise anyone could open any guest's account by typing her number.
+ * (staging) - otherwise anyone could open any guest's account by typing her number.
  */
 const demoCodesAllowed = () => process.env.NODE_ENV !== "production" || process.env.DEMO_LOGIN_CODES === "1";
 

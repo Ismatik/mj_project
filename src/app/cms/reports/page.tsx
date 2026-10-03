@@ -33,7 +33,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/cms/repo
 
   return (
     <div>
-      <PageHead title="Отчёты" meta={`${dmy(period.from)} — ${dmy(period.toIncl)}`} />
+      <PageHead title="Отчёты" meta={`${dmy(period.from)} - ${dmy(period.toIncl)}`} />
       <section className={s.panel}>
         <div className={s.presets} role="group" aria-label="Период">
           {presets.map((p) => (
@@ -65,7 +65,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/cms/repo
           </div>
         </form>
         <p className={s.muted} style={{ marginTop: 10, marginBottom: 0 }}>
-          В Excel — сводка, все чеки, услуги, мастера, выручка по дням, онлайн-оплаты и смены, каждый раздел на своём листе.
+          В Excel - сводка, все чеки, услуги, мастера, выручка по дням, онлайн-оплаты и смены, каждый раздел на своём листе.
         </p>
       </section>
 
@@ -124,13 +124,13 @@ export default async function ReportsPage({ searchParams }: PageProps<"/cms/repo
                     <td>{sv.name}</td>
                     <td className={s.num}>{sv.count}</td>
                     <td className={s.num}>{somoni(sv.revenue)}</td>
-                    <td className={s.num}>{sv.discounts ? somoni(sv.discounts) : "—"}</td>
+                    <td className={s.num}>{sv.discounts ? somoni(sv.discounts) : "-"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {r.services.length > 12 && <p className={s.muted}>Все {r.services.length} услуг — в Excel.</p>}
+          {r.services.length > 12 && <p className={s.muted}>Все {r.services.length} услуг - в Excel.</p>}
         </section>
       </div>
 

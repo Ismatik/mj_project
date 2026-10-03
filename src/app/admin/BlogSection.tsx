@@ -19,7 +19,7 @@ export function BlogSection({ posts, services, lang }: { posts: AdminPost[]; ser
   if (editing) return <PostEditor key={editing.id || "new"} post={editing} services={services} lang={lang} onClose={() => setEditing(null)} />;
   return (
     <>
-      <Head title="Блог и советы" lead="Статьи и советы по уходу — на странице /blog и в разделе «Советы» на главной. Каждая статья публикуется отдельно." />
+      <Head title="Блог и советы" lead="Статьи и советы по уходу - на странице /blog и в разделе «Советы» на главной. Каждая статья публикуется отдельно." />
       <div className={s.stack}>
         <div>
           <Button size="sm" onClick={() => setEditing(EMPTY)}>
@@ -91,7 +91,7 @@ function PostEditor({ post, services, lang, onClose }: { post: AdminPost; servic
 
   return (
     <>
-      <Head title={post.id ? "Статья" : "Новая статья"} lead={tr ? "Перевод: пустое поле — на сайте будет русский текст." : "Текст: пустая строка — новый абзац, «## » — подзаголовок, «- » — пункт списка, «> » — цитата, **жирный**, [ссылка](/#zapis)."} />
+      <Head title={post.id ? "Статья" : "Новая статья"} lead={tr ? "Перевод: пустое поле - на сайте будет русский текст." : "Текст: пустая строка - новый абзац, «## » - подзаголовок, «- » - пункт списка, «> » - цитата, **жирный**, [ссылка](/#zapis)."} />
       <div className={s.stack}>
         <Box label="Заголовок">
           <input aria-label="Заголовок статьи" className={s.inputTitle} value={text("title")} placeholder={tr ? p.title : ""} onChange={(e) => setText("title", e.target.value)} />
@@ -110,7 +110,7 @@ function PostEditor({ post, services, lang, onClose }: { post: AdminPost; servic
             <span className={s.small}>/blog/{p.slug || "…"}</span>
           </Box>
         )}
-        <Box label="Кратко — для списка статей и поиска">
+        <Box label="Кратко - для списка статей и поиска">
           <textarea aria-label="Кратко" className={s.textarea} rows={2} value={text("excerpt")} placeholder={tr ? p.excerpt : ""} onChange={(e) => setText("excerpt", e.target.value)} />
         </Box>
         <Box label="Текст">

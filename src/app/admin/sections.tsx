@@ -43,14 +43,14 @@ export function Text({ value, onChange, title, label, rows }: { value: string; o
   return <input aria-label={label} className={title ? s.inputTitle : s.input} value={value} onChange={(e) => onChange(e.target.value)} />;
 }
 
-// ── Тексты секций ──────────────────────────────────────────
+// Тексты секций
 export function TextsSection({ c, onChange }: Props) {
   const edit = editor(c, onChange);
   return (
     <>
       <Head title="Тексты секций" lead="Заголовки и описания, которые видят гостьи на сайте. Перенос строки в заголовке сохраняется." />
       <div className={s.stack}>
-        <Box label="Hero — главный экран">
+        <Box label="Hero - главный экран">
           <Text label="Надпись над заголовком" value={c.hero.kicker} onChange={(v) => edit((d) => void (d.hero.kicker = v))} />
           <Text label="Заголовок" title rows={2} value={c.hero.title} onChange={(v) => edit((d) => void (d.hero.title = v))} />
           <Text label="Подзаголовок" rows={2} value={c.hero.subtitle} onChange={(v) => edit((d) => void (d.hero.subtitle = v))} />
@@ -64,7 +64,7 @@ export function TextsSection({ c, onChange }: Props) {
           <Text label="Заголовок" title value={c.philosophy.title} onChange={(v) => edit((d) => void (d.philosophy.title = v))} />
           <Text label="Текст" rows={4} value={c.philosophy.body} onChange={(v) => edit((d) => void (d.philosophy.body = v))} />
         </Box>
-        <Box label="Наши услуги — карточки">
+        <Box label="Наши услуги - карточки">
           <Text label="Заголовок секции" title value={c.services.title} onChange={(v) => edit((d) => void (d.services.title = v))} />
           {c.services.cards.map((card, i) => (
             <div key={i} className={s.two}>
@@ -72,7 +72,7 @@ export function TextsSection({ c, onChange }: Props) {
               <Text label={`Карточка ${i + 1}: описание`} value={card.desc} onChange={(v) => edit((d) => void (d.services.cards[i]!.desc = v))} />
             </div>
           ))}
-          <span className={s.small}>Цены под карточками берутся из CMS — раздел «Услуги и цены».</span>
+          <span className={s.small}>Цены под карточками берутся из CMS - раздел «Услуги и цены».</span>
         </Box>
         <Box label="Бегущая строка">
           <Text
@@ -103,7 +103,7 @@ export function TextsSection({ c, onChange }: Props) {
   );
 }
 
-// ── Услуги и цены ──────────────────────────────────────────
+// Услуги и цены
 export function ServicesSection({
   c,
   services,
@@ -117,7 +117,7 @@ export function ServicesSection({
     <>
       <Head
         title="Услуги и цены на сайте"
-        lead="Что показывать в прайсе под секцией «Наши услуги». Цены и длительность меняет владелица в CMS — здесь только видимость на сайте."
+        lead="Что показывать в прайсе под секцией «Наши услуги». Цены и длительность меняет владелица в CMS - здесь только видимость на сайте."
       />
       <div>
         {services.map((sv, i) => {
@@ -162,7 +162,7 @@ export function ServicesSection({
 function ServiceNames({ services, names, onName }: { services: AdminService[]; names: Names; onName: (kind: keyof Names, id: string, v: string) => void }) {
   return (
     <>
-      <Head title="Названия услуг" lead="Как услуги и категории называются на этом языке — в прайсе, онлайн-записи, боте и сообщениях. Пустое поле — русское название." />
+      <Head title="Названия услуг" lead="Как услуги и категории называются на этом языке - в прайсе, онлайн-записи, боте и сообщениях. Пустое поле - русское название." />
       <div className={s.stack} style={{ gap: 6 }}>
         {services.map((sv, i) => {
           const cat = i === 0 || services[i - 1]!.categoryId !== sv.categoryId;
@@ -192,7 +192,7 @@ function ServiceNames({ services, names, onName }: { services: AdminService[]; n
   );
 }
 
-// ── Фотографии ─────────────────────────────────────────────
+// Фотографии
 export async function upload(file: File): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
   const form = new FormData();
   form.append("file", file);
@@ -247,10 +247,10 @@ function PhotoCard({ label, place, photo, onChange }: { label: string; place: st
   );
 }
 
-// ── Свадебный зал ──────────────────────────────────────────
+// Свадебный зал
 /**
  * Тексты переводятся, поэтому идут через `c`/`onChange` (вид текущего языка).
- * Фотография общая для всех языков — она правится в русском черновике `draft`.
+ * Фотография общая для всех языков - она правится в русском черновике `draft`.
  */
 export function BridalSection({
   c,
@@ -273,7 +273,7 @@ export function BridalSection({
         </Box>
         <Box label="Фотография">
           {translating ? (
-            <p className={s.lead}>Фотография общая для всех языков — меняйте её на русской вкладке.</p>
+            <p className={s.lead}>Фотография общая для всех языков - меняйте её на русской вкладке.</p>
           ) : (
             <div className={s.photos}>
               <PhotoCard
@@ -294,19 +294,19 @@ export function PhotosSection({ c, onChange }: Props) {
   const edit = editor(c, onChange);
   return (
     <>
-      <Head title="Фотографии" lead="JPG, PNG или WebP до 8 МБ. На сайте фото показываются в чёрно-белом стиле MJ. Сейчас часть снимков — временные стоковые." />
+      <Head title="Фотографии" lead="JPG, PNG или WebP до 8 МБ. На сайте фото показываются в чёрно-белом стиле MJ. Сейчас часть снимков - временные стоковые." />
       <div className={s.photos}>
-        <PhotoCard label="Hero — главный экран" place="верх страницы" photo={c.photos.hero} onChange={(p) => edit((d) => void (d.photos.hero = p))} />
+        <PhotoCard label="Hero - главный экран" place="верх страницы" photo={c.photos.hero} onChange={(p) => edit((d) => void (d.photos.hero = p))} />
         <PhotoCard label="Интерьер" place="секция «О салоне»" photo={c.photos.interior} onChange={(p) => edit((d) => void (d.photos.interior = p))} />
         {c.reviews.items.map((r, i) => (
-          <PhotoCard key={r.id} label={`Отзыв — ${r.author}`} place="аватар" photo={r.photo} onChange={(p) => edit((d) => void (d.reviews.items[i]!.photo = p))} />
+          <PhotoCard key={r.id} label={`Отзыв - ${r.author}`} place="аватар" photo={r.photo} onChange={(p) => edit((d) => void (d.reviews.items[i]!.photo = p))} />
         ))}
       </div>
     </>
   );
 }
 
-// ── Отзывы ─────────────────────────────────────────────────
+// Отзывы
 export function ReviewsSection({ c, onChange, translating }: Props & { translating?: boolean }) {
   const edit = editor(c, onChange);
   const [draft, setDraft] = useState({ author: "", text: "", source: "" });
@@ -377,18 +377,18 @@ export function ReviewsSection({ c, onChange, translating }: Props & { translati
   );
 }
 
-// ── Контакты и часы ────────────────────────────────────────
+// Контакты и часы
 const CONTACT_FIELDS: { key: keyof SiteContent["contacts"]; label: string; hint?: string }[] = [
   { key: "phone", label: "Телефон" },
   { key: "whatsapp", label: "WhatsApp", hint: "номер для ссылки wa.me, только цифры" },
-  { key: "instagram", label: "Instagram — салон", hint: "без @" },
-  { key: "instagramGallery", label: "Instagram — галерея", hint: "без @" },
+  { key: "instagram", label: "Instagram - салон", hint: "без @" },
+  { key: "instagramGallery", label: "Instagram - галерея", hint: "без @" },
   { key: "address", label: "Адрес" },
   { key: "district", label: "Район, город" },
   { key: "hours", label: "Часы работы" },
   { key: "dayOff", label: "Выходной" },
-  { key: "mapLat", label: "Карта — широта", hint: "например 38.5761; в Google Maps нажмите на точку салона и скопируйте координаты" },
-  { key: "mapLng", label: "Карта — долгота", hint: "например 68.7824" },
+  { key: "mapLat", label: "Карта - широта", hint: "например 38.5761; в Google Maps нажмите на точку салона и скопируйте координаты" },
+  { key: "mapLng", label: "Карта - долгота", hint: "например 68.7824" },
   { key: "twoGisUrl", label: "Ссылка на салон в 2ГИС", hint: "необязательно; иначе откроется точка на карте" },
 ];
 
@@ -414,7 +414,7 @@ export function ContactsSection({ c, onChange, translating }: Props & { translat
   );
 }
 
-// ── SEO ────────────────────────────────────────────────────
+// SEO
 export function SeoSection({ c, onChange }: Props) {
   const edit = editor(c, onChange);
   const counter = (n: number, max: number) => <div className={`${s.counter} ${n > max ? s.counterOver : ""}`}>{`${n} / ${max}`}</div>;

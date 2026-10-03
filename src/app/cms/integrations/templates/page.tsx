@@ -22,7 +22,7 @@ export default async function TemplatesPage() {
   const listError = listed && !listed.ok ? listed.error : null;
   return (
     <div>
-      <PageHead title="Шаблоны сообщений" meta="Подтверждения, напоминания и коды входа — на языке гостьи" />
+      <PageHead title="Шаблоны сообщений" meta="Подтверждения, напоминания и коды входа - на языке гостьи" />
       <p className={s.back}>
         <Link href="/cms/integrations">← Интеграции</Link>
       </p>
@@ -32,8 +32,8 @@ export default async function TemplatesPage() {
         <h2 id="wa-title">Шаблоны WhatsApp для Meta</h2>
         <p>
           WhatsApp разрешает первым писать гостье только по шаблонам, одобренным Meta. Тексты ниже уже подготовлены в формате Meta (русский и английский;
-          таджикским гостьям в WhatsApp уходит русский вариант). Кнопка отправляет их на проверку — обычно она занимает от нескольких минут до суток. Пошаговая
-          инструкция — в <code>docs/whatsapp-setup.md</code>.
+          таджикским гостьям в WhatsApp уходит русский вариант). Кнопка отправляет их на проверку - обычно она занимает от нескольких минут до суток. Пошаговая
+          инструкция - в <code>docs/whatsapp-setup.md</code>.
         </p>
         <SubmitTemplates configured={configured} />
         {listError && <p className={s.small}>Статус из Meta не получен: {listError}</p>}

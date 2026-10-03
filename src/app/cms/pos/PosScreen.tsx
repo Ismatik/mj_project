@@ -164,7 +164,7 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
       router.refresh();
     } catch {
       fx.hideLoader();
-      fx.toast("Оплата не прошла — проверьте соединение", "Касса");
+      fx.toast("Оплата не прошла - проверьте соединение", "Касса");
     } finally {
       setPaying(false);
     }
@@ -196,7 +196,7 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
           <label>
             · мастер{" "}
             <select value={who.staffId ?? ""} onChange={(e) => setWho((w) => ({ ...w, staffId: e.target.value || null }))}>
-              <option value="">—</option>
+              <option value="">-</option>
               {data.staff.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name}
@@ -214,7 +214,7 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
               if (phoneInput.trim()) void findByPhone();
             }}
           >
-            <input aria-label="Телефон гостьи" placeholder="Гостья по телефону — для бонусов" inputMode="tel" value={phoneInput} onChange={(e) => setPhoneInput(e.target.value)} />
+            <input aria-label="Телефон гостьи" placeholder="Гостья по телефону - для бонусов" inputMode="tel" value={phoneInput} onChange={(e) => setPhoneInput(e.target.value)} />
             <button type="submit" disabled={!phoneInput.trim()}>
               Найти
             </button>
@@ -273,7 +273,7 @@ export function PosScreen({ data, initialAppt }: { data: PosData; initialAppt?: 
                 <path d="M16 12h-6" />
               </svg>
               <div className={s.emptyTitle}>Чек пока пуст</div>
-              <div className={s.emptyText}>Выберите услуги в быстром меню справа — они появятся здесь.</div>
+              <div className={s.emptyText}>Выберите услуги в быстром меню справа - они появятся здесь.</div>
             </div>
           )}
         </div>

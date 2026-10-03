@@ -23,7 +23,7 @@ export default async function PosPage({ searchParams }: PageProps<"/cms/pos">) {
         </div>
       )}
       <div className={m.bar}>
-        <span className={m.muted}>{open ? "Смена открыта" : "Смена на сегодня закрыта — новые чеки попадут в отчёты, но не в Z-отчёт"}</span>
+        <span className={m.muted}>{open ? "Смена открыта" : "Смена на сегодня закрыта - новые чеки попадут в отчёты, но не в Z-отчёт"}</span>
         <ButtonLink href="/cms/pos/shift" variant="outline" size="sm">
           {open ? "Закрытие смены" : "Z-отчёт"}
         </ButtonLink>

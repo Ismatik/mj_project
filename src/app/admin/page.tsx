@@ -9,7 +9,7 @@ import { AdminApp } from "./AdminApp";
 export const metadata: Metadata = { title: "Админка сайта · Mavzunai Jovid", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
-// Site admin — design/Site Admin.dc.html. Edits autosave to a draft; "Опубликовать" makes them live.
+// Site admin - design/Site Admin.dc.html. Edits autosave to a draft; "Опубликовать" makes them live.
 export default async function AdminPage() {
   const user = await requireSiteAdmin();
   const [docs, services, team, posts] = await Promise.all([getSiteDocuments(), getServicesForAdmin(), getMastersForAdmin(), adminPosts()]);

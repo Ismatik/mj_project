@@ -64,7 +64,7 @@ export async function getWaitlistPage() {
       phone: e.phone,
       service: e.service.name,
       master: e.staff?.name ?? null,
-      window: e.timeFrom || e.timeTo ? `${e.timeFrom ?? "09:00"}–${e.timeTo ?? "18:00"}` : null,
+      window: e.timeFrom || e.timeTo ? `${e.timeFrom ?? "09:00"}-${e.timeTo ?? "18:00"}` : null,
       note: e.note,
       source: e.source,
       status: e.status,

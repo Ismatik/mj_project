@@ -150,7 +150,7 @@
   user-select: all;
 }
 
-/* The weekday toggles are 31×27 on a phone — too small to set a schedule with. */
+/* The weekday toggles are 31×27 on a phone - too small to set a schedule with. */
 @media (max-width: 600px) {
   .dayBtn {
     min-height: 44px;

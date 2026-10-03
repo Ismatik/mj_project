@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { addDays, atSalonTime, mondayOf, todayYmd } from "@/lib/time";
 import { monthPrepositional, monthToDate } from "./ranges";
 
-const DAY_MINUTES = 9 * 60; // 09:00–18:00
+const DAY_MINUTES = 9 * 60; // 09:00-18:00
 
 export async function getStaffBoard() {
   const today = todayYmd();

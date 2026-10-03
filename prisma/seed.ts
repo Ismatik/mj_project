@@ -343,9 +343,9 @@ async function main() {
         title: "Осенний уход за кожей −20%",
         titleTg: "Нигоҳубини тирамоҳии пӯст −20%",
         titleEn: "Autumn skin care −20%",
-        description: "Уход за кожей со скидкой 20% — цена уже со скидкой при записи на сайте и на кассе.",
-        descriptionTg: "Нигоҳубини пӯст бо тахфифи 20% — нарх ҳангоми сабт дар сайт ва дар касса аллакай бо тахфиф аст.",
-        descriptionEn: "Skin care 20% off — the price is already reduced when you book on the website or pay at the salon.",
+        description: "Уход за кожей со скидкой 20% - цена уже со скидкой при записи на сайте и на кассе.",
+        descriptionTg: "Нигоҳубини пӯст бо тахфифи 20% - нарх ҳангоми сабт дар сайт ва дар касса аллакай бо тахфиф аст.",
+        descriptionEn: "Skin care 20% off - the price is already reduced when you book on the website or pay at the salon.",
         kind: "PERCENT",
         value: 20,
         serviceIds: [serviceId.skin!],
@@ -459,14 +459,14 @@ async function main() {
   });
 
   // Guest card: allergies and colour formulas
-  await db.guest.update({ where: { id: guestId.marta }, data: { allergies: "Аммиак — только безаммиачные красители. Чувствительная кожа головы." } });
-  await db.guest.update({ where: { id: guestId.sevara }, data: { allergies: "Латекс (перчатки — нитриловые)" } });
+  await db.guest.update({ where: { id: guestId.marta }, data: { allergies: "Аммиак - только безаммиачные красители. Чувствительная кожа головы." } });
+  await db.guest.update({ where: { id: guestId.sevara }, data: { allergies: "Латекс (перчатки - нитриловые)" } });
   await db.colourFormula.createMany({
     data: [
       { guestId: guestId.marta!, staffId: staffId.ines, title: "Балаяж", formula: "Осветление Blondor + 6% 1:2, 40 мин; тонирование Igora Vibrance 9-24 + 1,9% 1:2, 20 мин", note: "Корни не трогать", createdBy: "Инес", createdAt: atSalonTime(addDays(today, -40), "13:00") },
       { guestId: guestId.marta!, staffId: staffId.ines, title: "Тонирование", formula: "Igora Vibrance 9-24 + 9-0 1:1, оксид 1,9%, 20 мин", createdBy: "Инес", createdAt: atSalonTime(addDays(today, -12), "15:00") },
       { guestId: guestId.gulnora!, staffId: staffId.ines, title: "Окрашивание в один тон", formula: "Igora Royal 6-68 + 6-0 2:1, оксид 6%, 35 мин", createdBy: "Инес", createdAt: atSalonTime(addDays(today, -9), "11:30") },
-      { guestId: guestId.anna!, staffId: staffId.mira, title: "Ламинирование ресниц", formula: "Состав 1 — 9 мин, состав 2 — 8 мин, краска графит 5 мин", createdBy: "Мира", createdAt: atSalonTime(addDays(today, -20), "12:00") },
+      { guestId: guestId.anna!, staffId: staffId.mira, title: "Ламинирование ресниц", formula: "Состав 1 - 9 мин, состав 2 - 8 мин, краска графит 5 мин", createdBy: "Мира", createdAt: atSalonTime(addDays(today, -20), "12:00") },
     ],
   });
 
@@ -558,7 +558,7 @@ async function main() {
       slug: "uhod-za-okrashennymi-volosami",
       title: "Как сохранить цвет после окрашивания",
       excerpt: "Пять простых правил от колориста Инес: чтобы оттенок оставался ярким до следующего визита.",
-      body: "Цвет держится дольше, если в первые дни дать ему закрепиться.\n\n## Первые 48 часов\n- Не мойте голову двое суток после окрашивания.\n- Откажитесь от горячей воды — она раскрывает чешуйки волоса.\n\n## Каждый день\n- Шампунь без сульфатов и маска для окрашенных волос раз в неделю.\n- **Термозащита** перед феном и утюжком обязательна.\n\n> Тонирование раз в 4–6 недель освежает оттенок и добавляет блеск.\n\nЗапишитесь на [окрашивание](/#zapis) — Инес подберёт уход под ваш цвет.",
+      body: "Цвет держится дольше, если в первые дни дать ему закрепиться.\n\n## Первые 48 часов\n- Не мойте голову двое суток после окрашивания.\n- Откажитесь от горячей воды - она раскрывает чешуйки волоса.\n\n## Каждый день\n- Шампунь без сульфатов и маска для окрашенных волос раз в неделю.\n- **Термозащита** перед феном и утюжком обязательна.\n\n> Тонирование раз в 4-6 недель освежает оттенок и добавляет блеск.\n\nЗапишитесь на [окрашивание](/#zapis) - Инес подберёт уход под ваш цвет.",
       tags: ["волосы", "уход"],
       service: "color",
       cover: "photo-1688395199230-ab7c7170a4b6",
@@ -572,7 +572,7 @@ async function main() {
         en: {
           title: "How to keep your colour after dyeing",
           excerpt: "Five simple rules from our colourist Ines to keep the shade bright until your next visit.",
-          body: "Colour lasts longer if you give it a few days to settle.\n\n## The first 48 hours\n- Don't wash your hair for two days after colouring.\n- Avoid hot water — it opens the hair cuticle.\n\n## Every day\n- A sulphate-free shampoo and a colour mask once a week.\n- **Heat protection** before the dryer or straightener is a must.\n\n> A toner every 4–6 weeks refreshes the shade and adds shine.",
+          body: "Colour lasts longer if you give it a few days to settle.\n\n## The first 48 hours\n- Don't wash your hair for two days after colouring.\n- Avoid hot water - it opens the hair cuticle.\n\n## Every day\n- A sulphate-free shampoo and a colour mask once a week.\n- **Heat protection** before the dryer or straightener is a must.\n\n> A toner every 4-6 weeks refreshes the shade and adds shine.",
         },
       },
     },
@@ -580,7 +580,7 @@ async function main() {
       slug: "podgotovka-k-svadbe",
       title: "Подготовка к свадьбе: календарь невесты",
       excerpt: "Когда делать пробный образ, окрашивание и маникюр, чтобы в главный день всё было идеально.",
-      body: "Красивый образ начинается за несколько недель до свадьбы.\n\n## За месяц\n- Пробный образ: причёска и макияж, фото при дневном свете.\n- Примерка платья и подгонка по фигуре.\n\n## За неделю\n- Окрашивание и уход за кожей лица.\n- Архитектура бровей — за 5–7 дней, чтобы форма «улеглась».\n\n## Накануне\n- Маникюр и педикюр.\n- Ранний сон и много воды.\n\nСоберите свой [свадебный пакет](/svadba) — со скидкой на услуги и платьем из проката.",
+      body: "Красивый образ начинается за несколько недель до свадьбы.\n\n## За месяц\n- Пробный образ: причёска и макияж, фото при дневном свете.\n- Примерка платья и подгонка по фигуре.\n\n## За неделю\n- Окрашивание и уход за кожей лица.\n- Архитектура бровей - за 5-7 дней, чтобы форма «улеглась».\n\n## Накануне\n- Маникюр и педикюр.\n- Ранний сон и много воды.\n\nСоберите свой [свадебный пакет](/svadba) - со скидкой на услуги и платьем из проката.",
       tags: ["невестам"],
       service: "bridal",
       cover: "photo-1708134128589-0dfd38b2203a",
@@ -591,7 +591,7 @@ async function main() {
       slug: "gel-lak-bez-skolov",
       title: "Гель-лак без сколов: три недели идеального маникюра",
       excerpt: "Петра рассказывает, что продлевает жизнь покрытию и чего лучше избегать.",
-      body: "Покрытие держится 3 недели, если соблюдать простые правила.\n\n- Работайте по дому в перчатках.\n- Масло для кутикулы — каждый вечер.\n- Не используйте ногти как инструмент.\n\nЕсли появился скол, не снимайте покрытие сами — придите на коррекцию.",
+      body: "Покрытие держится 3 недели, если соблюдать простые правила.\n\n- Работайте по дому в перчатках.\n- Масло для кутикулы - каждый вечер.\n- Не используйте ногти как инструмент.\n\nЕсли появился скол, не снимайте покрытие сами - придите на коррекцию.",
       tags: ["ногти", "уход"],
       service: "gel",
       cover: "photo-1650292266612-a634d749626f",

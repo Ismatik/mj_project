@@ -53,7 +53,7 @@ export function AppointmentPanel({ a, closeHref, role }: { a: AppointmentDetail;
       <div className={s.panelHead}>
         <div>
           <div className={s.kicker}>
-            {longDate(a.startsAt)} · {clock(a.startsAt)}–{clock(new Date(a.startsAt.getTime() + a.durationMin * 60_000))}
+            {longDate(a.startsAt)} · {clock(a.startsAt)}-{clock(new Date(a.startsAt.getTime() + a.durationMin * 60_000))}
           </div>
           <div className={s.panelTitle}>
             {a.guestName} · {a.service}

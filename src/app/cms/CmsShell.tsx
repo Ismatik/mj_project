@@ -78,7 +78,7 @@ export function CmsShell({ nav, counts, user, branch, dateLabel, canBook, childr
         <div className={s.userBox}>
           <div>
             <div className={s.userName}>
-              {user.name} — {user.roleLabel}
+              {user.name} - {user.roleLabel}
             </div>
             <div className={s.userDate}>{dateLabel}</div>
           </div>

@@ -82,7 +82,7 @@ export default async function CertificatesPage() {
 
       <section className={s.panel} aria-labelledby="online">
         <SectionHead title={<span id="online">Онлайн-оплаты</span>} />
-        <p className={s.muted}>Пока банк не подключён, оплаты проходят через тестовую кассу — деньги не списываются (CMS → Интеграции → Онлайн-оплата).</p>
+        <p className={s.muted}>Пока банк не подключён, оплаты проходят через тестовую кассу - деньги не списываются (CMS → Интеграции → Онлайн-оплата).</p>
         {d.payments.length === 0 && <p className={s.muted}>Онлайн-оплат ещё не было.</p>}
         <div className={s.table}>
           {d.payments.map((p) => {

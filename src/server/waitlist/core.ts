@@ -116,7 +116,7 @@ export async function offerFreed(db: Db, date: Ymd, freed: { start: number; end:
         {
           channel: "telegram",
           to: "reception",
-          body: `Лист ожидания: освободившееся время предложено гостье ${e.name}${e.phone ? `, ${formatPhone(e.phone)}` : ""} — ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}. Держим до ${clock(expires)}.${e.phone ? "" : " Номера нет — позвоните или напишите ей сами."}`,
+          body: `Лист ожидания: освободившееся время предложено гостье ${e.name}${e.phone ? `, ${formatPhone(e.phone)}` : ""} - ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}. Держим до ${clock(expires)}.${e.phone ? "" : " Номера нет - позвоните или напишите ей сами."}`,
           meta: { kind: "waitlist-offer", entryId: e.id, appointmentId: appt.id },
         },
       ];
@@ -182,7 +182,7 @@ export async function acceptOffer(db: Db, token: string): Promise<{ ok: boolean;
       {
         channel: "telegram",
         to: "reception",
-        body: `Лист ожидания: ${e.name} подтвердила время — ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}, мастер ${staff.map((m) => m.name).join(" + ")}, ${somoni(a.price)}.${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}`,
+        body: `Лист ожидания: ${e.name} подтвердила время - ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}, мастер ${staff.map((m) => m.name).join(" + ")}, ${somoni(a.price)}.${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}`,
         meta: { kind: "waitlist-booked", entryId: e.id, appointmentId: a.id },
       },
     ];
@@ -285,7 +285,7 @@ export async function joinWaitlist(db: Db, input: JoinInput) {
       data: {
         channel: "telegram",
         to: "reception",
-        body: `Лист ожидания (с ${via}): ${input.name}${input.phone ? `, ${formatPhone(input.phone)}` : ""} — ${service?.name ?? "услуга"}, ${longDate(atSalonTime(input.date, "12:00"))}${input.timeFrom || input.timeTo ? `, ${input.timeFrom ?? "…"}–${input.timeTo ?? "…"}` : ""}. Предложим время, если кто-то отменит запись.`,
+        body: `Лист ожидания (с ${via}): ${input.name}${input.phone ? `, ${formatPhone(input.phone)}` : ""} - ${service?.name ?? "услуга"}, ${longDate(atSalonTime(input.date, "12:00"))}${input.timeFrom || input.timeTo ? `, ${input.timeFrom ?? "…"}-${input.timeTo ?? "…"}` : ""}. Предложим время, если кто-то отменит запись.`,
         meta: { kind: "waitlist-join", entryId: e.id },
       },
     });

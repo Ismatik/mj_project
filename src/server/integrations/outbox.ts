@@ -14,7 +14,7 @@ async function modes(db: PrismaClient): Promise<Modes> {
 /** Sends one message through its channel and records the result. Returns false when the channel is switched off. */
 async function deliver(db: PrismaClient, msg: OutboxMessage, modeOf: Modes): Promise<boolean> {
   const mode = modeOf.get(msg.channel);
-  if (!mode) return false; // channel switched off — stays queued
+  if (!mode) return false; // channel switched off - stays queued
   const channel = channelFor(msg.channel as ChannelKey, mode);
   let result: DeliveryResult;
   if (mode === "LIVE" && msg.channel === "telegram" && msg.to === "reception") {

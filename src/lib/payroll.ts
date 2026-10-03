@@ -1,7 +1,7 @@
 // Master pay and the till's end of day: pure calculations (the CMS pages, reports and tests use them).
 import { addDays, type Ymd } from "./time";
 
-// ─── Months ──────────────────────────────────────────────
+// Months
 
 export type Month = string; // "YYYY-MM"
 
@@ -32,7 +32,7 @@ export function daysBetween(from: Ymd, to: Ymd): Ymd[] {
   return out;
 }
 
-// ─── Payroll ─────────────────────────────────────────────
+// Payroll
 
 export type PayInput = {
   /** Value of the services she did (after promotion discounts) */
@@ -57,7 +57,7 @@ export function payFor(p: PayInput) {
 }
 export type Pay = ReturnType<typeof payFor>;
 
-// ─── End of day ──────────────────────────────────────────
+// End of day
 
 type Method = "CASH" | "CARD" | "QR";
 export type ShiftInput = {

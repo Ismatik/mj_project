@@ -8,7 +8,7 @@ const out = process.env.OUT ?? 'e2e-output';
 mkdirSync(out, { recursive: true });
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 
 async function loginAs(login, next = '') {
   const ctx = await b.newContext({ viewport: { width: 1360, height: 900 } });
@@ -101,7 +101,7 @@ const navLabels = (p) => p.$$eval('aside nav a', (as) => as.map((a) => a.querySe
   await p.click('dialog button[type=submit]');
   await p.waitForTimeout(600);
   const txt = await p.textContent('dialog');
-  check('clash with the master is refused', txt.includes('Мира: занято 15:00–16:00'), txt.match(/Мира: занято[^)]*\)/)?.[0] ?? '');
+  check('clash with the master is refused', txt.includes('Мира: занято 15:00-16:00'), txt.match(/Мира: занято[^)]*\)/)?.[0] ?? '');
   await p.screenshot({ path: `${out}/booking-errors.png` });
   await p.click('dialog button:has-text("Отмена")');
   await p.fill('input[aria-label="Поиск"]', 'Тахмина');

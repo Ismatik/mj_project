@@ -4,7 +4,7 @@ import type { Lang } from "./locales";
 const ru = {
   blog: {
     title: "Советы и статьи",
-    intro: "Уход, тренды и подготовка к особым дням — от мастеров Mavzunai Jovid.",
+    intro: "Уход, тренды и подготовка к особым дням - от мастеров Mavzunai Jovid.",
     nav: "Блог",
     all: "Все",
     read: "Читать",
@@ -16,7 +16,7 @@ const ru = {
     empty: "Скоро здесь появятся советы наших мастеров.",
     homeTitle: "Советы мастеров",
     homeAll: "Все статьи →",
-    draft: "Черновик — видят только редакторы",
+    draft: "Черновик - видят только редакторы",
   },
   insta: {
     title: "Мы в Instagram",
@@ -39,7 +39,7 @@ export type BlogDict = typeof ru;
 const tg: BlogDict = {
   blog: {
     title: "Маслиҳатҳо ва мақолаҳо",
-    intro: "Нигоҳубин, тамоюлҳо ва омодагӣ ба рӯзҳои махсус — аз устоҳои Mavzunai Jovid.",
+    intro: "Нигоҳубин, тамоюлҳо ва омодагӣ ба рӯзҳои махсус - аз устоҳои Mavzunai Jovid.",
     nav: "Блог",
     all: "Ҳама",
     read: "Хондан",
@@ -51,7 +51,7 @@ const tg: BlogDict = {
     empty: "Ба наздикӣ дар ин ҷо маслиҳатҳои устоҳои мо пайдо мешаванд.",
     homeTitle: "Маслиҳатҳои устоҳо",
     homeAll: "Ҳамаи мақолаҳо →",
-    draft: "Лоиҳа — танҳо муҳаррирон мебинанд",
+    draft: "Лоиҳа - танҳо муҳаррирон мебинанд",
   },
   insta: {
     title: "Мо дар Instagram",
@@ -72,7 +72,7 @@ const tg: BlogDict = {
 const en: BlogDict = {
   blog: {
     title: "Tips & articles",
-    intro: "Care, trends and getting ready for special days — from the Mavzunai Jovid team.",
+    intro: "Care, trends and getting ready for special days - from the Mavzunai Jovid team.",
     nav: "Blog",
     all: "All",
     read: "Read",
@@ -84,7 +84,7 @@ const en: BlogDict = {
     empty: "Tips from our masters are coming soon.",
     homeTitle: "Tips from our masters",
     homeAll: "All articles →",
-    draft: "Draft — only editors can see it",
+    draft: "Draft - only editors can see it",
   },
   insta: {
     title: "Find us on Instagram",

@@ -14,7 +14,7 @@ import { getSiteContent } from "@/server/site";
 import s from "../../money.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Подарочный сертификат — Mavzunai Jovid", robots: { index: false } };
+export const metadata: Metadata = { title: "Подарочный сертификат - Mavzunai Jovid", robots: { index: false } };
 
 // Opened from the QR code: the certificate, its balance and a PDF download.
 export default async function CertificatePage({ params }: PageProps<"/sertifikat/[token]">) {

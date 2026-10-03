@@ -33,7 +33,7 @@ export async function generateMetadata({ params, searchParams }: PageProps<"/blo
   if (!found) return {};
   const p = found.post;
   return {
-    title: `${p.title} — Mavzunai Jovid`,
+    title: `${p.title} - Mavzunai Jovid`,
     description: p.excerpt || undefined,
     alternates: alternates(lang, `/blog/${p.slug}`),
     openGraph: { title: p.title, description: p.excerpt || undefined, type: "article", images: p.coverUrl ? [p.coverUrl] : undefined },

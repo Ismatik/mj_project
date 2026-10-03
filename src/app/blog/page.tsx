@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getLang();
   const t = blogDict(lang).blog;
-  return { title: `${t.title} — Mavzunai Jovid`, description: t.intro, alternates: alternates(lang, "/blog") };
+  return { title: `${t.title} - Mavzunai Jovid`, description: t.intro, alternates: alternates(lang, "/blog") };
 }
 
 // Beauty tips and articles written in the site admin.

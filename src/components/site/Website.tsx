@@ -273,7 +273,7 @@ export function Website({
                   ★★★★★
                 </div>
                 <p className={s.reviewText}>{r.text}</p>
-                <footer className={s.reviewAuthor}>— {r.author}</footer>
+                <footer className={s.reviewAuthor}>- {r.author}</footer>
               </blockquote>
             ))}
           </div>

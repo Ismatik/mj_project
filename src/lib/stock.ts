@@ -28,7 +28,7 @@ const group = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
 /** "1 250 мл" */
 export const qty = (n: number, unit: string) => `${group.format(n)} ${unit}`;
 
-/** "3 уп. + 120 мл" — how it looks on the shelf */
+/** "3 уп. + 120 мл" - how it looks on the shelf */
 export function inPacks(quantity: number, packSize: number, unit: string): string {
   if (packSize <= 1 || quantity <= 0) return qty(quantity, unit);
   const packs = Math.floor(quantity / packSize);

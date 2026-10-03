@@ -70,7 +70,7 @@ export function DressCard({ dress, today }: { dress: DressData; today: string })
               <li key={b.id}>
                 <span>
                   {short(b.startsOn)}
-                  {b.endsOn !== b.startsOn && `–${short(b.endsOn)}`}
+                  {b.endsOn !== b.startsOn && `-${short(b.endsOn)}`}
                   {b.guest && ` · ${b.guest}`}
                 </span>
                 <button type="button" disabled={pending} onClick={() => run(() => cancelDressBooking(b.id), "Бронь снята")} aria-label="Снять бронь">
@@ -128,7 +128,7 @@ export function DressCard({ dress, today }: { dress: DressData; today: string })
                 Вернулось
               </button>
             ) : (
-              <button type="button" disabled={pending} onClick={() => run(() => setDressStatus(dress.id, "CLEANING"), `${dress.name} — в химчистке`)}>
+              <button type="button" disabled={pending} onClick={() => run(() => setDressStatus(dress.id, "CLEANING"), `${dress.name} - в химчистке`)}>
                 В химчистку
               </button>
             )}

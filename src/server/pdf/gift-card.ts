@@ -52,8 +52,8 @@ export async function giftCardPdf(
   const lang = (["ru", "tg", "en"].includes(card.lang) ? card.lang : "ru") as Lang;
   const t = T[lang];
   const doc = await PDFDocument.create();
-  doc.setTitle(`Mavzunai Jovid — ${t.title.toLowerCase()} ${card.code}`);
-  doc.setAuthor("Mavzunai Jovid — Gallery of Beauty MJ");
+  doc.setTitle(`Mavzunai Jovid - ${t.title.toLowerCase()} ${card.code}`);
+  doc.setAuthor("Mavzunai Jovid - Gallery of Beauty MJ");
   const f = await embedFonts(doc);
   const W = 595.28;
   const H = 419.53;

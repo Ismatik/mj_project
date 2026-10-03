@@ -33,9 +33,9 @@ async function findMaster(slug: string) {
 export async function generateMetadata({ params }: PageProps<"/mastera/[slug]">): Promise<Metadata> {
   const { master, lang } = await findMaster((await params).slug);
   const t = dict(lang);
-  if (!master) return { title: `${t.masters.notFound} — Mavzunai Jovid` };
+  if (!master) return { title: `${t.masters.notFound} - Mavzunai Jovid` };
   return {
-    title: `${master.name} — ${master.title} · Mavzunai Jovid`,
+    title: `${master.name} - ${master.title} · Mavzunai Jovid`,
     description: master.bio.slice(0, 160) || t.masters.metaDescription(master.name, master.title),
     alternates: alternates(lang, `/mastera/${master.slug}`),
     openGraph: master.photo?.url ? { images: [master.photo.url] } : undefined,

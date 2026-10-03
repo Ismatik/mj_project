@@ -110,7 +110,7 @@ export async function requestCallback(input: { name: string; phone: string; serv
   const guest = await db.guest.findUnique({ where: { phone } });
   const req = await db.bookingRequest.create({ data: { name, phone, service, date: new Date(`${date}T00:00:00Z`), guestId: guest?.id } });
   await db.outboxMessage.create({
-    data: { channel: "telegram", to: "reception", body: `Перезвонить: ${name}, ${formatPhone(phone)} — ${service}${lang === "ru" ? "" : ` · говорит: ${LANG_NAME[lang]}`}`, meta: { kind: "site-request", requestId: req.id } },
+    data: { channel: "telegram", to: "reception", body: `Перезвонить: ${name}, ${formatPhone(phone)} - ${service}${lang === "ru" ? "" : ` · говорит: ${LANG_NAME[lang]}`}`, meta: { kind: "site-request", requestId: req.id } },
   });
   revalidatePath("/cms", "layout");
   return { ok: true };

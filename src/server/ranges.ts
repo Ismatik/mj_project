@@ -22,7 +22,7 @@ const MONTHS_DATIVE = ["январю", "февралю", "марту", "апре
 const MONTHS_PREP = ["январе", "феврале", "марте", "апреле", "мае", "июне", "июле", "августе", "сентябре", "октябре", "ноябре", "декабре"];
 
 export const monthName = (ymd: Ymd) => MONTHS[Number(ymd.slice(5, 7)) - 1]!;
-/** "к августу" — the month before `ymd`, in the dative. */
+/** "к августу" - the month before `ymd`, in the dative. */
 export const previousMonthDative = (ymd: Ymd) => MONTHS_DATIVE[(Number(ymd.slice(5, 7)) + 10) % 12]!;
 /** "в сентябре" */
 export const monthPrepositional = (ymd: Ymd) => MONTHS_PREP[Number(ymd.slice(5, 7)) - 1]!;

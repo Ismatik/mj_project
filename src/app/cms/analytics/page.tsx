@@ -10,7 +10,7 @@ import s from "./analytics.module.css";
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
-// "Аналитика" — design isAnalytics, plus payment methods and top services.
+// "Аналитика" - design isAnalytics, plus payment methods and top services.
 export default async function AnalyticsPage() {
   await requirePage("analytics", "/cms/analytics");
   const a = await getAnalytics();

@@ -1,7 +1,7 @@
 // Bonus program and promotions: rules and calculations (pure, shared by the till, website, bot and worker).
 import type { Lang } from "./i18n/locales";
 
-// ─── Bonus program ───────────────────────────────────────────
+// Bonus program
 // 1 point = 1 somoni. Points are earned on money actually paid (cash, card, QR, online prepayment),
 // not on what was paid with points or a gift certificate.
 
@@ -69,7 +69,7 @@ export function tierFor(spent12m: number, rules: BonusRules) {
 
 export const earnPoints = (paidMoney: number, percent: number) => Math.max(0, Math.floor((paidMoney * percent) / 100));
 
-// ─── Settling a receipt ──────────────────────────────────────
+// Settling a receipt
 
 /**
  * How a receipt is paid: online prepayment first, then the gift certificate, then points (capped by the rules),
@@ -89,7 +89,7 @@ export function settleReceipt(
   return { deposit, gift, bonus, paid: left };
 }
 
-// ─── Promotions ──────────────────────────────────────────────
+// Promotions
 
 export type PromoLike = {
   id: string;

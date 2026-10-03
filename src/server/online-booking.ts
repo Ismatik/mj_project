@@ -93,7 +93,7 @@ export async function slotsFor(serviceId: string, date: Ymd, staffId: string | n
   return { service, slots };
 }
 
-// ─── Booking, cancelling and rescheduling by guests (website and Telegram) ───
+// Booking, cancelling and rescheduling by guests (website and Telegram)
 
 export type BookingSourceKind = "WEBSITE" | "TELEGRAM";
 export type GuestBookingResult =
@@ -200,7 +200,7 @@ export async function createGuestBooking(input: {
       {
         channel: "telegram",
         to: "reception",
-        body: `Онлайн-запись с ${via}${input.note ? ` (${input.note})` : ""}: ${guest.name}, ${formatPhone(guest.phone)} — ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}.${promo ? ` ${promo.code ? `Промокод ${promo.code}` : `Акция «${promo.title}»`}: ${somoni(price)} вместо ${somoni(service.price)}.` : ""}${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}${deposit ? ` Ждёт предоплату ${somoni(deposit)} до ${clock(holdUntil!)}.` : " Подтвердите в календаре."}`,
+        body: `Онлайн-запись с ${via}${input.note ? ` (${input.note})` : ""}: ${guest.name}, ${formatPhone(guest.phone)} - ${service.name}, ${longDate(startsAt)}, ${clock(startsAt)}, мастер ${master.name}.${promo ? ` ${promo.code ? `Промокод ${promo.code}` : `Акция «${promo.title}»`}: ${somoni(price)} вместо ${somoni(service.price)}.` : ""}${lang === "ru" ? "" : ` Язык гостьи: ${LANG_NAME[lang]}.`}${deposit ? ` Ждёт предоплату ${somoni(deposit)} до ${clock(holdUntil!)}.` : " Подтвердите в календаре."}`,
         meta: { kind: "online-booking", appointmentId: appt.id },
       },
     ];
@@ -272,7 +272,7 @@ export async function cancelByGuest(appointmentId: string, guestId: string, lang
       data: {
         channel: "telegram",
         to: "reception",
-        body: `Гостья отменила запись: ${a.guest?.name ?? a.guestName} — ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}.${a.depositPaid ? ` Внесена предоплата ${somoni(a.depositPaid)} — решите с гостьей возврат или перенос.` : ""}`,
+        body: `Гостья отменила запись: ${a.guest?.name ?? a.guestName} - ${a.serviceLabel}, ${longDate(a.startsAt)}, ${clock(a.startsAt)}.${a.depositPaid ? ` Внесена предоплата ${somoni(a.depositPaid)} - решите с гостьей возврат или перенос.` : ""}`,
         meta: { kind: "guest-cancel", appointmentId: a.id },
       },
     }),
@@ -300,7 +300,7 @@ export async function rescheduleByGuest(appointmentId: string, guestId: string, 
       data: {
         channel: "telegram",
         to: "reception",
-        body: `Гостья перенесла запись: ${a.guest?.name ?? a.guestName} — ${a.serviceLabel}, теперь ${longDate(startsAt)}, ${clock(startsAt)}. Подтвердите в календаре.`,
+        body: `Гостья перенесла запись: ${a.guest?.name ?? a.guestName} - ${a.serviceLabel}, теперь ${longDate(startsAt)}, ${clock(startsAt)}. Подтвердите в календаре.`,
         meta: { kind: "guest-reschedule", appointmentId: a.id },
       },
     });

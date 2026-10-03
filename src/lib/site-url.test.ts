@@ -17,7 +17,7 @@ describe("links sent to guests", () => {
     expect(botLink()).toBeNull();
   });
 
-  it("prefers the bot — a guest who opens it becomes reachable for free", () => {
+  it("prefers the bot - a guest who opens it becomes reachable for free", () => {
     process.env.TELEGRAM_BOT_USERNAME = "mavzunaijovid_bot";
     expect(selfServiceLink("ru")).toBe("https://t.me/mavzunaijovid_bot");
     expect(selfServiceLink("en")).toBe("https://t.me/mavzunaijovid_bot");

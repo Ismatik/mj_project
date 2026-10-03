@@ -37,7 +37,7 @@ await new Promise((r) => ig.listen(3998, '127.0.0.1', r));
 
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 const ctxOf = async (w = 1360, h = 900) => {
   const c = await b.newContext({ viewport: { width: w, height: h }, locale: 'ru-RU', timezoneId: 'Asia/Dushanbe' });
   await c.route(/unsplash|cdn\.ig\.test/, (r) => r.fulfill({ status: 200, contentType: 'image/png', body: png }));
@@ -115,7 +115,7 @@ try {
   await g.goto(BASE + '/en/blog/ukhod-za-kozhey-zimoy');
   check('translation saved', (await text(g, 'article h1')).includes('Winter skin care'));
   await a.goto(BASE + '/blog/brovi-osen?preview=1');
-  check('editors preview drafts', (await text(a, 'main')).includes('Черновик — видят только редакторы'));
+  check('editors preview drafts', (await text(a, 'main')).includes('Черновик - видят только редакторы'));
 
   // ── Map and call bar ──────────────────────────────────
   await g.goto(BASE + '/');

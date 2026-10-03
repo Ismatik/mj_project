@@ -42,7 +42,7 @@ await new Promise((r) => meta.listen(FAKE_PORT, '127.0.0.1', r));
 
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 const ctxOf = async (w = 1360, h = 900) => {
   const c = await b.newContext({ viewport: { width: w, height: h }, locale: 'en-US', timezoneId: 'Asia/Dushanbe' });
   await c.route(/unsplash|mino\.tj/, (r) => r.fulfill({ status: 200, contentType: 'image/png', body: png }));
@@ -144,7 +144,7 @@ try {
   // ── Owner: template, bot language, WhatsApp live ──────
   const owner = await login('mavzuna');
   await owner.goto(BASE + '/cms/integrations/templates');
-  await owner.fill('textarea[aria-label="Подтверждение онлайн-записи — English"]', 'Mavzunai Jovid: {name}, see you {when} for {service}!');
+  await owner.fill('textarea[aria-label="Подтверждение онлайн-записи - English"]', 'Mavzunai Jovid: {name}, see you {when} for {service}!');
   await owner.click('button:has-text("Сохранить шаблоны")');
   await owner.waitForSelector('text=Шаблоны сохранены');
   check('template saved', (await owner.textContent('main')).includes('Marta, see you Wednesday'));
@@ -167,7 +167,7 @@ try {
   await owner.waitForSelector('button[data-cb=lang]');
   await owner.click('button[data-cb=lang] >> nth=-1');
   await owner.click('button[data-cb="lang:en"] >> nth=-1');
-  await owner.waitForSelector("text=Done — I'll speak English now");
+  await owner.waitForSelector("text=Done - I'll speak English now");
   check('bot switches to English', (await owner.$$('button[data-cb=book]:has-text("✦ Book")')).length > 0);
 
   await owner.goto(BASE + '/cms/integrations');

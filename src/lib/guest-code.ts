@@ -11,7 +11,7 @@ type Mode = "MOCK" | "LIVE" | null; // null = switched off
 
 /**
  * Telegram when the guest has chatted with the bot (free and instant), otherwise WhatsApp, otherwise SMS.
- * Simulator chats ("sim-…") only count while Telegram is in mock mode — a live bot can't reach them.
+ * Simulator chats ("sim-…") only count while Telegram is in mock mode - a live bot can't reach them.
  */
 export function pickCodeChannel(chatIds: string[], modes: Record<CodeChannel, Mode>): { channel: CodeChannel; to?: string } | null {
   if (modes.telegram) {

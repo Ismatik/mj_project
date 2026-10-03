@@ -1,5 +1,5 @@
 // A small Excel (.xlsx) writer: a few sheets of typed columns, a bold header, totals and frozen panes.
-// No dependency — an .xlsx is a ZIP of XML files; Node's zlib does the compression and CRC.
+// No dependency - an .xlsx is a ZIP of XML files; Node's zlib does the compression and CRC.
 import { crc32, deflateRawSync } from "node:zlib";
 
 export type Cell = string | number | Date | null | undefined;
@@ -157,7 +157,7 @@ export function zip(files: { name: string; data: Buffer }[]): Buffer {
   const parts: Buffer[] = [];
   const central: Buffer[] = [];
   let offset = 0;
-  // DOS time: 1 Jan 2026 00:00 — fixed, so the same data gives the same file
+  // DOS time: 1 Jan 2026 00:00 - fixed, so the same data gives the same file
   const dosTime = 0;
   const dosDate = ((2026 - 1980) << 9) | (1 << 5) | 1;
   for (const f of files) {

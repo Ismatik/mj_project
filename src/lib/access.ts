@@ -1,4 +1,4 @@
-// Who may open what. Pure data — used by the sidebar, page guards, search and tests.
+// Who may open what. Pure data - used by the sidebar, page guards, search and tests.
 
 export type Role = "OWNER" | "RECEPTION" | "CONTENT" | "MASTER";
 

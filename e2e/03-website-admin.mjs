@@ -9,7 +9,7 @@ const out = process.env.OUT ?? 'e2e-output';
 mkdirSync(out, { recursive: true });
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 const newCtx = (w = 1280, h = 900) => b.newContext({ viewport: { width: w, height: h }, locale: 'ru-RU', timezoneId: 'Asia/Dushanbe' });
 async function loginAs(login, ctx) {
   ctx ??= await newCtx(1360);
@@ -90,7 +90,7 @@ try {
   await p.click('nav button:has-text("Отзывы")');
   await p.locator('div', { has: p.locator('text=D I, Душанбе') }).locator('button:has-text("Скрыть")').last().click();
   await p.click('nav button:has-text("SEO")');
-  await p.fill('input[class*=input] >> nth=0', 'MJ — салон красоты в Душанбе');
+  await p.fill('input[class*=input] >> nth=0', 'MJ - салон красоты в Душанбе');
   await p.click('nav button:has-text("Фотографии")');
   await p.locator('input[type=file]').first().setInputFiles(fileURLToPath(new URL('./fixtures/test.png', import.meta.url)));
   await p.waitForSelector('text=/Фото загружено/');
@@ -105,7 +105,7 @@ try {
   check('hidden price removed from the site after publish', !html.includes('Педикюр'));
   check('new hero title live', html.includes('которая остаётся'));
   check('hidden review gone', !html.includes('Проходил мимо'));
-  check('SEO title live', html.includes('<title>MJ — салон красоты в Душанбе</title>'));
+  check('SEO title live', html.includes('<title>MJ - салон красоты в Душанбе</title>'));
   const media = html.match(/\/media\/[a-f0-9-]{36}\.png/);
   check('uploaded photo on the site', !!media);
   if (media) check('photo served', (await fetch(BASE + media[0])).status === 200);

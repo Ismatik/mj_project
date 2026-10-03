@@ -16,7 +16,7 @@ import { MastersSection, type AdminCategory, type AdminStaff } from "./MastersSe
 import { BridalSection, ContactsSection, PhotosSection, ReviewsSection, SeoSection, ServicesSection, TextsSection, type AdminService } from "./sections";
 import s from "./admin.module.css";
 
-// Порядок — как секции идут на сайте: тексты → услуги → свадебный зал →
+// Порядок - как секции идут на сайте: тексты → услуги → свадебный зал →
 // мастера → отзывы → советы. Служебные разделы собраны в конце.
 const SECTIONS = [
   { id: "texts", label: "Тексты секций" },
@@ -127,7 +127,7 @@ export function AdminApp(props: {
     });
 
   const statusText =
-    saving === "saving" ? "Сохраняем черновик…" : saving === "error" ? "Черновик не сохранился — проверьте соединение" : dirty ? "Есть неопубликованные изменения" : "Сайт актуален";
+    saving === "saving" ? "Сохраняем черновик…" : saving === "error" ? "Черновик не сохранился - проверьте соединение" : dirty ? "Есть неопубликованные изменения" : "Сайт актуален";
 
   return (
     <div className={s.page}>
@@ -174,7 +174,7 @@ export function AdminApp(props: {
           ))}
           <div className={s.navUser}>
             <span>
-              {props.user.name} — {props.user.roleLabel}
+              {props.user.name} - {props.user.roleLabel}
             </span>
             {props.user.isOwner && <Link href="/cms">CMS салона →</Link>}
             <form action={logout}>
@@ -190,13 +190,13 @@ export function AdminApp(props: {
                 {LANG_NAME[l]}
               </button>
             ))}
-            {translating && <span className={s.small}>Перевод: пустое поле или текст как на русском — на сайте будет русский вариант.</span>}
+            {translating && <span className={s.small}>Перевод: пустое поле или текст как на русском - на сайте будет русский вариант.</span>}
           </div>
           {section === "texts" && <TextsSection c={view} onChange={change} />}
           {section === "prices" && <ServicesSection c={view} services={props.services} onChange={change} names={names} onName={setName} />}
           {section === "bridal" && <BridalSection c={view} onChange={change} draft={draft} onDraft={update} translating={!!translating} />}
           {section === "photos" &&
-            (translating ? <p className={s.lead}>Фотографии общие для всех языков — меняйте их на русской вкладке.</p> : <PhotosSection c={draft} onChange={update} />)}
+            (translating ? <p className={s.lead}>Фотографии общие для всех языков - меняйте их на русской вкладке.</p> : <PhotosSection c={draft} onChange={update} />)}
           {section === "masters" && (
             <MastersSection c={view} onChange={change} staff={props.staff} categories={props.categories} translating={translating} names={names} onName={setName} />
           )}

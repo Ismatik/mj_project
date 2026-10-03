@@ -69,8 +69,8 @@ export function RulesForm({ initial }: { initial: BonusRules }) {
         </label>
       </div>
       <p className={s.muted}>
-        Бонусы начисляются с денег, реально оплаченных гостьей (наличные, карта, QR, онлайн-предоплата) — не с оплаты бонусами и сертификатом. Поздравление с днём
-        рождения уходит утром вместе с бонусами (шаблон — в «Шаблонах сообщений»).
+        Бонусы начисляются с денег, реально оплаченных гостьей (наличные, карта, QR, онлайн-предоплата) - не с оплаты бонусами и сертификатом. Поздравление с днём
+        рождения уходит утром вместе с бонусами (шаблон - в «Шаблонах сообщений»).
       </p>
       <Button type="submit" disabled={pending}>
         {pending ? "Сохраняем…" : "Сохранить правила"}
@@ -119,7 +119,7 @@ export function Promotions({ promotions, services, today }: { promotions: Promot
             <div className={s.promoMain}>
               <b>{p.title}</b>
               <small>
-                {shortDate(new Date(`${p.startsOn}T07:00:00Z`))} — {shortDate(new Date(`${p.endsOn}T07:00:00Z`))} ·{" "}
+                {shortDate(new Date(`${p.startsOn}T07:00:00Z`))} - {shortDate(new Date(`${p.endsOn}T07:00:00Z`))} ·{" "}
                 {p.serviceIds.length ? p.serviceIds.map((id) => name.get(id)).filter(Boolean).join(", ") : "все услуги"}
               </small>
               <small>
@@ -174,7 +174,7 @@ function PromotionEditor({ initial, services, onDone }: { initial: Editable; ser
         ))}
       </div>
       <label>
-        Название{lang !== "ru" && <small> (пусто — по-русски)</small>}
+        Название{lang !== "ru" && <small> (пусто - по-русски)</small>}
         <input name="title" value={f[titleKey]} onChange={(e) => setF({ ...f, [titleKey]: e.target.value })} />
       </label>
       <label>
@@ -193,7 +193,7 @@ function PromotionEditor({ initial, services, onDone }: { initial: Editable; ser
           </span>
         </label>
         <label>
-          Промокод <small>пусто — акция применяется сама</small>
+          Промокод <small>пусто - акция применяется сама</small>
           <input name="code" value={f.code} onChange={(e) => setF({ ...f, code: e.target.value.toUpperCase() })} />
         </label>
         <label>
@@ -210,7 +210,7 @@ function PromotionEditor({ initial, services, onDone }: { initial: Editable; ser
         </label>
       </div>
       <fieldset className={s.services}>
-        <legend>Услуги (ничего не отмечено — все)</legend>
+        <legend>Услуги (ничего не отмечено - все)</legend>
         {services.map((sv) => (
           <label key={sv.id} className={s.check}>
             <input

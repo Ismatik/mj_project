@@ -1,4 +1,4 @@
-// Mavzunai Jovid Telegram bot — conversation logic, independent of Telegram itself.
+// Mavzunai Jovid Telegram bot - conversation logic, independent of Telegram itself.
 // The same engine answers real Telegram updates (webhook) and the CMS chat simulator.
 import { dateLabel as dateLabelIn, somoni } from "../i18n/format";
 import { LANG_NAME, LANGS, isLang, langFromTelegram, type Lang } from "../i18n/locales";
@@ -184,7 +184,7 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     out.push({ text: t.anythingElse, buttons: mainMenu() });
   };
 
-  // ── Phone / name input ──────────────────────────────────
+  // Phone / name input
   if (state.step === "phone" && (u.contactPhone || u.text) && !u.data) {
     const phone = normalizePhone(u.contactPhone ?? u.text ?? "");
     if (!phone) {
@@ -225,7 +225,7 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     return out;
   }
 
-  // ── Commands and free text ──────────────────────────────
+  // Commands and free text
   const text = (u.text ?? "").trim();
   if (!u.data && text) {
     if (text.startsWith("/staff")) {
@@ -259,7 +259,7 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     return out;
   }
 
-  // ── Buttons ─────────────────────────────────────────────
+  // Buttons
   const [cmd, ...rest] = u.data.split(":");
   const arg = rest.join(":");
 

@@ -7,7 +7,7 @@ import s from "./rental.module.css";
 const dressWord = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? "платье" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "платья" : "платьев");
 const bookingWord = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? "бронь" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "брони" : "броней");
 
-// "Прокат платьев" — design isRental.
+// "Прокат платьев" - design isRental.
 export default async function RentalPage() {
   await requirePage("rental", "/cms/rental");
   const r = await getRental();

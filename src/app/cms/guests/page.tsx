@@ -22,7 +22,7 @@ const FILTERS: { key: GuestFilter; label: string }[] = [
 
 const plural = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? "гостья" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "гостьи" : "гостий");
 
-// "Книга гостей" — design isCrm.
+// "Книга гостей" - design isCrm.
 export default async function GuestsPage({ searchParams }: PageProps<"/cms/guests">) {
   const user = await requirePage("guests", "/cms/guests");
   const sp = await searchParams;
@@ -84,7 +84,7 @@ export default async function GuestsPage({ searchParams }: PageProps<"/cms/guest
                 <Avatar name={g.name} size="sm" />
                 <span className={s.name}>{g.name}</span>
                 {g.allergy && (
-                  <i className={s.allergyDot} title="Есть аллергии — откройте карточку" aria-label="аллергии">
+                  <i className={s.allergyDot} title="Есть аллергии - откройте карточку" aria-label="аллергии">
                     !
                   </i>
                 )}
@@ -96,7 +96,7 @@ export default async function GuestsPage({ searchParams }: PageProps<"/cms/guest
               </span>
               <span className={s.light}>{formatPhone(g.phone)}</span>
               <span className={s.serif}>{g.visits}</span>
-              <span className={s.light}>{g.last ? shortDate(g.last) : "—"}</span>
+              <span className={s.light}>{g.last ? shortDate(g.last) : "-"}</span>
               <span className={s.light}>{g.fav}</span>
               <span>
                 <Tag tone={t.tone}>{t.label}</Tag>

@@ -55,7 +55,7 @@ export default async function ShiftPage({ searchParams }: PageProps<"/cms/pos/sh
       )}
       {z && d.late.count > 0 && (
         <div className={s.warn} role="note">
-          После закрытия пробито чеков: {d.late.count} на {somoni(d.late.total)}. Они не вошли в Z-отчёт — попадут в отчёты за период.
+          После закрытия пробито чеков: {d.late.count} на {somoni(d.late.total)}. Они не вошли в Z-отчёт - попадут в отчёты за период.
         </div>
       )}
 
@@ -181,7 +181,7 @@ export default async function ShiftPage({ searchParams }: PageProps<"/cms/pos/sh
                         <td>{r.number}</td>
                         <td>{r.at}</td>
                         <td>
-                          {[r.guest === "—" ? "" : r.guest, r.master === "—" ? "" : r.master].filter(Boolean).join(" · ") || "Без записи"}
+                          {[r.guest === "-" ? "" : r.guest, r.master === "-" ? "" : r.master].filter(Boolean).join(" · ") || "Без записи"}
                           <small>{r.services}</small>
                         </td>
                         <td className={s.num}>{somoni(r.total)}</td>

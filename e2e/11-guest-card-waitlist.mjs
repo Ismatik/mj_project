@@ -14,7 +14,7 @@ const sql = (q) => execSync(`psql "${process.env.DATABASE_URL}" -tAc ${JSON.stri
 
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 const ctxOf = async () => {
   const c = await b.newContext({ viewport: { width: 1360, height: 900 }, locale: 'ru-RU', timezoneId: 'Asia/Dushanbe', extraHTTPHeaders: { 'x-forwarded-for': '203.0.113.11' } });
   await c.route(/unsplash|mino\.tj/, (r) => r.fulfill({ status: 200, contentType: 'image/png', body: png }));
@@ -88,16 +88,16 @@ try {
   check('master sees allergies and formulas', panel.includes('Никель') && panel.includes('Состав 1'), panel.slice(0, 160));
   await m.click('section[aria-label="Запись"] button:has-text("+ Записать формулу")');
   await m.fill('form[aria-label="Новая формула"] input[name=title]', 'Ламинирование');
-  await m.fill('form[aria-label="Новая формула"] textarea[name=formula]', 'Состав 1 — 8 мин, состав 2 — 7 мин');
+  await m.fill('form[aria-label="Новая формула"] textarea[name=formula]', 'Состав 1 - 8 мин, состав 2 - 7 мин');
   await m.click('button:has-text("Сохранить формулу")');
-  await m.waitForSelector('code:has-text("состав 2 — 7 мин")');
+  await m.waitForSelector('code:has-text("состав 2 - 7 мин")');
   check('master records a formula for her visit', sql(`select count(*) from "ColourFormula" f join "Staff" s on s.id = f."staffId" where s.name = 'Мира' and f."appointmentId" = '${annaAppt}'`) === '1');
 
   // ── Walk-ins ──────────────────────────────────────────
   await r.goto(BASE + '/cms/waitlist');
   check('walk-in queue shows who waits', (await text(r, 'tr[data-walkin="Мадина"]')).includes('ждёт'));
   await r.click('tr[data-walkin="Мадина"] button:has-text("Посадить")');
-  await r.waitForSelector('text=/Мадина — к мастеру/');
+  await r.waitForSelector('text=/Мадина - к мастеру/');
   check('walk-in seated', sql(`select status || '/' || source from "Appointment" where "guestName" = 'Мадина'`) === 'IN_CHAIR/WALK_IN');
   await r.fill('form[aria-label="Живая очередь"] input[name=name]', 'Тахмина');
   await r.selectOption('form[aria-label="Живая очередь"] select[name=service]', { label: 'Стрижка + укладка' });

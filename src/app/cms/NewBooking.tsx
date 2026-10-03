@@ -389,7 +389,7 @@ export function NewBooking({ open, onClose }: { open: boolean; onClose: () => vo
                 <span className={s.label}>Уже занято</span>
                 {visibleBusy.map((b, i) => (
                   <div key={i}>
-                    {staffById.get(b.staffId)?.name}: {toClock(b.start)}–{toClock(b.end)} · {b.label}
+                    {staffById.get(b.staffId)?.name}: {toClock(b.start)}-{toClock(b.end)} · {b.label}
                   </div>
                 ))}
               </div>
@@ -410,7 +410,7 @@ export function NewBooking({ open, onClose }: { open: boolean; onClose: () => vo
               </label>
               <div className={s.fieldset}>
                 <span className={s.label}>Длительность</span>
-                <div className={s.static}>{service ? `${service.durationMin} мин` : "—"}</div>
+                <div className={s.static}>{service ? `${service.durationMin} мин` : "-"}</div>
               </div>
             </div>
             <label className={s.fieldset}>

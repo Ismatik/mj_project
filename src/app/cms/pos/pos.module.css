@@ -1,4 +1,4 @@
-/* design: isPos — receipt panel 5fr, quick menu 7fr */
+/* design: isPos - receipt panel 5fr, quick menu 7fr */
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -470,7 +470,7 @@
   font-size: 12.5px;
 }
 .oldPrice {
-  /* --mj-text-muted is 1.9:1 on paper — the price it strikes through was invisible */
+  /* --mj-text-muted is 1.9:1 on paper - the price it strikes through was invisible */
   color: var(--mj-text-2);
   font-weight: 400;
   font-size: 0.85em;
@@ -483,7 +483,7 @@
   color: var(--mj-gold-deep);
 }
 
-/* ── Till on a phone ─────────────────────────────────── */
+/* Till on a phone */
 /* Reception takes payments standing up; the three pay buttons are the hottest
    targets in the whole product. 16px fields keep iOS from zooming mid-sale. */
 @media (max-width: 600px) {

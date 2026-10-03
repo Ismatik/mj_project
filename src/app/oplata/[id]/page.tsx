@@ -13,7 +13,7 @@ import s from "../../money.module.css";
 import { Checkout } from "./Checkout";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Оплата — Mavzunai Jovid", robots: { index: false } };
+export const metadata: Metadata = { title: "Оплата - Mavzunai Jovid", robots: { index: false } };
 
 // Test checkout: stands in for the bank's payment page until an acquiring contract is signed.
 export default async function PaymentPage({ params }: PageProps<"/oplata/[id]">) {

@@ -6,7 +6,7 @@ import { SETTING_KEYS } from "@/lib/settings-keys";
 import { PasswordForm, SalonForm, TeamList } from "./SettingsForms";
 import s from "./settings.module.css";
 
-// "Настройки салона" — design isSettings, plus password and team access.
+// "Настройки салона" - design isSettings, plus password and team access.
 export default async function SettingsPage() {
   const user = await requirePage("settings", "/cms/settings");
   const [settings, users] = await Promise.all([

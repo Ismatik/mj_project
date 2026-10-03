@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   if (!(await reportUser("reports"))) return denied();
   const sp = new URL(req.url).searchParams;
   const period = periodFrom({ from: sp.get("from"), to: sp.get("to") });
-  if (!period) return badRequest("Период — не больше года");
+  if (!period) return badRequest("Период - не больше года");
   const report = await getPeriodReport(period.from, period.to);
   const format = formatOf(req);
   const name = `MJ-отчёт-${period.from}_${period.toIncl}.${format}`;

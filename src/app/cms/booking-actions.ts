@@ -70,7 +70,7 @@ async function busyFor(staffIds: string[], date: Ymd): Promise<Busy[]> {
   });
 }
 
-/** The chosen masters' existing bookings that day — shown as a hint under the time field. */
+/** The chosen masters' existing bookings that day - shown as a hint under the time field. */
 export async function getBusy(staffIds: string[], date: Ymd): Promise<Busy[]> {
   await requireBooker();
   return busyFor(staffIds, date);

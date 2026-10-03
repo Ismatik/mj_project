@@ -32,5 +32,5 @@ Notes:
 - Suite 07 starts its own stand-in for Meta's Graph API on port 3999. Start the app with
   `WHATSAPP_TOKEN=test-token WHATSAPP_PHONE_ID=10001 WHATSAPP_APP_SECRET=test-app-secret WHATSAPP_VERIFY_TOKEN=test-verify WHATSAPP_API_BASE=http://127.0.0.1:3999 WHATSAPP_WABA_ID=20002 DEMO_LOGIN_CODES=1`.
 - Suite 13 starts a stand-in for Instagram's API on port 3998: also start the app with `INSTAGRAM_TOKEN=test-ig-token INSTAGRAM_API_BASE=http://127.0.0.1:3998`.
-- Suites 08–12 need `DATABASE_URL` (08 moves one payment deadline into the past with `psql`; 09 reads balances and runs the birthday job with `npx tsx`).
+- Suites 08-12 need `DATABASE_URL` (08 moves one payment deadline into the past with `psql`; 09 reads balances and runs the birthday job with `npx tsx`).
 - The website form is rate-limited per address; restart the app if you run the suites many times within an hour.

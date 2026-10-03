@@ -8,7 +8,7 @@ const out = process.env.OUT ?? 'e2e-output';
 mkdirSync(out, { recursive: true });
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 const num = (t) => Number(t.replace(/[^\d]/g, ''));
 async function loginAs(login) {
   const ctx = await b.newContext({ viewport: { width: 1360, height: 900 }, locale: 'ru-RU', timezoneId: 'Asia/Dushanbe' });
@@ -123,7 +123,7 @@ try {
   // staff: toggle a day
   await p.goto(BASE + '/cms/staff');
   await p.locator('[aria-label="График: Дарио"] button').nth(1).click();
-  await p.waitForSelector('text=/Дарио: Вт — рабочий день/');
+  await p.waitForSelector('text=/Дарио: Вт - рабочий день/');
   check('work day toggled', true);
   await p.screenshot({ path: out + '/staff.png', fullPage: true });
 

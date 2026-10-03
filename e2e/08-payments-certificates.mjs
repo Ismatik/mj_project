@@ -14,7 +14,7 @@ const sql = (q) => execSync(`psql "${process.env.DATABASE_URL}" -tAc ${JSON.stri
 
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 const ctxOf = async (w = 1360, h = 900) => {
   const c = await b.newContext({ viewport: { width: w, height: h }, locale: 'ru-RU', timezoneId: 'Asia/Dushanbe', acceptDownloads: true });
   await c.route(/unsplash|mino\.tj/, (r) => r.fulfill({ status: 200, contentType: 'image/png', body: png }));
@@ -132,7 +132,7 @@ try {
   await o.reload();
   const box = await o.textContent('main');
   check('reception told about the paid prepayment', box.includes('Предоплата 450 c. получена'));
-  check('unpaid booking released', box.includes('Запись снята — предоплата не внесена: Зарина Ахмедова'));
+  check('unpaid booking released', box.includes('Запись снята - предоплата не внесена: Зарина Ахмедова'));
   check('confirmation sent after the prepayment', box.includes('Малика, вы записаны'));
   check('online certificate sale reported', box.includes('Продан сертификат на сайте') && box.includes('Нигора'));
 

@@ -69,7 +69,7 @@ export async function paySale(input: PayInput): Promise<PayResult> {
   const usedPromos = new Set<string>();
   for (const l of lines) {
     const service = svc.get(String(l.serviceId));
-    if (!service) return { ok: false, error: "Услуга не найдена — обновите страницу" };
+    if (!service) return { ok: false, error: "Услуга не найдена - обновите страницу" };
     if (l.appointmentId) {
       const a = appt.get(l.appointmentId);
       if (!a) return { ok: false, error: "Эта запись уже оплачена или отменена" };
@@ -146,8 +146,8 @@ export async function paySale(input: PayInput): Promise<PayResult> {
       if (e.message === "GIFT_BALANCE" || e.message === "POINTS") return e.message;
       throw e;
     });
-  if (sale === "GIFT_BALANCE") return { ok: false, error: "На сертификате не хватает средств — обновите сумму" };
-  if (sale === "POINTS") return { ok: false, error: "Бонусов не хватает — обновите страницу" };
+  if (sale === "GIFT_BALANCE") return { ok: false, error: "На сертификате не хватает средств - обновите сумму" };
+  if (sale === "POINTS") return { ok: false, error: "Бонусов не хватает - обновите страницу" };
 
   revalidatePath("/cms", "layout");
   const parts = [

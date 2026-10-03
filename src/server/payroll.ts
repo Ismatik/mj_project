@@ -60,8 +60,8 @@ export async function getPayroll(month: Month, onlyStaffId?: string | null) {
 export type Payroll = Awaited<ReturnType<typeof getPayroll>>;
 
 export async function setRate(staffId: string, commission: number, salary: number) {
-  if (!Number.isInteger(commission) || commission < 0 || commission > 100) return { ok: false as const, error: "Процент — от 0 до 100" };
-  if (!Number.isInteger(salary) || salary < 0 || salary > 1_000_000) return { ok: false as const, error: "Оклад — целое число сомони" };
+  if (!Number.isInteger(commission) || commission < 0 || commission > 100) return { ok: false as const, error: "Процент - от 0 до 100" };
+  if (!Number.isInteger(salary) || salary < 0 || salary > 1_000_000) return { ok: false as const, error: "Оклад - целое число сомони" };
   await db.staff.update({ where: { id: staffId }, data: { commission, salary } });
   return { ok: true as const };
 }
@@ -85,7 +85,7 @@ export async function addPayout(staffId: string, month: Month, amount: number, m
   const staff = await db.staff.findUnique({ where: { id: staffId } });
   if (!staff) return { ok: false as const, error: "Мастер не найден" };
   const today = todayYmd();
-  if (method === "CASH" && !(await isDayOpen(today))) return { ok: false as const, error: "Смена на сегодня закрыта — выдайте завтра или переводом" };
+  if (method === "CASH" && !(await isDayOpen(today))) return { ok: false as const, error: "Смена на сегодня закрыта - выдайте завтра или переводом" };
   const text = note.trim().slice(0, 200) || null;
   await db.$transaction(async (tx) => {
     const p = await tx.staffPayout.create({ data: { staffId, month, amount, method, note: text, paidBy: by } });
@@ -101,7 +101,7 @@ export async function addPayout(staffId: string, month: Month, amount: number, m
 export async function deletePayout(id: string) {
   const p = await db.staffPayout.findUnique({ where: { id }, include: { movement: true } });
   if (!p) return { ok: true as const };
-  if (p.movement && !(await isDayOpen(p.movement.day.toISOString().slice(0, 10)))) return { ok: false as const, error: "Смена того дня закрыта — выплату уже посчитали в кассе" };
+  if (p.movement && !(await isDayOpen(p.movement.day.toISOString().slice(0, 10)))) return { ok: false as const, error: "Смена того дня закрыта - выплату уже посчитали в кассе" };
   await db.staffPayout.delete({ where: { id } }); // the till movement goes with it
   return { ok: true as const };
 }

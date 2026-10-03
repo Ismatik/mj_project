@@ -30,7 +30,7 @@ export function WorkDays({ staffId, name, days, editable }: { staffId: string; n
                 flip(i);
                 const res = await toggleWorkDay(staffId, i);
                 if (!res.ok) fx.toast(res.error ?? "Не получилось", "График");
-                else fx.toast(`${name}: ${label} — ${on ? "выходной" : "рабочий день"}`, "График");
+                else fx.toast(`${name}: ${label} - ${on ? "выходной" : "рабочий день"}`, "График");
               })
             }
           >

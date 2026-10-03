@@ -1,4 +1,4 @@
-/* Public website — design/Mavzunai Jovid Website Main.dc.html */
+/* Public website - design/Mavzunai Jovid Website Main.dc.html */
 .site {
   font-family: var(--mj-sans);
   color: var(--mj-ink);
@@ -6,7 +6,7 @@
 }
 .site a {
   transition: all 0.45s var(--mj-ease);
-  /* "all" also animated the focus ring, so it faded in over 0.45s — a focus
+  /* "all" also animated the focus ring, so it faded in over 0.45s - a focus
      indicator has to be there the instant the key is pressed */
   transition-property: color, background-color, border-color, transform, box-shadow, opacity;
 }
@@ -278,7 +278,7 @@
 }
 .h2 {
   font-family: var(--mj-serif);
-  /* "ХИЗМАТРАСОНИҲОИ МО" (tg) is 340px at 26px/0.14em — wider than a 320px phone */
+  /* "ХИЗМАТРАСОНИҲОИ МО" (tg) is 340px at 26px/0.14em - wider than a 320px phone */
   font-size: clamp(20px, 5.4vw, 26px);
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -358,7 +358,7 @@
   margin: 56px auto 0;
   display: grid;
   /* min(…, 100%) so the 300px track collapses instead of running past the
-     section padding on a 320px phone — prices must not touch the screen edge */
+     section padding on a 320px phone - prices must not touch the screen edge */
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: 36px 56px;
 }
@@ -1415,7 +1415,7 @@
   }
 }
 
-/* ── Touch targets ───────────────────────────────────── */
+/* Touch targets */
 /* Everything a thumb hits gets 44px. Sizes above 760px are untouched. */
 @media (max-width: 760px) {
   .btnInk,
@@ -1430,7 +1430,7 @@
     min-width: 44px;
     min-height: 44px;
   }
-  /* Footer links are a 20px inline box inside a 29px line — stack them as rows. */
+  /* Footer links are a 20px inline box inside a 29px line - stack them as rows. */
   .footerCol a {
     display: inline-flex;
     align-items: center;
@@ -1472,7 +1472,7 @@
     height: 44px;
     transform: translateY(-50%);
   }
-  /* Long informational copy is body text, not a caption — keep it readable. */
+  /* Long informational copy is body text, not a caption - keep it readable. */
   .priceNote {
     font-size: 13.5px;
   }

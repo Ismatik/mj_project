@@ -1,6 +1,6 @@
-# WhatsApp for Mavzunai Jovid — setup guide
+# WhatsApp for Mavzunai Jovid - setup guide
 
-The platform sends WhatsApp messages through Meta's **WhatsApp Business Platform — Cloud API**. It is hosted by Meta: no provider (BSP) or extra server is needed, and there is no monthly fee. Meta charges per delivered *template* message (see "Costs"). Everything on the platform side is ready. The steps below are what the salon does once in Meta.
+The platform sends WhatsApp messages through Meta's **WhatsApp Business Platform - Cloud API**. It is hosted by Meta: no provider (BSP) or extra server is needed, and there is no monthly fee. Meta charges per delivered *template* message (see "Costs"). Everything on the platform side is ready. The steps below are what the salon does once in Meta.
 
 ## What you need before starting
 
@@ -9,7 +9,7 @@ The platform sends WhatsApp messages through Meta's **WhatsApp Business Platform
 | Facebook account | The owner's personal account; it becomes the admin of the business portfolio. |
 | Business documents | For **Business verification**: registration certificate (свидетельство о регистрации / ИНН) and a document with the address (utility bill or bank statement). The business name and address must match what you enter. |
 | A phone number for the API | It receives one SMS or call for verification. **A number connected to the Cloud API stops working in the regular WhatsApp / WhatsApp Business app.** Either use a new number, or move +992 98 103 11 11 knowing the salon will then answer guests from the CMS/Telegram (the platform forwards every guest message to reception) instead of the phone app. |
-| Website domain | `SITE_DOMAIN` with HTTPS (Caddy does this automatically) — Meta sends webhooks there. |
+| Website domain | `SITE_DOMAIN` with HTTPS (Caddy does this automatically) - Meta sends webhooks there. |
 | Bank card | Added in WhatsApp Manager to pay for template messages. |
 
 ## Steps
@@ -39,19 +39,19 @@ Parameters `{{1}}`, `{{2}}`… are filled in automatically. Guests who speak Taj
 
 | Name | Category | Russian | English |
 |---|---|---|---|
-| `mj_booking_confirmation` | Utility | Mavzunai Jovid: {{1}}, вы записаны — {{2}}, {{3}}, мастер {{4}}. Ждём вас по адресу: ул. Бухоро, 23/25, Душанбе. Если планы изменятся, просто ответьте на это сообщение. | Mavzunai Jovid: {{1}}, you're booked — {{2}}, {{3}}, with {{4}}. We're at 23/25 Bukhoro St, Dushanbe. If your plans change, just reply to this message. |
-| `mj_reminder_day` | Utility | Mavzunai Jovid: напоминаем о записи — {{1}}, {{2}}, мастер {{3}}. ул. Бухоро, 23/25. Если планы изменились, ответьте на это сообщение, и мы перенесём визит. | Mavzunai Jovid: a reminder of your booking — {{1}}, {{2}} with {{3}}. 23/25 Bukhoro St. If your plans have changed, reply to this message and we'll move your visit. |
-| `mj_reminder_hours` | Utility | Mavzunai Jovid: ждём вас сегодня в {{1}} — {{2}}, мастер {{3}}. ул. Бухоро, 23/25, Душанбе. | Mavzunai Jovid: see you today at {{1}} — {{2}} with {{3}}. 23/25 Bukhoro St, Dushanbe. |
-| `mj_birthday` | Marketing | Mavzunai Jovid: {{1}}, с днём рождения! Дарим вам {{2}} бонусов — ими можно оплатить до {{3}}% визита. Ждём вас в салоне на ул. Бухоро, 23/25. | Mavzunai Jovid: happy birthday, {{1}}! Here are {{2}} bonus points from us — use them for up to {{3}}% of a visit. See you at 23/25 Bukhoro St. |
-| `mj_waitlist_offer` | Utility | Mavzunai Jovid: {{1}}, освободилось время, которого вы ждали — {{2}}, {{3}}, мастер {{4}}. Мы держим его для вас 30 минут. Подтвердить или отказаться можно по ссылке {{5}} — спасибо! | Mavzunai Jovid: {{1}}, the time you were waiting for is free — {{2}}, {{3}}, with {{4}}. We're holding it for you for 30 minutes. Confirm or decline at {{5}} — thank you! |
-| `mj_login_code` | Authentication | Text fixed by Meta: «{{1}} — ваш код подтверждения…» + button «Скопировать код» | “{{1}} is your verification code…” + “Copy code” button |
+| `mj_booking_confirmation` | Utility | Mavzunai Jovid: {{1}}, вы записаны - {{2}}, {{3}}, мастер {{4}}. Ждём вас по адресу: ул. Бухоро, 23/25, Душанбе. Если планы изменятся, просто ответьте на это сообщение. | Mavzunai Jovid: {{1}}, you're booked - {{2}}, {{3}}, with {{4}}. We're at 23/25 Bukhoro St, Dushanbe. If your plans change, just reply to this message. |
+| `mj_reminder_day` | Utility | Mavzunai Jovid: напоминаем о записи - {{1}}, {{2}}, мастер {{3}}. ул. Бухоро, 23/25. Если планы изменились, ответьте на это сообщение, и мы перенесём визит. | Mavzunai Jovid: a reminder of your booking - {{1}}, {{2}} with {{3}}. 23/25 Bukhoro St. If your plans have changed, reply to this message and we'll move your visit. |
+| `mj_reminder_hours` | Utility | Mavzunai Jovid: ждём вас сегодня в {{1}} - {{2}}, мастер {{3}}. ул. Бухоро, 23/25, Душанбе. | Mavzunai Jovid: see you today at {{1}} - {{2}} with {{3}}. 23/25 Bukhoro St, Dushanbe. |
+| `mj_birthday` | Marketing | Mavzunai Jovid: {{1}}, с днём рождения! Дарим вам {{2}} бонусов - ими можно оплатить до {{3}}% визита. Ждём вас в салоне на ул. Бухоро, 23/25. | Mavzunai Jovid: happy birthday, {{1}}! Here are {{2}} bonus points from us - use them for up to {{3}}% of a visit. See you at 23/25 Bukhoro St. |
+| `mj_waitlist_offer` | Utility | Mavzunai Jovid: {{1}}, освободилось время, которого вы ждали - {{2}}, {{3}}, мастер {{4}}. Мы держим его для вас 30 минут. Подтвердить или отказаться можно по ссылке {{5}} - спасибо! | Mavzunai Jovid: {{1}}, the time you were waiting for is free - {{2}}, {{3}}, with {{4}}. We're holding it for you for 30 minutes. Confirm or decline at {{5}} - thank you! |
+| `mj_login_code` | Authentication | Text fixed by Meta: «{{1}} - ваш код подтверждения…» + button «Скопировать код» | “{{1}} is your verification code…” + “Copy code” button |
 
 The texts live in `src/lib/whatsapp-templates.ts`. If Meta rejects one, change its text there, keeping the name and the order of the parameters, and press the button again. You can also edit it in WhatsApp Manager.
 
 ## Costs
 
 - Meta charges per delivered template message. The price depends on the category (authentication and utility are the cheapest; marketing is the most expensive) and on the guest's country. Check the current rate card: <https://developers.facebook.com/docs/whatsapp/pricing>.
-- `mj_birthday` is a *Marketing* template (Meta's rules: a greeting with a gift is promotional). It costs more than the others and a guest can mute marketing messages from the salon in WhatsApp. If you'd rather not pay for it, set «Подарок ко дню рождения» to 0 in CMS → Бонусы и акции — the points and greeting are then skipped.
+- `mj_birthday` is a *Marketing* template (Meta's rules: a greeting with a gift is promotional). It costs more than the others and a guest can mute marketing messages from the salon in WhatsApp. If you'd rather not pay for it, set «Подарок ко дню рождения» to 0 in CMS → Бонусы и акции - the points and greeting are then skipped.
 - Replies to a guest within 24 hours of her last message are free-form and free.
 - The platform uses WhatsApp only for guests without the Telegram bot. Telegram is free, so the more guests use the bot, the lower the bill.
 
@@ -61,5 +61,5 @@ The texts live in `src/lib/whatsapp-templates.ts`. If Meta rejects one, change i
 |---|---|
 | Outbox: *131047 Re-engagement message* | More than 24 h since the guest wrote, and the message was not a template. Templates must be approved. |
 | Outbox: *132001 Template name does not exist* | The template is not approved yet (see the status table). |
-| Outbox: *190 / OAuthException* | The token expired or lacks permissions — generate a permanent system-user token (step 5). |
+| Outbox: *190 / OAuthException* | The token expired or lacks permissions - generate a permanent system-user token (step 5). |
 | Guest messages don't reach reception | Webhook not verified or not subscribed to **messages** (step 9); `WHATSAPP_APP_SECRET` wrong (the server answers 401). |

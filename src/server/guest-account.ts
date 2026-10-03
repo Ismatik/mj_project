@@ -43,7 +43,7 @@ export async function getGuestAccount(guestId: string, lang: Lang = "ru") {
     pay: a.payments[0] ?? null,
     rebook: a.service?.active && a.service.showOnSite ? { serviceId: a.service.id, staffId: a.staff[0]?.staffId ?? null } : null,
   });
-  // Masters she has visited, most frequent first — candidates for "favourite"
+  // Masters she has visited, most frequent first - candidates for "favourite"
   const counts = new Map<string, { id: string; name: string; visits: number }>();
   for (const a of past) for (const s of a.staff) counts.set(s.staff.id, { id: s.staff.id, name: name("staff", s.staff.id, s.staff.name), visits: (counts.get(s.staff.id)?.visits ?? 0) + 1 });
 

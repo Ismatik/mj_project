@@ -88,7 +88,7 @@ export function GuestCard({ guest, closeHref, isOwner }: { guest: GuestCardData;
         </div>
         <div>
           <span>Любимая услуга</span>
-          <b className={s.small}>{guest.favourite ?? "—"}</b>
+          <b className={s.small}>{guest.favourite ?? "-"}</b>
         </div>
       </div>
 

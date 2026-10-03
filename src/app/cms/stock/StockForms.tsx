@@ -153,7 +153,7 @@ export function ItemForm({ item, onDone }: { item?: Item; onDone?: () => void })
       </div>
       <div className={s.two}>
         <label>
-          Минимум, {f.unit} <small>ниже — предупредим</small>
+          Минимум, {f.unit} <small>ниже - предупредим</small>
           <input name="minQuantity" inputMode="numeric" value={f.minQuantity} onChange={(e) => setF({ ...f, minQuantity: digits(e.target.value) })} />
         </label>
         {item ? (
@@ -208,7 +208,7 @@ export function NormsEditor({ services, items }: { services: StockPage["services
       <label>
         Услуга
         <select name="normService" value={serviceId} onChange={(e) => pick(e.target.value)}>
-          <option value="">— выберите —</option>
+          <option value="">- выберите -</option>
           {services.map((x) => (
             <option key={x.id} value={x.id}>
               {x.name}
@@ -224,7 +224,7 @@ export function NormsEditor({ services, items }: { services: StockPage["services
             return (
               <div key={i} className={s.inline} style={{ marginTop: 0 }}>
                 <select aria-label="Позиция" value={r.itemId} onChange={(e) => setRows(rows.map((x, k) => (k === i ? { ...x, itemId: e.target.value } : x)))}>
-                  <option value="">—</option>
+                  <option value="">-</option>
                   {active.map((it) => (
                     <option key={it.id} value={it.id}>
                       {it.name}

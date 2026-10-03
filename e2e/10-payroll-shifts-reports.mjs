@@ -17,7 +17,7 @@ const sql = (q) => execSync(`psql "${process.env.DATABASE_URL}" -tAc ${JSON.stri
 
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 async function login(name) {
   const c = await b.newContext({ viewport: { width: 1360, height: 900 }, locale: 'ru-RU', timezoneId: 'Asia/Dushanbe' });
   await c.route(/unsplash|mino\.tj/, (r) => r.fulfill({ status: 200, contentType: 'image/png', body: png }));
@@ -116,7 +116,7 @@ try {
   await o.click('button:has-text("Петра")');
   await o.fill('form[aria-label="Выплата Петра"] input[aria-label="Сумма выплаты"]', '100');
   await o.click('form[aria-label="Выплата Петра"] button');
-  await o.waitForSelector('text=Смена на сегодня закрыта — выдайте завтра или переводом');
+  await o.waitForSelector('text=Смена на сегодня закрыта - выдайте завтра или переводом');
   check('no cash payout from a closed till', true);
 
   // ── Reports ───────────────────────────────────────────

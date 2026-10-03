@@ -15,7 +15,7 @@ const BAND = rgb(0xf4 / 255, 0xef / 255, 0xe6 / 255);
 export type ReportColumn = { header: string; width: number; align?: "left" | "right" };
 
 /** The fonts have no minus sign or narrow spaces; use what they have */
-const clean = (s: string) => s.replace(/−/g, "–").replace(/[  ]/g, " ");
+const clean = (s: string) => s.replace(/−/g, "-").replace(/[  ]/g, " ");
 
 export class ReportPdf {
   private page!: PDFPage;
@@ -31,8 +31,8 @@ export class ReportPdf {
 
   static async create(o: { title: string; subtitle?: string; generated: string; landscape?: boolean }) {
     const doc = await PDFDocument.create();
-    doc.setTitle(`Mavzunai Jovid — ${o.title}`);
-    doc.setAuthor("Mavzunai Jovid — Gallery of Beauty MJ");
+    doc.setTitle(`Mavzunai Jovid - ${o.title}`);
+    doc.setAuthor("Mavzunai Jovid - Gallery of Beauty MJ");
     const [W, H] = o.landscape ? [841.89, 595.28] : [595.28, 841.89];
     const r = new ReportPdf(doc, await embedFonts(doc), W, H, o.title, o.generated);
     r.newPage();

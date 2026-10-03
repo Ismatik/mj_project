@@ -1,4 +1,4 @@
-/* CMS shell — from design/Salon CMS Dashboard Main.dc.html (sidebar 256px, header on sand). */
+/* CMS shell - from design/Salon CMS Dashboard Main.dc.html (sidebar 256px, header on sand). */
 .shell {
   display: flex;
   min-height: 100vh;
@@ -6,7 +6,7 @@
   background: linear-gradient(to right, var(--mj-ink) 256px, var(--mj-cream) 256px);
 }
 
-/* ── Sidebar ─────────────────────────────────────────── */
+/* Sidebar */
 .sidebar {
   width: 256px;
   flex-shrink: 0;
@@ -122,7 +122,7 @@
   color: var(--mj-gold);
 }
 
-/* ── Main + header ───────────────────────────────────── */
+/* Main + header */
 .main {
   flex: 1;
   min-width: 0;
@@ -172,7 +172,7 @@
   display: none;
 }
 
-/* ── Search ──────────────────────────────────────────── */
+/* Search */
 .search {
   position: relative;
   flex: 1;
@@ -245,7 +245,7 @@
   color: var(--mj-text-2);
 }
 
-/* ── Responsive ──────────────────────────────────────── */
+/* Responsive */
 @media (max-width: 1024px) {
   .shell {
     background: var(--mj-cream);
@@ -257,7 +257,7 @@
     bottom: 0;
     z-index: 200;
     transform: translateX(-100%);
-    /* visibility:hidden takes the 17 off-screen nav links out of the tab order —
+    /* visibility:hidden takes the 17 off-screen nav links out of the tab order -
        without it a keyboard user tabs through an invisible menu before the page */
     visibility: hidden;
     transition:

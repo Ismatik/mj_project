@@ -236,7 +236,7 @@
   .row2 {
     grid-template-columns: 1fr;
   }
-  /* Reception books from a phone with a guest waiting — every control gets a thumb. */
+  /* Reception books from a phone with a guest waiting - every control gets a thumb. */
   .chip,
   .hit,
   .link,

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { LoaderScreen } from "@/components/fx/FxProvider";
 import { prefersReducedMotion } from "@/lib/fx/reduced-motion";
 
-/** "Открываем салон…" — the MJ loader right after signing in (?welcome=1). Rendered on the server so nothing flashes first. */
+/** "Открываем салон…" - the MJ loader right after signing in (?welcome=1). Rendered on the server so nothing flashes first. */
 export function EntryLoader() {
   const params = useSearchParams();
   const pathname = usePathname();

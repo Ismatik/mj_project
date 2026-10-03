@@ -29,7 +29,7 @@ export async function saveSettings(values: Record<string, string>): Promise<Resu
 export async function changeOwnPassword(current: string, next: string): Promise<Result> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: "Войдите заново" };
-  if (String(next).length < 8) return { ok: false, error: "Новый пароль — минимум 8 символов" };
+  if (String(next).length < 8) return { ok: false, error: "Новый пароль - минимум 8 символов" };
   const row = await db.user.findUnique({ where: { id: user.id } });
   if (!row || !(await verifyPassword(String(current), row.passwordHash))) return { ok: false, error: "Текущий пароль неверный" };
   await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(next) } });
@@ -39,7 +39,7 @@ export async function changeOwnPassword(current: string, next: string): Promise<
 export async function resetUserPassword(userId: string, next: string): Promise<Result> {
   const owner = await requireOwner();
   if (userId === owner.id) return { ok: false, error: "Свой пароль меняйте в блоке выше" };
-  if (String(next).length < 8) return { ok: false, error: "Пароль — минимум 8 символов" };
+  if (String(next).length < 8) return { ok: false, error: "Пароль - минимум 8 символов" };
   await db.user.update({ where: { id: userId }, data: { passwordHash: await hashPassword(next) } });
   await db.session.deleteMany({ where: { userId } });
   return { ok: true };

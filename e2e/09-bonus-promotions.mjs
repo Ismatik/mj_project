@@ -17,7 +17,7 @@ const points = (phone) => Number(sql(`select "bonusBalance" from "Guest" where p
 
 const b = await chromium.launch();
 const results = [];
-const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' — ' + extra : ''}`);
+const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
 // Its own client address: the website allows a few bookings per address an hour and earlier suites use them up
 const ctxOf = async (w = 1360, h = 900) => {
   const c = await b.newContext({ viewport: { width: w, height: h }, locale: 'ru-RU', timezoneId: 'Asia/Dushanbe', extraHTTPHeaders: { 'x-forwarded-for': '203.0.113.9' } });

@@ -73,7 +73,7 @@ export function validateBooking(input: BookingInput, ctx: BookingContext): Booki
     const end = start + input.durationMin;
     const clash = ctx.busy.find((b) => input.staffIds.includes(b.staffId) && b.start < end && start < b.end);
     if (clash) {
-      e.time = `${ctx.staffNames[clash.staffId]}: занято ${toClock(clash.start)}–${toClock(clash.end)} (${clash.label})`;
+      e.time = `${ctx.staffNames[clash.staffId]}: занято ${toClock(clash.start)}-${toClock(clash.end)} (${clash.label})`;
     }
   }
   return e;

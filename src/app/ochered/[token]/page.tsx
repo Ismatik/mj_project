@@ -17,7 +17,7 @@ import { OfferButtons } from "./OfferButtons";
 import s from "../../money.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Лист ожидания — Mavzunai Jovid", robots: { index: false } };
+export const metadata: Metadata = { title: "Лист ожидания - Mavzunai Jovid", robots: { index: false } };
 
 // Opened from the "a time has opened up" message: confirm or decline the held time.
 export default async function WaitlistOfferPage({ params }: PageProps<"/ochered/[token]">) {

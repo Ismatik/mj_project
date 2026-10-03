@@ -24,7 +24,7 @@ export default async function PayrollPage({ searchParams }: PageProps<"/cms/payr
     <div>
       <PageHead
         title={owner ? "Зарплата мастеров" : "Моя зарплата"}
-        meta="Начислено = оклад + процент от выручки + премии − штрафы · выручка — стоимость услуг в чеках мастера после скидок"
+        meta="Начислено = оклад + процент от выручки + премии − штрафы · выручка - стоимость услуг в чеках мастера после скидок"
       />
       <div className={s.bar}>
         <div className={s.monthNav}>

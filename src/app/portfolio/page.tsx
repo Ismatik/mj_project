@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const lang = await getLang();
   const c = localize(await getSiteContent("published"), lang);
-  return { title: `${c.team.portfolioTitle} — Mavzunai Jovid`, description: c.team.portfolioIntro, alternates: alternates(lang, "/portfolio") };
+  return { title: `${c.team.portfolioTitle} - Mavzunai Jovid`, description: c.team.portfolioIntro, alternates: alternates(lang, "/portfolio") };
 }
 
 export default async function PortfolioPage() {

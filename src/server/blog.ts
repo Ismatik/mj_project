@@ -34,7 +34,7 @@ export async function postBySlug(slug: string, lang: Lang, preview = false) {
   return { post: view(p, lang), more: more.map((m) => view(m, lang)) };
 }
 
-// ─── Site admin ──────────────────────────────────────────
+// Site admin
 
 export async function adminPosts() {
   const rows = await db.blogPost.findMany({ orderBy: [{ status: "asc" }, { updatedAt: "desc" }] });

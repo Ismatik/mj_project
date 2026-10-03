@@ -1,6 +1,6 @@
 /* Shared MJ components. Values mirror design/Salon CMS Dashboard Main.dc.html and design/Site Admin.dc.html. */
 
-/* ── Buttons ─────────────────────────────────────────── */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -74,7 +74,7 @@
   width: 100%;
 }
 
-/* ── Tags ────────────────────────────────────────────── */
+/* Tags */
 .tag {
   display: inline-block;
   font-size: 9.5px;
@@ -112,7 +112,7 @@
   border-color: var(--mj-line);
 }
 
-/* ── Headings ────────────────────────────────────────── */
+/* Headings */
 .kicker {
   font-size: 10.5px;
   letter-spacing: 0.3em;
@@ -172,7 +172,7 @@
   color: var(--mj-gold);
 }
 
-/* ── Stat card ───────────────────────────────────────── */
+/* Stat card */
 .statGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -233,7 +233,7 @@
   margin-top: 3px;
 }
 
-/* ── Avatar (initials) ───────────────────────────────── */
+/* Avatar (initials) */
 .avatar {
   flex-shrink: 0;
   background: var(--mj-ink);
@@ -246,7 +246,7 @@
   letter-spacing: 0.05em;
 }
 
-/* ── Bars ────────────────────────────────────────────── */
+/* Bars */
 .track {
   height: 8px;
   background: var(--mj-sand-2);
@@ -309,7 +309,7 @@
   color: var(--mj-gold);
 }
 
-/* ── Form fields ─────────────────────────────────────── */
+/* Form fields */
 .field {
   display: block;
 }
@@ -321,7 +321,7 @@
   margin-bottom: 7px;
 }
 .fieldHint {
-  /* --mj-text-muted is 1.8:1 on cream — unreadable for a hint that carries meaning */
+  /* --mj-text-muted is 1.8:1 on cream - unreadable for a hint that carries meaning */
   color: var(--mj-text-2);
   letter-spacing: 0.1em;
   text-transform: none;
@@ -354,7 +354,7 @@ textarea.input {
   line-height: 1.6;
 }
 
-/* ── Touch targets and phone keyboards ───────────────── */
+/* Touch targets and phone keyboards */
 /* Anything under 16px makes iOS Safari zoom the page on focus, and a 27px button
    is hard to hit on a phone. Desktop sizing is untouched. */
 @media (max-width: 600px) {

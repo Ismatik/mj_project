@@ -26,7 +26,7 @@ export const INTEGRATIONS: IntegrationInfo[] = [
     key: "whatsapp",
     title: "WhatsApp",
     purpose:
-      "Подтверждение записи, напоминания за 24 и 2 часа и коды входа — гостьям без Telegram. Сообщения гостей в WhatsApp пересылаются ресепшену, гостья получает автоответ.",
+      "Подтверждение записи, напоминания за 24 и 2 часа и коды входа - гостьям без Telegram. Сообщения гостей в WhatsApp пересылаются ресепшену, гостья получает автоответ.",
     envKeys: ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_ID", "WHATSAPP_APP_SECRET", "WHATSAPP_VERIFY_TOKEN"],
     goLive:
       "Верификация Meta Business и номер в WhatsApp Cloud API; одобренные шаблоны (см. «Шаблоны сообщений»); ключи в .env; в Meta указать webhook https://ДОМЕН/api/whatsapp/webhook с тем же WHATSAPP_VERIFY_TOKEN и подписаться на messages. Затем «Живой».",
@@ -56,7 +56,7 @@ export const INTEGRATIONS: IntegrationInfo[] = [
     purpose: "Лента последних публикаций @mavzunai.jovid.official на главной странице сайта. В режиме «Мок» вместо неё показываются фото из портфолио со ссылкой на профиль.",
     envKeys: ["INSTAGRAM_TOKEN"],
     goLive:
-      "Профессиональный аккаунт Instagram (бизнес или автор), приложение Meta с продуктом «Instagram API with Instagram Login», долгосрочный токен в INSTAGRAM_TOKEN (см. docs/instagram-setup.md). Затем «Живой» и «Обновить ленту» — дальше лента обновляется каждый час.",
+      "Профессиональный аккаунт Instagram (бизнес или автор), приложение Meta с продуктом «Instagram API with Instagram Login», долгосрочный токен в INSTAGRAM_TOKEN (см. docs/instagram-setup.md). Затем «Живой» и «Обновить ленту» - дальше лента обновляется каждый час.",
     liveIn: "R4",
     liveReady: true,
   },

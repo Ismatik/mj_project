@@ -9,9 +9,9 @@ export type MessageVars = Partial<Record<"name" | "service" | "when" | "time" | 
 export type Templates = Partial<Record<MessageKind, Partial<Record<Lang, string>>>>;
 
 export const MESSAGE_KINDS: { kind: MessageKind; title: string; hint: string; vars: (keyof MessageVars)[] }[] = [
-  { kind: "booking-confirmation", title: "Подтверждение онлайн-записи", hint: "Сразу после записи на сайте; ссылка ведёт в бот, а пока он не подключён — в личный кабинет", vars: ["name", "service", "when", "master", "address", "link"] },
-  { kind: "reminder-day", title: "Напоминание за день", hint: "За 20–26 часов до визита", vars: ["name", "service", "when", "time", "master", "address"] },
-  { kind: "reminder-hours", title: "Напоминание в день визита", hint: "За 1–3 часа до визита", vars: ["name", "service", "time", "master", "address"] },
+  { kind: "booking-confirmation", title: "Подтверждение онлайн-записи", hint: "Сразу после записи на сайте; ссылка ведёт в бот, а пока он не подключён - в личный кабинет", vars: ["name", "service", "when", "master", "address", "link"] },
+  { kind: "reminder-day", title: "Напоминание за день", hint: "За 20-26 часов до визита", vars: ["name", "service", "when", "time", "master", "address"] },
+  { kind: "reminder-hours", title: "Напоминание в день визита", hint: "За 1-3 часа до визита", vars: ["name", "service", "time", "master", "address"] },
   { kind: "login-code", title: "Код входа в личный кабинет", hint: "Вход на сайте по номеру телефона", vars: ["code"] },
   { kind: "birthday", title: "Поздравление с днём рождения", hint: "Утром в день рождения, вместе с подарочными бонусами", vars: ["name", "points", "percent"] },
   { kind: "waitlist-offer", title: "Освободилось время (лист ожидания)", hint: "Когда запись отменили и время подходит гостье из листа ожидания; ссылка держит время 30 минут", vars: ["name", "service", "when", "master", "link"] },
@@ -20,39 +20,39 @@ export const MESSAGE_KINDS: { kind: MessageKind; title: string; hint: string; va
 
 export const DEFAULT_TEMPLATES: Record<MessageKind, Record<Lang, string>> = {
   "booking-confirmation": {
-    ru: "Mavzunai Jovid: {name}, вы записаны — {service}, {when}, мастер {master}. {address}. Перенести или отменить визит можно здесь: {link} — там же ваши записи и бонусы.",
-    tg: "Mavzunai Jovid: {name}, шумо сабт шудед — {service}, {when}, усто {master}. {address}. Ташрифро дар ин ҷо гузаронидан ё бекор кардан мумкин аст: {link} — дар ҳамон ҷо сабтҳо ва бонусҳои шумо.",
-    en: "Mavzunai Jovid: {name}, you're booked — {service}, {when}, with {master}. {address}. Reschedule or cancel here: {link} — it also keeps your bookings and points.",
+    ru: "Mavzunai Jovid: {name}, вы записаны - {service}, {when}, мастер {master}. {address}. Перенести или отменить визит можно здесь: {link} - там же ваши записи и бонусы.",
+    tg: "Mavzunai Jovid: {name}, шумо сабт шудед - {service}, {when}, усто {master}. {address}. Ташрифро дар ин ҷо гузаронидан ё бекор кардан мумкин аст: {link} - дар ҳамон ҷо сабтҳо ва бонусҳои шумо.",
+    en: "Mavzunai Jovid: {name}, you're booked - {service}, {when}, with {master}. {address}. Reschedule or cancel here: {link} - it also keeps your bookings and points.",
   },
   "reminder-day": {
-    ru: "Mavzunai Jovid ✦ Напоминаем: {when} — {service}, мастер {master}. {address}. Если планы изменились, перенесите или отмените запись в боте («Мои записи») или напишите нам.",
-    tg: "Mavzunai Jovid ✦ Ёдрас мекунем: {when} — {service}, усто {master}. {address}. Агар нақшаҳо тағйир ёфтанд, сабтро дар бот («Сабтҳои ман») гузаронед ё бекор кунед, ё ба мо нависед.",
-    en: "Mavzunai Jovid ✦ A reminder: {when} — {service} with {master}. {address}. If your plans have changed, reschedule or cancel in the bot (“My bookings”) or message us.",
+    ru: "Mavzunai Jovid ✦ Напоминаем: {when} - {service}, мастер {master}. {address}. Если планы изменились, перенесите или отмените запись в боте («Мои записи») или напишите нам.",
+    tg: "Mavzunai Jovid ✦ Ёдрас мекунем: {when} - {service}, усто {master}. {address}. Агар нақшаҳо тағйир ёфтанд, сабтро дар бот («Сабтҳои ман») гузаронед ё бекор кунед, ё ба мо нависед.",
+    en: "Mavzunai Jovid ✦ A reminder: {when} - {service} with {master}. {address}. If your plans have changed, reschedule or cancel in the bot (“My bookings”) or message us.",
   },
   "reminder-hours": {
-    ru: "Mavzunai Jovid ✦ Ждём вас сегодня в {time} — {service}, мастер {master}. {address}.",
-    tg: "Mavzunai Jovid ✦ Имрӯз соати {time} шуморо интизорем — {service}, усто {master}. {address}.",
-    en: "Mavzunai Jovid ✦ See you today at {time} — {service} with {master}. {address}.",
+    ru: "Mavzunai Jovid ✦ Ждём вас сегодня в {time} - {service}, мастер {master}. {address}.",
+    tg: "Mavzunai Jovid ✦ Имрӯз соати {time} шуморо интизорем - {service}, усто {master}. {address}.",
+    en: "Mavzunai Jovid ✦ See you today at {time} - {service} with {master}. {address}.",
   },
   "login-code": {
-    ru: "Mavzunai Jovid: код для входа в личный кабинет — {code}. Никому его не сообщайте.",
-    tg: "Mavzunai Jovid: рамзи воридшавӣ ба кабинети шахсӣ — {code}. Онро ба касе нагӯед.",
+    ru: "Mavzunai Jovid: код для входа в личный кабинет - {code}. Никому его не сообщайте.",
+    tg: "Mavzunai Jovid: рамзи воридшавӣ ба кабинети шахсӣ - {code}. Онро ба касе нагӯед.",
     en: "Mavzunai Jovid: your sign-in code is {code}. Don't share it with anyone.",
   },
   birthday: {
-    ru: "Mavzunai Jovid ✦ {name}, с днём рождения! Дарим вам {points} бонусов — ими можно оплатить до {percent}% визита. Ждём вас!",
-    tg: "Mavzunai Jovid ✦ {name}, зодрӯзатон муборак! Ба шумо {points} бонус тӯҳфа мекунем — бо онҳо то {percent}% ташрифро пардохт кардан мумкин аст. Шуморо интизорем!",
-    en: "Mavzunai Jovid ✦ Happy birthday, {name}! Here are {points} bonus points from us — use them for up to {percent}% of a visit. We look forward to seeing you!",
+    ru: "Mavzunai Jovid ✦ {name}, с днём рождения! Дарим вам {points} бонусов - ими можно оплатить до {percent}% визита. Ждём вас!",
+    tg: "Mavzunai Jovid ✦ {name}, зодрӯзатон муборак! Ба шумо {points} бонус тӯҳфа мекунем - бо онҳо то {percent}% ташрифро пардохт кардан мумкин аст. Шуморо интизорем!",
+    en: "Mavzunai Jovid ✦ Happy birthday, {name}! Here are {points} bonus points from us - use them for up to {percent}% of a visit. We look forward to seeing you!",
   },
   "waitlist-offer": {
-    ru: "Mavzunai Jovid ✦ {name}, освободилось время: {service}, {when}, мастер {master}. Держим его для вас 30 минут — подтвердите по ссылке: {link}",
-    tg: "Mavzunai Jovid ✦ {name}, вақт холӣ шуд: {service}, {when}, усто {master}. Онро 30 дақиқа барои шумо нигоҳ медорем — бо пайванд тасдиқ кунед: {link}",
-    en: "Mavzunai Jovid ✦ {name}, a time has opened up: {service}, {when}, with {master}. We're holding it for you for 30 minutes — confirm here: {link}",
+    ru: "Mavzunai Jovid ✦ {name}, освободилось время: {service}, {when}, мастер {master}. Держим его для вас 30 минут - подтвердите по ссылке: {link}",
+    tg: "Mavzunai Jovid ✦ {name}, вақт холӣ шуд: {service}, {when}, усто {master}. Онро 30 дақиқа барои шумо нигоҳ медорем - бо пайванд тасдиқ кунед: {link}",
+    en: "Mavzunai Jovid ✦ {name}, a time has opened up: {service}, {when}, with {master}. We're holding it for you for 30 minutes - confirm here: {link}",
   },
   "whatsapp-reply": {
-    ru: "Mavzunai Jovid: спасибо за сообщение! Администратор ответит в рабочее время (Вт–Вс, 09:00–18:00). Запись: {link}",
-    tg: "Mavzunai Jovid: ташаккур барои паём! Маъмур дар вақти корӣ (Сш–Яш, 09:00–18:00) ҷавоб медиҳад. Сабт: {link}",
-    en: "Mavzunai Jovid: thank you for your message! Our receptionist will reply during opening hours (Tue–Sun, 09:00–18:00). Bookings: {link}",
+    ru: "Mavzunai Jovid: спасибо за сообщение! Администратор ответит в рабочее время (Вт-Вс, 09:00-18:00). Запись: {link}",
+    tg: "Mavzunai Jovid: ташаккур барои паём! Маъмур дар вақти корӣ (Сш-Яш, 09:00-18:00) ҷавоб медиҳад. Сабт: {link}",
+    en: "Mavzunai Jovid: thank you for your message! Our receptionist will reply during opening hours (Tue-Sun, 09:00-18:00). Bookings: {link}",
   },
 };
 

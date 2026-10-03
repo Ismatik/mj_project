@@ -22,7 +22,7 @@ const jost = Jost({
 const domain = process.env.SITE_DOMAIN && process.env.SITE_DOMAIN !== "localhost" ? process.env.SITE_DOMAIN : null;
 
 export const metadata: Metadata = {
-  title: "Mavzunai Jovid — Gallery of Beauty MJ",
+  title: "Mavzunai Jovid - Gallery of Beauty MJ",
   description: "Салон красоты и свадебный зал в Душанбе.",
   ...(domain ? { metadataBase: new URL(`https://${domain}`) } : {}),
 };

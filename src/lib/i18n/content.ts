@@ -1,5 +1,5 @@
 // Translations of the admin-edited site content. Russian is the full document; Tajik and English are overlays
-// that hold only what was translated — anything missing falls back to Russian.
+// that hold only what was translated - anything missing falls back to Russian.
 import type { Lang } from "./locales";
 
 /** Names of CMS entities (services, categories, masters) in another language, by id */
@@ -55,7 +55,7 @@ export function applyOverlay<T>(base: T, ov: unknown): T {
   return base;
 }
 
-/** What differs between an edited translation view and the Russian base — the new overlay. */
+/** What differs between an edited translation view and the Russian base - the new overlay. */
 export function diffOverlay(view: unknown, base: unknown): unknown {
   if (typeof base === "string") return typeof view === "string" && view.trim() && view !== base ? view : undefined;
   if (Array.isArray(base)) {

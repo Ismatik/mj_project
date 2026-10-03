@@ -98,7 +98,7 @@
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  /* 1.7:1 on sand — "Выходной" is information a master looks for */
+  /* 1.7:1 on sand - "Выходной" is information a master looks for */
   color: var(--mj-text-2);
   text-align: center;
 }

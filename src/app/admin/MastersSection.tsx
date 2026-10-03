@@ -24,7 +24,7 @@ type Props = {
   onName?: (kind: keyof Names, id: string, v: string) => void;
 };
 
-// ── Наши мастера ───────────────────────────────────────────
+// Наши мастера
 export function MastersSection({ c, onChange, staff, categories, translating, names, onName }: Props) {
   const edit = editor(c, onChange);
   const slugs = masterSlugs(staff, c.masters);
@@ -39,7 +39,7 @@ export function MastersSection({ c, onChange, staff, categories, translating, na
     <>
       <Head
         title="Наши мастера"
-        lead="Страницы «Мастера» и «Портфолио» на сайте. Имена, должности и услуги мастеров берутся из CMS; здесь — фото, рассказ о мастере и его работы."
+        lead="Страницы «Мастера» и «Портфолио» на сайте. Имена, должности и услуги мастеров берутся из CMS; здесь - фото, рассказ о мастере и его работы."
       />
       <div className={s.stack}>
         <Box label="Тексты страниц">
@@ -90,7 +90,7 @@ function MasterTranslation({
   onEdit: (fn: (p: MasterProfile) => void) => void;
 }) {
   return (
-    <section className={s.master} aria-label={`Мастер ${m.name} — ${LANG_NAME[lang]}`}>
+    <section className={s.master} aria-label={`Мастер ${m.name} - ${LANG_NAME[lang]}`}>
       <div className={s.masterHead}>
         <div className={s.masterAvatar}>{p?.photo?.url ? <img src={p.photo.url} alt="" /> : <span>{m.name[0]}</span>}</div>
         <div className={s.masterWho}>
@@ -166,7 +166,7 @@ function MasterEditor({
     setBusy(null);
     if (added.length) {
       onEdit((d) => void d.portfolio.unshift(...added));
-      fx.toast(`Добавлено фото: ${added.length} — ${m.name}`, "Сайт");
+      fx.toast(`Добавлено фото: ${added.length} - ${m.name}`, "Сайт");
     }
   }
 
@@ -208,7 +208,7 @@ function MasterEditor({
           <textarea
             className={s.textarea}
             rows={4}
-            placeholder="Опыт, в чём сильна, любимые техники — пара живых абзацев."
+            placeholder="Опыт, в чём сильна, любимые техники - пара живых абзацев."
             value={p.bio}
             onChange={(e) => onEdit((d) => void (d.bio = e.target.value))}
           />
@@ -230,7 +230,7 @@ function MasterEditor({
                 setBusy(null);
                 if (!res.ok) return setError(res.error);
                 onEdit((d) => void (d.photo = { url: res.url }));
-                fx.toast(`Портрет обновлён — ${m.name}`, "Сайт");
+                fx.toast(`Портрет обновлён - ${m.name}`, "Сайт");
               }}
             />
           </label>

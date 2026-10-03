@@ -1,4 +1,4 @@
-/* Guest account (/kabinet) — MJ style: cream ground, ink type, gold rules, square corners */
+/* Guest account (/kabinet) - MJ style: cream ground, ink type, gold rules, square corners */
 .kicker {
   font-size: 11px;
   letter-spacing: 0.32em;
@@ -518,7 +518,7 @@
   .signIn {
     padding: 44px 16px 64px;
   }
-  /* Guests manage their bookings here from a phone — give the controls a thumb. */
+  /* Guests manage their bookings here from a phone - give the controls a thumb. */
   .primary,
   .primarySmall,
   .ghostSmall,

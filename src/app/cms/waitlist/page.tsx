@@ -16,7 +16,7 @@ export default async function WaitlistPage() {
   return (
     <div>
       <LiveRefresh />
-      <PageHead title="Лист ожидания" meta="Когда запись отменяют, освободившееся время само предлагается первой подходящей гостье — ссылка держит его 30 минут" />
+      <PageHead title="Лист ожидания" meta="Когда запись отменяют, освободившееся время само предлагается первой подходящей гостье - ссылка держит его 30 минут" />
       <div className={s.grid}>
         <div className={s.stack}>
           <section className={s.panel} aria-labelledby="walkin-form">
@@ -84,7 +84,7 @@ export default async function WaitlistPage() {
                           </small>
                           {e.offer && (
                             <small className={s.diffPlus}>
-                              Предложено {e.offer.at}, {e.offer.master} — ждём ответа до {e.offer.until}
+                              Предложено {e.offer.at}, {e.offer.master} - ждём ответа до {e.offer.until}
                             </small>
                           )}
                         </td>

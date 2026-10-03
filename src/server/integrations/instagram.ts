@@ -23,7 +23,7 @@ async function saveFeed(db: PrismaClient, feed: InstaFeed) {
 /** Fetches the latest posts (live mode only). Returns how many were stored, or an error. */
 export async function refreshInstagram(db: PrismaClient): Promise<{ ok: true; count: number } | { ok: false; error: string }> {
   const integ = await db.integration.findUnique({ where: { key: "instagram" } });
-  if (!integ?.enabled || integ.mode !== "LIVE") return { ok: false, error: "Instagram в режиме «Мок» — на сайте показываются фото из портфолио" };
+  if (!integ?.enabled || integ.mode !== "LIVE") return { ok: false, error: "Instagram в режиме «Мок» - на сайте показываются фото из портфолио" };
   const t = await token(db);
   if (!t) return { ok: false, error: "Нет INSTAGRAM_TOKEN" };
   const prev = (await db.setting.findUnique({ where: { key: FEED_SETTING } }))?.value as InstaFeed | undefined;

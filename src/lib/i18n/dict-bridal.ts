@@ -2,10 +2,10 @@
 import type { Lang } from "./locales";
 
 const ru = {
-  meta: "Свадебный пакет — Mavzunai Jovid",
+  meta: "Свадебный пакет - Mavzunai Jovid",
   kicker: "Свадебный зал",
   title: "Соберите свадебный образ",
-  lead: "Причёска, макияж, ногти и платье — в одном пакете. Выберите, что нужно, и мы свяжемся, чтобы поставить время в день свадьбы.",
+  lead: "Причёска, макияж, ногти и платье - в одном пакете. Выберите, что нужно, и мы свяжемся, чтобы поставить время в день свадьбы.",
   cta: "Собрать свадебный пакет",
   steps: { date: "Дата свадьбы", services: "Образ в день свадьбы", dress: "Платье из проката", trial: "Пробный образ", contacts: "Ваши контакты" },
   discountHint: (pct: number, n: number) => `Скидка ${pct}% на услуги, если выбрать от ${n}`,
@@ -14,10 +14,10 @@ const ru = {
   size: "размер",
   perDay: (p: string) => `${p} / сутки`,
   dressTaken: "занято на эту дату",
-  dressPickDate: "Сначала выберите дату свадьбы — покажем свободные платья.",
+  dressPickDate: "Сначала выберите дату свадьбы - покажем свободные платья.",
   trialWant: "Записаться на пробный образ до свадьбы",
   trialHint: (price: string, pct: number) => `${price}${pct ? ` · предоплата ${pct}% онлайн` : ""}. Выберите день и время:`,
-  trialNoTimes: "В этот день свободного времени нет — выберите другой.",
+  trialNoTimes: "В этот день свободного времени нет - выберите другой.",
   name: "Имя невесты",
   phone: "Телефон",
   note: "Пожелания (необязательно)",
@@ -39,7 +39,7 @@ const ru = {
   errors: {
     date: "Выберите дату свадьбы (не раньше завтрашнего дня)",
     services: "Выберите хотя бы одну услугу",
-    dress: "Это платье уже занято на вашу дату — выберите другое",
+    dress: "Это платье уже занято на вашу дату - выберите другое",
     trial: "Пробный образ не записан:",
   },
 };
@@ -47,10 +47,10 @@ const ru = {
 export type BridalDict = typeof ru;
 
 const tg: BridalDict = {
-  meta: "Бастаи арӯсӣ — Mavzunai Jovid",
+  meta: "Бастаи арӯсӣ - Mavzunai Jovid",
   kicker: "Толори тӯй",
   title: "Симои арӯсиро ҷамъ кунед",
-  lead: "Мӯй, ороиш, нохунҳо ва либос — дар як баста. Чизи лозимиро интихоб кунед, мо барои муайян кардани вақт дар рӯзи тӯй бо шумо тамос мегирем.",
+  lead: "Мӯй, ороиш, нохунҳо ва либос - дар як баста. Чизи лозимиро интихоб кунед, мо барои муайян кардани вақт дар рӯзи тӯй бо шумо тамос мегирем.",
   cta: "Бастаи арӯсиро ҷамъ кардан",
   steps: { date: "Санаи тӯй", services: "Симо дар рӯзи тӯй", dress: "Либос аз иҷора", trial: "Симои озмоишӣ", contacts: "Тамосҳои шумо" },
   discountHint: (pct, n) => `Тахфифи ${pct}% ба хизматрасониҳо, агар аз ${n} интихоб кунед`,
@@ -59,10 +59,10 @@ const tg: BridalDict = {
   size: "андоза",
   perDay: (p) => `${p} / шабонарӯз`,
   dressTaken: "дар ин сана банд аст",
-  dressPickDate: "Аввал санаи тӯйро интихоб кунед — либосҳои холиро нишон медиҳем.",
+  dressPickDate: "Аввал санаи тӯйро интихоб кунед - либосҳои холиро нишон медиҳем.",
   trialWant: "Пеш аз тӯй ба симои озмоишӣ сабт шудан",
   trialHint: (price, pct) => `${price}${pct ? ` · пешпардохти ${pct}% онлайн` : ""}. Рӯз ва вақтро интихоб кунед:`,
-  trialNoTimes: "Дар ин рӯз вақти холӣ нест — рӯзи дигарро интихоб кунед.",
+  trialNoTimes: "Дар ин рӯз вақти холӣ нест - рӯзи дигарро интихоб кунед.",
   name: "Номи арӯс",
   phone: "Телефон",
   note: "Хоҳишҳо (ихтиёрӣ)",
@@ -84,16 +84,16 @@ const tg: BridalDict = {
   errors: {
     date: "Санаи тӯйро интихоб кунед (на пештар аз фардо)",
     services: "Ақаллан як хизматрасониро интихоб кунед",
-    dress: "Ин либос дар санаи шумо аллакай банд аст — дигарашро интихоб кунед",
+    dress: "Ин либос дар санаи шумо аллакай банд аст - дигарашро интихоб кунед",
     trial: "Симои озмоишӣ сабт нашуд:",
   },
 };
 
 const en: BridalDict = {
-  meta: "Bridal package — Mavzunai Jovid",
+  meta: "Bridal package - Mavzunai Jovid",
   kicker: "Wedding hall",
   title: "Build your bridal look",
-  lead: "Hair, makeup, nails and a dress — in one package. Choose what you need and we'll call you to set the times on your wedding day.",
+  lead: "Hair, makeup, nails and a dress - in one package. Choose what you need and we'll call you to set the times on your wedding day.",
   cta: "Build a bridal package",
   steps: { date: "Wedding date", services: "Your wedding-day look", dress: "Dress from our rental", trial: "Trial look", contacts: "Your details" },
   discountHint: (pct, n) => `${pct}% off the services when you choose ${n} or more`,
@@ -102,10 +102,10 @@ const en: BridalDict = {
   size: "size",
   perDay: (p) => `${p} / day`,
   dressTaken: "taken on this date",
-  dressPickDate: "Choose your wedding date first — we'll show the dresses that are free.",
+  dressPickDate: "Choose your wedding date first - we'll show the dresses that are free.",
   trialWant: "Book a trial look before the wedding",
   trialHint: (price, pct) => `${price}${pct ? ` · ${pct}% prepaid online` : ""}. Choose a day and time:`,
-  trialNoTimes: "No free time on this day — please choose another.",
+  trialNoTimes: "No free time on this day - please choose another.",
   name: "Bride's name",
   phone: "Phone",
   note: "Wishes (optional)",
@@ -127,7 +127,7 @@ const en: BridalDict = {
   errors: {
     date: "Choose your wedding date (tomorrow or later)",
     services: "Choose at least one service",
-    dress: "This dress is already taken for your date — please choose another",
+    dress: "This dress is already taken for your date - please choose another",
     trial: "The trial look wasn't booked:",
   },
 };

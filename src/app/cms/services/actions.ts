@@ -28,7 +28,7 @@ function check(input: ServiceInput): string | null {
   if (!Number.isInteger(input.durationMin) || input.durationMin < 5 || input.durationMin > 600) return "Длительность от 5 до 600 минут";
   if (!Number.isInteger(input.price) || input.price < 0 || input.price > 100000) return "Цена в сомони, целое число";
   if (!Array.isArray(input.staffIds) || input.staffIds.length === 0) return "Отметьте хотя бы одного мастера";
-  if (!Number.isInteger(input.depositPercent) || input.depositPercent < 0 || input.depositPercent > 100) return "Предоплата — от 0 до 100 %";
+  if (!Number.isInteger(input.depositPercent) || input.depositPercent < 0 || input.depositPercent > 100) return "Предоплата - от 0 до 100 %";
   return null;
 }
 

@@ -6,11 +6,11 @@ import { revenueByDay } from "./dashboard";
 import { changeLabel, monthToDate, previousMonthDative, previousMonthToDate } from "./ranges";
 
 const HOUR_BUCKETS = [
-  { label: "09:00–11:00", to: 11 * 60 },
-  { label: "11:00–13:00", to: 13 * 60 },
-  { label: "13:00–15:00", to: 15 * 60 },
-  { label: "15:00–17:00", to: 17 * 60 },
-  { label: "17:00–18:00", to: 24 * 60 },
+  { label: "09:00-11:00", to: 11 * 60 },
+  { label: "11:00-13:00", to: 13 * 60 },
+  { label: "13:00-15:00", to: 15 * 60 },
+  { label: "15:00-17:00", to: 17 * 60 },
+  { label: "17:00-18:00", to: 24 * 60 },
 ];
 
 export async function getAnalytics() {

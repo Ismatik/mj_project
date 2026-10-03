@@ -29,7 +29,7 @@ export default async function LoyaltyPage() {
         <section className={s.panel} aria-labelledby="promos">
           <SectionHead title={<span id="promos">Акции и промокоды</span>} />
           <p className={s.muted}>
-            Акция без промокода применяется сама: в онлайн-записи, в боте и в кассе — к услугам и датам акции. Промокод работает, когда его вводят при записи или на
+            Акция без промокода применяется сама: в онлайн-записи, в боте и в кассе - к услугам и датам акции. Промокод работает, когда его вводят при записи или на
             кассе. Отмеченные «на сайте» показываются в разделе «Акции».
           </p>
           <Promotions promotions={d.promotions} services={d.services} today={todayYmd()} />
