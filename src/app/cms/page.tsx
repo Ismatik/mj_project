@@ -10,6 +10,7 @@ import { appointmentStatus } from "@/lib/labels";
 import { addDays, atSalonTime, mondayOf, todayYmd } from "@/lib/time";
 import { requirePage } from "@/server/auth";
 import { getDashboard, getDashboardMoney } from "@/server/dashboard";
+import { LiveRefresh } from "./LiveRefresh";
 import { Reminders } from "./Reminders";
 import { Requests } from "./Requests";
 import s from "./dashboard.module.css";
@@ -88,6 +89,7 @@ export default async function DashboardPage() {
 
   return (
     <div>
+      <LiveRefresh />
       <div className={s.hero}>
         <Kicker>
           {greeting(hour)}, {firstName}

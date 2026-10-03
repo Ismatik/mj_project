@@ -2,6 +2,7 @@ import { PageHead, SectionHead } from "@/components/ui/Headings";
 import { formatPhone } from "@/lib/phone";
 import { requirePage } from "@/server/auth";
 import { getWaitlistPage } from "@/server/waitlist/admin";
+import { LiveRefresh } from "../LiveRefresh";
 import { EntryActions, EntryForm, WalkInActions, WalkInForm } from "./WaitlistForms";
 import s from "../money.module.css";
 
@@ -14,6 +15,7 @@ export default async function WaitlistPage() {
   const d = await getWaitlistPage();
   return (
     <div>
+      <LiveRefresh />
       <PageHead title="Лист ожидания" meta="Когда запись отменяют, освободившееся время само предлагается первой подходящей гостье — ссылка держит его 30 минут" />
       <div className={s.grid}>
         <div className={s.stack}>

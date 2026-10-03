@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useFx } from "@/components/fx/FxProvider";
 import { masterBotCode, newMasterBotCode, unlinkMasterBot } from "./actions";
@@ -12,6 +13,7 @@ import s from "./staff.module.css";
  */
 export function BotLink({ staffId, name, chats, editable }: { staffId: string; name: string; chats: number; editable: boolean }) {
   const fx = useFx();
+  const router = useRouter();
   const [pending, start] = useTransition();
   const [code, setCode] = useState<string | null>(null);
 
@@ -34,7 +36,12 @@ export function BotLink({ staffId, name, chats, editable }: { staffId: string; n
             type="button"
             className={s.botBtn}
             disabled={pending}
-            onClick={() => start(async () => fx.toast((await unlinkMasterBot(staffId)).ok ? `${name} отвязана` : "Не получилось", "Telegram"))}
+            onClick={() =>
+              start(async () => {
+                fx.toast((await unlinkMasterBot(staffId)).ok ? `${name} отвязана` : "Не получилось", "Telegram");
+                router.refresh(); // the "подключена · чатов N" line above is rendered on the server
+              })
+            }
           >
             Отвязать
           </button>
@@ -54,7 +61,12 @@ export function BotLink({ staffId, name, chats, editable }: { staffId: string; n
           type="button"
           className={s.botBtn}
           disabled={pending}
-          onClick={() => start(async () => show(await newMasterBotCode(staffId), "Новый код: старый больше не работает"))}
+          onClick={() =>
+            start(async () => {
+              show(await newMasterBotCode(staffId), "Новый код: старый больше не работает");
+              router.refresh(); // a new code drops her existing chats, so the count above changes
+            })
+          }
         >
           Новый код
         </button>

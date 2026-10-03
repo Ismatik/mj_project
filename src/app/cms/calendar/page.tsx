@@ -3,6 +3,7 @@ import { clock } from "@/lib/format";
 import { addDays } from "@/lib/time";
 import { requirePage } from "@/server/auth";
 import { getAppointment, getWeek } from "@/server/calendar";
+import { LiveRefresh } from "../LiveRefresh";
 import { AppointmentPanel } from "./AppointmentPanel";
 import s from "./calendar.module.css";
 
@@ -37,6 +38,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/cms/cal
 
   return (
     <div>
+      <LiveRefresh />
       <div className={s.head}>
         <h1 className={s.title}>Календарь записей</h1>
         <div className={s.weekNav}>
