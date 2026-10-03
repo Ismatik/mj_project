@@ -5,12 +5,12 @@ Everything runs in Docker on the laptop; the site is published to the internet t
 `https://mj.tail1234.ts.net`. No domain to buy, no static IP, no open ports, no monthly bill.
 
 ```
-guest / Telegram / WhatsApp ──HTTPS──▶ Tailscale ══ outgoing connection ══ laptop → web:3000
+guest / Telegram / WhatsApp  HTTPS ▶ Tailscale   outgoing connection   laptop → web:3000
 ```
 
 The laptop only ever connects *out*, so this works behind any home router, mobile hotspot or
 shared public IP. If you later buy a domain, switch to `docs/home-server.md` (Cloudflare Tunnel)
-or a VPS — nothing in the app changes, only `SITE_DOMAIN`.
+or a VPS - nothing in the app changes, only `SITE_DOMAIN`.
 
 **Read "Honest limits" at the bottom before putting real guests on this.**
 
@@ -22,7 +22,7 @@ sudo usermod -aG docker $USER
 ```
 
 **Now reboot, before starting anything.** `pacman -Syu` upgrades the whole system, kernel included.
-When it does, the running kernel's modules are gone from disk and the new ones are not in use yet —
+When it does, the running kernel's modules are gone from disk and the new ones are not in use yet -
 so `docker.service` fails to start with nothing obviously wrong, because it cannot load `overlay`
 and `br_netfilter`. The reboot also applies the `docker` group to your user. If you skip it and
 `systemctl enable --now docker` fails, this is why; `uname -r` disagreeing with `pacman -Q linux`
@@ -47,7 +47,7 @@ git clone https://github.com/Ismatik/mj_project && cd mj_project
 cp .env.example .env
 ```
 
-In `.env` set these. Leave `SITE_DOMAIN` alone for now — you don't know the address yet:
+In `.env` set these. Leave `SITE_DOMAIN` alone for now - you don't know the address yet:
 
 ```ini
 POSTGRES_PASSWORD=<long random password>
@@ -72,7 +72,7 @@ docker compose up -d --build       # first build takes a few minutes
 docker compose ps                  # all "running"; migrate "exited (0)"
 ```
 
-Load the starting data — accounts, service menu, website texts, **plus demo guests and bookings**:
+Load the starting data - accounts, service menu, website texts, **plus demo guests and bookings**:
 
 ```bash
 docker compose run --rm migrate npx prisma db seed
@@ -95,8 +95,8 @@ sudo tailscale up                      # opens a browser link to sign in (Google
 
 Funnel needs two things switched on once, in the Tailscale admin console:
 
-- **DNS → MagicDNS** — on (gives the machine its `.ts.net` name)
-- **DNS → HTTPS Certificates** — on
+- **DNS → MagicDNS** - on (gives the machine its `.ts.net` name)
+- **DNS → HTTPS Certificates** - on
 
 Then publish:
 
@@ -105,7 +105,7 @@ tailscale funnel --bg 3000
 tailscale funnel status
 ```
 
-The first run may refuse and print a link to enable Funnel for this machine — open it, approve, run
+The first run may refuse and print a link to enable Funnel for this machine - open it, approve, run
 it again. `funnel status` prints the address:
 
 ```
@@ -113,7 +113,7 @@ https://mj.tail1234.ts.net (Funnel on)
 |-- / proxy http://127.0.0.1:3000
 ```
 
-Put that hostname — **without** `https://` — into `.env` and restart so links in messages and the
+Put that hostname - **without** `https://` - into `.env` and restart so links in messages and the
 webhook addresses use it:
 
 ```ini
@@ -124,7 +124,7 @@ SITE_DOMAIN=mj.tail1234.ts.net
 docker compose up -d
 ```
 
-Open the address from your phone on mobile data (not home wifi — that would prove nothing).
+Open the address from your phone on mobile data (not home wifi - that would prove nothing).
 `/login` is the CMS: `mavzuna` and the `SEED_OWNER_PASSWORD` you chose. **Change it after the first
 sign-in.**
 
@@ -135,21 +135,40 @@ Funnel survives reboots once set with `--bg`; Docker brings the containers back 
 
 **Do this one before anyone relies on the salon being online.** Until you do, closing the lid
 suspends the laptop and the whole salon goes offline: the website stops answering, the till is
-unreachable, reminders are not sent. Nothing is lost — it is a pause, not a crash — but guests see
+unreachable, reminders are not sent. Nothing is lost - it is a pause, not a crash - but guests see
 nothing at all while it lasts.
 
 ```bash
-# Closing the lid must not suspend
-sudo sed -i 's/^#\?HandleLidSwitch=.*/HandleLidSwitch=ignore/; s/^#\?HandleLidSwitchExternalPower=.*/HandleLidSwitchExternalPower=ignore/; s/^#\?HandleLidSwitchDocked=.*/HandleLidSwitchDocked=ignore/' /etc/systemd/logind.conf
+# 1. Closing the lid must not suspend. A drop-in rather than editing logind.conf: pacman
+#    replaces that file on upgrade and leaves your edit behind in a .pacnew nobody reads.
+sudo mkdir -p /etc/systemd/logind.conf.d
+sudo tee /etc/systemd/logind.conf.d/salon.conf >/dev/null <<'CONF'
+[Login]
+HandleLidSwitch=ignore
+HandleLidSwitchExternalPower=ignore
+HandleLidSwitchDocked=ignore
+CONF
 sudo systemctl restart systemd-logind
-# No sleep at all
+
+# 2. No sleep at all, whoever asks for it - a desktop power setting, a stray timer, the kernel.
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
-# Correct clock — bookings and reminders depend on it
+
+# 3. Correct clock - bookings and reminders are nothing without it.
 sudo timedatectl set-ntp true
 ```
 
-On GNOME or KDE also turn off "Automatic suspend" in the power settings. Keep it plugged in; a small
-UPS for the **router** matters as much as one for the laptop.
+Then check it took, rather than trusting it:
+
+```bash
+systemctl is-enabled sleep.target          # masked
+systemd-inhibit --list | grep -i lid       # handle-lid-switch should be inhibited or ignored
+systemctl is-active systemd-logind         # active
+timedatectl | grep -i synchronized         # yes
+```
+
+Step 2 makes the desktop's own "Automatic suspend" setting harmless, so you do not have to find it
+in GNOME or KDE. Screen blanking is fine and worth keeping - a dark screen is not a sleeping
+machine. Keep it plugged in; a small UPS for the **router** matters as much as one for the laptop.
 
 No inbound ports are needed, so block everything incoming:
 
@@ -159,7 +178,7 @@ sudo pacman -S ufw && sudo ufw default deny incoming && sudo ufw enable
 
 ### If it did go to sleep (or was switched off)
 
-Nothing has to be set up again. Open the lid, or press the power button, and sign in — Docker
+Nothing has to be set up again. Open the lid, or press the power button, and sign in - Docker
 starts with the machine and brings every container back (`restart: unless-stopped`), and Funnel
 comes back with `tailscaled` because it was published with `--bg`. The site answers again on its
 own, usually within a minute.
@@ -188,9 +207,9 @@ within a minute of the worker coming back. Two things do not survive it, though:
 - **Guests could not reach the salon** for as long as it lasted. A booking nobody could make is not
   queued anywhere; the guest saw a site that did not answer and went elsewhere.
 - **Reminders whose moment passed are skipped, not sent late.** They are not queued in advance:
-  every 10 minutes the worker looks for visits starting in 20–26 hours and in 1–3 hours
+  every 10 minutes the worker looks for visits starting in 20-26 hours and in 1-3 hours
   (`src/lib/reminders.ts:8`). Sleep through the whole of one of those windows and that guest simply
-  never gets reminded — a three-hour nap is enough to lose the "2 hours before" message for
+  never gets reminded - a three-hour nap is enough to lose the "2 hours before" message for
   everyone due that afternoon.
 
 Which is the real argument for the commands above: it is not about uptime as a number, it is that a
@@ -198,7 +217,7 @@ closed lid quietly drops reminders nobody will notice are missing.
 
 ## 6. Backups off the laptop
 
-Daily dumps land in `./backups` — the same disk that will fail. Copy them, and the uploaded photos,
+Daily dumps land in `./backups` - the same disk that will fail. Copy them, and the uploaded photos,
 somewhere else. Setup and the nightly timer are in `docs/home-server.md` section 5; it is the same
 here.
 
@@ -208,11 +227,16 @@ This is free and it works, but know what you are choosing:
 
 - **The address looks like `mj.tail1234.ts.net`.** Fine for the salon's own use and for a bot, odd on
   a business card. A `.tj` domain plus `docs/home-server.md` fixes that whenever you want.
-- **Rate limits are weaker.** `src/server/client-ip.ts` trusts the first `X-Forwarded-For` entry
-  unless `TRUST_CLOUDFLARE=1`. Behind Caddy or Cloudflare that header is rewritten and cannot be
-  forged; it is not verified that Funnel does the same. Assume the per-address limit on the booking
-  and callback forms can be bypassed by someone who tries. It still stops accidents, not attackers.
-- **One laptop is one point of failure.** Closed lid, power cut, spilled tea — the salon's bookings
+- ~~Rate limits are weaker.~~ **Checked, and they are not.** `src/server/client-ip.ts` trusts the
+  first `X-Forwarded-For` entry, and Funnel gives it the same guarantee Caddy does. Go's
+  `httputil.ReverseProxy` strips every `X-Forwarded-*` the visitor sent, then tailscaled *sets* the
+  header (not appends) to the real public client address it got from the ingress relay. So there is
+  exactly one entry and the visitor cannot choose it. Source, since no Tailscale KB page documents
+  this: `addProxyForwardedHeaders` in `ipn/ipnlocal/serve.go`, and the `ipn.FunnelConn.Src` godoc -
+  "the address of the client that initiated the connection, not the address of the Tailscale Funnel
+  node which is relaying the connection". Being source-verified rather than documented, it is worth
+  re-checking after a big Tailscale upgrade.
+- **One laptop is one point of failure.** Closed lid, power cut, spilled tea - the salon's bookings
   are offline. The off-site backup is what makes that survivable rather than fatal.
 - **Tailscale is a third party on the critical path.** Free personal use, but their account and their
   uptime now matter to the salon.
@@ -233,5 +257,5 @@ docker run --rm --network host cloudflare/cloudflared:latest \
 
 It prints a `https://something-random.trycloudflare.com` address that works immediately from
 anywhere. **The address changes every time you restart it**, which breaks `SITE_DOMAIN`, the links
-inside messages and any registered Telegram webhook — so it is for showing the product, not for
+inside messages and any registered Telegram webhook - so it is for showing the product, not for
 running it.
