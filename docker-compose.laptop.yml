@@ -10,7 +10,7 @@ services:
     # Funnel runs on the host and proxies into this port. Bound to 127.0.0.1 on purpose:
     # the laptop must not serve the app to the café wifi it happens to be on.
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3100:3000"
 
   # Caddy terminates HTTPS for a real domain on ports 80/443. Funnel already does that,
   # and those ports are not reachable on a home line anyway, so keep it out of the way.
