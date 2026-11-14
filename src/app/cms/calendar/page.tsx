@@ -5,6 +5,7 @@ import { requirePage } from "@/server/auth";
 import { getAppointment, getWeek } from "@/server/calendar";
 import { LiveRefresh } from "../LiveRefresh";
 import { AppointmentPanel } from "./AppointmentPanel";
+import { ScrollToToday } from "./ScrollToToday";
 import s from "./calendar.module.css";
 
 const MONTHS_GEN = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
@@ -72,10 +73,11 @@ export default async function CalendarPage({ searchParams }: PageProps<"/cms/cal
 
       {appt && <AppointmentPanel key={`${appt.id}-${appt.status}-${appt.startsAt.toISOString()}`} a={appt} closeHref={href({})} role={user.role} />}
 
+      {!apptId && w.days.some((d) => d.isToday) && <ScrollToToday targetId="today" />}
       <div className={s.gridWrap}>
         <div className={s.grid}>
           {w.days.map((day) => (
-            <div key={day.ymd} className={`${s.day} ${day.closed ? s.dayClosed : ""} ${day.isToday ? s.dayToday : ""}`}>
+            <div key={day.ymd} id={day.isToday ? "today" : undefined} className={`${s.day} ${day.closed ? s.dayClosed : ""} ${day.isToday ? s.dayToday : ""}`}>
               <div className={s.dayHead}>
                 <div className={s.dow}>{day.dow}</div>
                 <div className={s.date}>{day.date}</div>
@@ -91,7 +93,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/cms/cal
                     title={`${clock(a.startsAt)} · ${a.guestName} · ${a.service}`}
                   >
                     <div className={s.cardTime}>
-                      {clock(a.startsAt)} · {a.guestName}
+                      {clock(a.startsAt)} · <span className={s.cardGuest}>{a.guestName}</span>
                     </div>
                     <div className={s.cardService}>{a.service}</div>
                     <div className={s.cardStaff}>{a.staff}</div>

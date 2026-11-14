@@ -6,14 +6,14 @@ const AT = (hhmm: string) => new Date(`2026-10-05T${hhmm}:00+05:00`); // Dushanb
 const VISIT = { guestName: "Фарзона", phone: "+992981031111", serviceLabel: "Маникюр", startsAt: AT("14:00") };
 
 /** Only the two tables these functions touch. */
-function fakeDb(opts: { linked?: string[]; visits?: { staffId: string; guestName: string; phone?: string | null; serviceLabel: string; startsAt: Date }[] } = {}) {
+function fakeDb(opts: { linked?: string[]; off?: string[]; visits?: { staffId: string; guestName: string; phone?: string | null; serviceLabel: string; startsAt: Date }[] } = {}) {
   const linked = opts.linked ?? [];
   const created: { to: string; body: string }[] = [];
   const db = {
     telegramChat: {
       // Two callers: linkedChats asks for one master by id, the day plan asks for all of them.
       findMany: async ({ where }: { where: { staffId?: unknown } }) =>
-        typeof where.staffId === "string" ? linked.filter((id) => id === where.staffId).map((id) => ({ id: `chat-${id}` })) : linked.map((id) => ({ staffId: id })),
+        typeof where.staffId === "string" ? linked.filter((id) => id === where.staffId).map((id) => ({ id: `chat-${id}` })) : linked.map((id) => ({ staffId: id, staff: { workDays: opts.off?.includes(id) ? [] : [0, 1, 2, 3, 4, 5, 6] } })),
     },
     appointment: {
       findMany: async () =>
@@ -138,6 +138,13 @@ describe("the morning plan", () => {
     const { db, created } = fakeDb({ linked: ["mira"], visits: [] });
     expect(await queueMasterDayPlans(db, ...DAY)).toBe(1);
     expect(created[0]!.body).toContain("записей пока нет");
+  });
+
+  it("leaves a master alone on her day off, unless someone is booked with her", async () => {
+    const quiet = fakeDb({ linked: ["mira"], off: ["mira"], visits: [] });
+    expect(await queueMasterDayPlans(quiet.db, ...DAY)).toBe(0);
+    const busy = fakeDb({ linked: ["mira"], off: ["mira"], visits: [{ staffId: "mira", guestName: "Фарзона", serviceLabel: "Маникюр", startsAt: AT("10:00") }] });
+    expect(await queueMasterDayPlans(busy.db, ...DAY)).toBe(1);
   });
 
   it("writes nothing at all when no master has linked a chat", async () => {

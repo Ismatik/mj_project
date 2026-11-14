@@ -3,6 +3,7 @@
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import { clock, longDate, somoni } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
+import { todayYmd, weekdayOf } from "@/lib/time";
 
 type Tx = Prisma.TransactionClient | PrismaClient;
 type Row = Prisma.OutboxMessageCreateManyInput;
@@ -62,7 +63,14 @@ export async function queueMasterDayPlans(db: PrismaClient, from: Date, to: Date
     orderBy: { startsAt: "asc" },
     include: { guest: { select: { phone: true } }, staff: { select: { staffId: true } } },
   });
-  const linked = await db.telegramChat.findMany({ where: { staffId: { not: null }, NOT: { id: { startsWith: "sim-" } } }, select: { staffId: true } });
+  // A master who has left keeps her chat linked until someone unlinks it; she must not keep
+  // getting the salon's day.
+  const linked = await db.telegramChat.findMany({
+    where: { staffId: { not: null }, staff: { active: true }, NOT: { id: { startsWith: "sim-" } } },
+    select: { staffId: true, staff: { select: { workDays: true } } },
+  });
+  const weekday = weekdayOf(todayYmd(from));
+  const dayOff = new Set(linked.filter((c) => c.staff && !c.staff.workDays.includes(weekday)).map((c) => c.staffId!));
   const byStaff = new Map<string, Visit[]>();
   for (const id of new Set(linked.map((c) => c.staffId!))) byStaff.set(id, []);
   for (const a of visits) {
@@ -74,6 +82,8 @@ export async function queueMasterDayPlans(db: PrismaClient, from: Date, to: Date
   }
   const rows: Row[] = [];
   for (const [staffId, list] of byStaff) {
+    // "Записей пока нет" every Monday is noise: on her day off she hears from us only if someone is booked.
+    if (!list.length && dayOff.has(staffId)) continue;
     // A master with nothing booked is told so: silence would read as "the bot is broken".
     const body = list.length
       ? `Ваш день, ${longDate(from)}:\n\n${list.map((v) => `${clock(v.startsAt)} - ${v.guestName}${v.phone ? `, ${formatPhone(v.phone)}` : ""}\n${v.serviceLabel}`).join("\n\n")}`

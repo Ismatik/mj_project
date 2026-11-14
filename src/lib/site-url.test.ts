@@ -19,16 +19,22 @@ describe("links sent to guests", () => {
 
   it("prefers the bot - a guest who opens it becomes reachable for free", () => {
     process.env.TELEGRAM_BOT_USERNAME = "mavzunaijovid_bot";
-    expect(selfServiceLink("ru")).toBe("https://t.me/mavzunaijovid_bot");
-    expect(selfServiceLink("en")).toBe("https://t.me/mavzunaijovid_bot");
+    expect(selfServiceLink("ru", true)).toBe("https://t.me/mavzunaijovid_bot");
+    expect(selfServiceLink("en", true)).toBe("https://t.me/mavzunaijovid_bot");
+  });
+
+  it("keeps to her account while the bot is named but not switched on", () => {
+    process.env.TELEGRAM_BOT_USERNAME = "mavzunaijovid_bot";
+    process.env.SITE_DOMAIN = "mavzunaijovid.tj";
+    expect(selfServiceLink("ru", false)).toBe("https://mavzunaijovid.tj/kabinet");
   });
 
   it("falls back to her account on the site, in her language", () => {
     delete process.env.TELEGRAM_BOT_USERNAME;
     process.env.SITE_DOMAIN = "mavzunaijovid.tj";
-    expect(selfServiceLink("ru")).toBe("https://mavzunaijovid.tj/kabinet");
-    expect(selfServiceLink("tg")).toBe("https://mavzunaijovid.tj/tj/kabinet");
-    expect(selfServiceLink("en")).toBe("https://mavzunaijovid.tj/en/kabinet");
+    expect(selfServiceLink("ru", true)).toBe("https://mavzunaijovid.tj/kabinet");
+    expect(selfServiceLink("tg", true)).toBe("https://mavzunaijovid.tj/tj/kabinet");
+    expect(selfServiceLink("en", true)).toBe("https://mavzunaijovid.tj/en/kabinet");
   });
 
   // Meta refuses a template whose parameter is empty, so this must hold in every configuration.
@@ -39,7 +45,7 @@ describe("links sent to guests", () => {
         else process.env.TELEGRAM_BOT_USERNAME = bot;
         if (domain === undefined) delete process.env.SITE_DOMAIN;
         else process.env.SITE_DOMAIN = domain;
-        expect(selfServiceLink("ru")).toMatch(/^https?:\/\/\S+$/);
+        for (const live of [true, false]) expect(selfServiceLink("ru", live)).toMatch(/^https?:\/\/\S+$/);
       }
     }
   });

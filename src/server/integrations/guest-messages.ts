@@ -13,12 +13,16 @@ type Db = PrismaClient | Prisma.TransactionClient;
 
 export const TEMPLATES_SETTING = "messageTemplates";
 
-export type MessageContext = { templates: Templates; content: SiteContent };
+export type MessageContext = { templates: Templates; content: SiteContent; botLive: boolean };
 
 /** Templates edited in the CMS and the published site content (translated names, address). */
 export async function messageContext(db: Db): Promise<MessageContext> {
-  const [setting, doc] = await Promise.all([db.setting.findUnique({ where: { key: TEMPLATES_SETTING } }), db.siteDocument.findUnique({ where: { id: "published" } })]);
-  return { templates: normalizeTemplates(setting?.value), content: normalizeContent(doc?.data ?? DEFAULT_CONTENT) };
+  const [setting, doc, telegram] = await Promise.all([
+    db.setting.findUnique({ where: { key: TEMPLATES_SETTING } }),
+    db.siteDocument.findUnique({ where: { id: "published" } }),
+    db.integration.findUnique({ where: { key: "telegram" } }),
+  ]);
+  return { templates: normalizeTemplates(setting?.value), content: normalizeContent(doc?.data ?? DEFAULT_CONTENT), botLive: !!telegram?.enabled && telegram.mode === "LIVE" };
 }
 
 type ApptLike = { startsAt: Date; serviceId: string | null; serviceLabel: string; staff: { id: string; name: string }[] };
@@ -33,7 +37,7 @@ export function appointmentVars(ctx: MessageContext, lang: Lang, a: ApptLike, gu
     time: clock(a.startsAt),
     master: a.staff.map((m) => nameIn(ctx.content, lang, "staff", m.id, m.name)).join(" + "),
     address: c.contacts.address,
-    link: selfServiceLink(lang),
+    link: selfServiceLink(lang, ctx.botLive),
   };
 }
 

@@ -16,11 +16,13 @@ export function botLink(): string | null {
 }
 
 /**
- * Where a guest manages her own bookings. The bot when it is live - a guest who opens it
+ * Where a guest manages her own bookings. The bot when it is live (botLive: Telegram switched
+ * to "Живой" in the CMS, not merely a username in .env - a link to a bot that does not answer is
+ * worse than no link) - a guest who opens it
  * becomes reachable in Telegram for free, which is the whole point of putting this link in
  * the confirmation she gets over paid WhatsApp. Her account on the site until then.
  * Never returns an empty string: Meta rejects a template parameter with no value.
  */
-export function selfServiceLink(lang: string): string {
-  return botLink() ?? siteLink("/kabinet", lang);
+export function selfServiceLink(lang: string, botLive: boolean): string {
+  return (botLive ? botLink() : null) ?? siteLink("/kabinet", lang);
 }

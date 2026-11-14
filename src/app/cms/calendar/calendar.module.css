@@ -137,6 +137,11 @@
   font-size: 12.5px;
   font-weight: 600;
 }
+/* The serif sets Cyrillic wide: in a 130px column a name broke after its first word. */
+.cardGuest {
+  font-family: var(--mj-sans);
+  font-weight: 500;
+}
 .cardService {
   font-size: 11.5px;
   font-weight: 300;
@@ -275,6 +280,7 @@
     min-height: 0;
     display: grid;
     grid-template-columns: 64px 1fr;
+    scroll-margin-top: 84px; /* clear of the sticky header when ScrollToToday lands here */
   }
   .dayHead {
     border-bottom: none;
