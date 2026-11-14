@@ -1,5 +1,6 @@
 // Guest account, masters and portfolio. Run against a freshly seeded app:  npm run db:seed && node e2e/06-guest-account.mjs
-// The app must show sign-in codes on screen (development, or DEMO_LOGIN_CODES=1).
+// The app must show sign-in codes on screen (development, or DEMO_LOGIN_CODES=1). Needs DATABASE_URL.
+import { execSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import { mkdirSync, readFileSync } from 'node:fs';
 
@@ -7,6 +8,11 @@ const png = readFileSync(new URL('./fixtures/test.png', import.meta.url));
 const BASE = process.env.BASE_URL ?? 'http://localhost:3000';
 const out = process.env.OUT ?? 'e2e-output';
 mkdirSync(out, { recursive: true });
+const sql = (q) => execSync(`psql "${process.env.DATABASE_URL}" -tAc ${JSON.stringify(q)}`).toString().trim();
+// The seed puts Гульнора's colouring on Thursday 13:30. From Thursday afternoon it is a past visit
+// and the account has nothing upcoming, so the suite only passed early in the week. Move it two
+// days ahead (three if that lands on the Monday off) whenever it is not comfortably in the future.
+sql(`update "Appointment" set status = 'CONFIRMED', "startsAt" = ((now() at time zone 'Asia/Dushanbe')::date + case when extract(isodow from (now() at time zone 'Asia/Dushanbe')::date + 2) = 1 then 3 else 2 end + time '13:30') at time zone 'Asia/Dushanbe' where "startsAt" < now() + interval '1 day' and id = (select a.id from "Appointment" a join "Guest" g on g.id = a."guestId" where g.phone = '+992906402816' and a."serviceLabel" = 'Окрашивание' order by a."startsAt" desc limit 1)`);
 const b = await chromium.launch();
 const results = [];
 const check = (name, ok, extra = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? ' - ' + extra : ''}`);
@@ -65,7 +71,8 @@ try {
   await p.click('#zapis [role=tab]:has-text("Брови и ресницы")');
   await p.click('#zapis button:has-text("Архитектура бровей")');
   const chips = await p.$$eval('#zapis fieldset:nth-of-type(2) button', (bs) => bs.map((x) => x.textContent));
-  check('master booking: master fixed', chips.includes('Мира') && chips.length === 2, chips.join(', '));
+  // On her own page she is the only choice: no "любой мастер", no colleagues
+  check('master booking: master fixed', chips.length === 1 && chips[0] === 'Мира', chips.join(', '));
   await p.screenshot({ path: out + '/master-page.png', fullPage: true });
 
   await p.goto(BASE + '/portfolio');

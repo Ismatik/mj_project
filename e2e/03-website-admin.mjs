@@ -30,7 +30,8 @@ try {
   const ctx = await newCtx(); const p = await ctx.newPage();
   p.on('pageerror', (e) => results.push('PAGEERROR ' + e.message));
   await p.goto(BASE + '/');
-  check('intro loader on first visit', await p.isVisible('text=Добро пожаловать'));
+  // The loader appears on hydration, a moment after "load": asking at once is a coin toss
+  check('intro loader on first visit', await p.waitForSelector('text=Добро пожаловать', { timeout: 3000 }).then(() => true, () => false));
   await p.waitForTimeout(3200);
   check('loader gone, hero visible', !(await p.isVisible('text=Добро пожаловать')) && await p.isVisible('h1'));
   check('price list from CMS', (await p.textContent('#uslugi')).includes('Педикюр') && (await p.textContent('#uslugi')).includes('320'));

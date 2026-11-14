@@ -27,7 +27,7 @@ try {
   const { ctx, p } = await loginAs('mavzuna');
   await p.goto(BASE + '/cms/integrations');
   const code = (await p.textContent('code')).replace('/staff ', '').trim();
-  check('staff code shown on integrations', /^MJ-\d{4}$/.test(code), code);
+  check('staff code shown on integrations', /^MJ-\d{4}-\d{4}-\d{4}$/.test(code), code);
 
   // Live mode needs keys
   await p.click('[aria-label="Telegram: режим"] button:has-text("Живой")');

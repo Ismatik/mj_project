@@ -42,6 +42,8 @@ try {
   await r.goto(BASE + '/cms/guests');
   const marta = await text(r, 'a:has-text("Марта Каримова")');
   check('guest book marks allergies', marta.includes('!'));
+  // The seed gives Марта a birthday on this week's Thursday, which is behind us from Friday on
+  sql(`update "Guest" set birthday = make_date(1994, extract(month from d)::int, extract(day from d)::int) from (select (now() at time zone 'Asia/Dushanbe')::date + 3 as d) x where name = 'Марта Каримова'`);
   await r.goto(BASE + '/cms/guests?tag=birthdays');
   check('birthdays in the next two weeks', (await text(r, 'main')).includes('Марта Каримова') && !(await text(r, 'main')).includes('София Рахимова'));
   await r.click('a:has-text("Марта Каримова")');
