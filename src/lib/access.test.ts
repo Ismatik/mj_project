@@ -34,6 +34,10 @@ describe("access", () => {
   it("only follows safe post-login targets", () => {
     expect(safeNext("https://evil.example", "OWNER")).toBe("/cms");
     expect(safeNext("//evil.example", "OWNER")).toBe("/cms");
+    // browsers treat a backslash or a tab after the first slash as "//"
+    expect(safeNext("/\\evil.example", "OWNER")).toBe("/cms");
+    expect(safeNext("/\t/evil.example", "OWNER")).toBe("/cms");
+    expect(safeNext("/cms/calendar\\x", "OWNER")).toBe("/cms");
     expect(safeNext("/cms/analytics", "RECEPTION")).toBe("/cms");
     expect(safeNext("/cms/pos", "RECEPTION")).toBe("/cms/pos");
     expect(safeNext("/cms", "MASTER")).toBe("/cms/calendar");

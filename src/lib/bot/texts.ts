@@ -43,6 +43,7 @@ const ru = {
   thanksKnown: (name: string) => `Спасибо, ${name}! Узнала вас ✦`,
   thanks: "Спасибо!",
   noBookingsForPhone: "По этому номеру записей пока нет.",
+  needOwnPhone: "Записи показываем только по номеру вашего Telegram - нажмите кнопку ниже. Если номер в Telegram другой, записи есть в личном кабинете на сайте.",
   askName: "Как к вам обращаться?",
   nameAgain: "Напишите, пожалуйста, ваше имя.",
   noUpcoming: "У вас нет предстоящих записей.",
@@ -79,6 +80,7 @@ const ru = {
   phone: "Телефон",
   staffOk: "Готово: этот чат будет получать уведомления ресепшена о новых записях, отменах и переносах.",
   staffBad: "Код не подошёл. Возьмите актуальный код в CMS → Интеграции.",
+  codeTooMany: "Слишком много попыток. Попробуйте через 15 минут.",
   masterOk: (name: string) => `Готово, ${name}. Сюда будут приходить ваши записи - новые, отменённые и перенесённые, а утром план на день.`,
   masterBad: "Код не подошёл. Личный код мастера выдают в CMS → Мастера.",
 };
@@ -126,6 +128,7 @@ const tg: BotTexts = {
   thanksKnown: (name) => `Ташаккур, ${name}! Шуморо шинохтам ✦`,
   thanks: "Ташаккур!",
   noBookingsForPhone: "Бо ин рақам ҳоло сабт нест.",
+  needOwnPhone: "Сабтҳоро танҳо бо рақами Telegram-и шумо нишон медиҳем - тугмаи поёнро пахш кунед. Агар рақам дар Telegram дигар бошад, сабтҳо дар кабинети шахсӣ дар сомона ҳастанд.",
   askName: "Ба шумо чӣ тавр муроҷиат кунем?",
   nameAgain: "Лутфан номатонро нависед.",
   noUpcoming: "Шумо сабти оянда надоред.",
@@ -159,6 +162,7 @@ const tg: BotTexts = {
   phone: "Телефон",
   staffOk: "Тайёр: ин чат огоҳиҳои ресепшенро дар бораи сабтҳои нав, бекоркунӣ ва гузаронидан мегирад.",
   staffBad: "Рамз мувофиқ нест. Рамзи навро дар CMS → Интеграции гиред.",
+  codeTooMany: "Кӯшишҳо аз ҳад зиёд. Пас аз 15 дақиқа боз кӯшиш кунед.",
   masterOk: (name) => `Тайёр, ${name}. Сабтҳои шумо ба ин ҷо меоянд - нав, бекоршуда ва гузаронидашуда, саҳарӣ бошад нақшаи рӯз.`,
   masterBad: "Рамз мувофиқ нест. Рамзи шахсии усторо дар CMS → Мастера медиҳанд.",
 };
@@ -204,6 +208,7 @@ const en: BotTexts = {
   thanksKnown: (name) => `Thank you, ${name}! I know you ✦`,
   thanks: "Thank you!",
   noBookingsForPhone: "No bookings for this number yet.",
+  needOwnPhone: "We only show bookings for your own Telegram number - tap the button below. If your Telegram number is different, your bookings are in your account on the website.",
   askName: "What's your name?",
   nameAgain: "Please write your name.",
   noUpcoming: "You have no upcoming bookings.",
@@ -237,6 +242,7 @@ const en: BotTexts = {
   phone: "Phone",
   staffOk: "Done: this chat will receive reception alerts about new bookings, cancellations and changes.",
   staffBad: "That code didn't work. Take the current code from CMS → Интеграции.",
+  codeTooMany: "Too many attempts. Try again in 15 minutes.",
   masterOk: (name) => `Done, ${name}. Your bookings will arrive here - new, cancelled and moved ones, and your plan each morning.`,
   masterBad: "That code didn't work. A master's personal code is issued in CMS → Мастера.",
 };

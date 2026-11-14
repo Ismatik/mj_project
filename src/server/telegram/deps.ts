@@ -12,21 +12,22 @@ import { cancelByGuest, createGuestBooking, getOnlineMenu, rescheduleByGuest, sl
 import { guestBonus, siteOffers } from "../loyalty/core";
 import { siteUrl } from "../payments/core";
 import { joinWaitlist } from "../waitlist/core";
+import { tooManyAttempts } from "../rate-limit";
 import { getSiteContent } from "../site";
 
 /** Code staff send as "/staff CODE" to receive reception alerts. Stored in the Telegram integration config. */
 export async function getStaffCode(): Promise<string> {
   const row = await db.integration.findUnique({ where: { key: "telegram" } });
   const config = (row?.config ?? {}) as { staffCode?: string };
-  if (config.staffCode) return config.staffCode;
-  const code = `MJ-${randomInt(1000, 9999)}`;
-  await db.integration.upsert({
-    where: { key: "telegram" },
-    update: { config: { ...config, staffCode: code } },
-    create: { key: "telegram", config: { staffCode: code } },
-  });
-  return code;
+  // Codes used to be "MJ-1234": 9000 values, which a patient stranger could try one by one.
+  if (config.staffCode && !/^MJ-\d{4}$/.test(config.staffCode)) return config.staffCode;
+  return rotateStaffCode();
 }
+
+const newStaffCode = () => `MJ-${randomInt(1000, 9999)}-${randomInt(1000, 9999)}-${randomInt(1000, 9999)}`;
+
+/** Five wrong "/staff" or "/master" codes from one chat, then a 15-minute pause. */
+export const tooManyCodeTries = (chatId: string) => tooManyAttempts(`bot-code:${chatId}`, 5);
 
 /**
  * A master's own code, made on first sight and kept. Personal rather than one code for everyone:
@@ -77,8 +78,12 @@ export async function linkMasterChat(chatId: string, code: string): Promise<stri
 export async function rotateStaffCode(): Promise<string> {
   const row = await db.integration.findUnique({ where: { key: "telegram" } });
   const config = (row?.config ?? {}) as Record<string, unknown>;
-  const code = `MJ-${randomInt(1000, 9999)}`;
-  await db.integration.upsert({ where: { key: "telegram" }, update: { config: { ...config, staffCode: code } }, create: { key: "telegram", config: { staffCode: code } } });
+  const code = newStaffCode();
+  // A new code is asked for when the old one has leaked, so whoever linked with it goes too.
+  await db.$transaction([
+    db.integration.upsert({ where: { key: "telegram" }, update: { config: { ...config, staffCode: code } }, create: { key: "telegram", config: { staffCode: code } } }),
+    db.telegramChat.updateMany({ where: { isStaff: true }, data: { isStaff: false } }),
+  ]);
   return code;
 }
 
@@ -117,8 +122,8 @@ export function botDeps(): BotDeps {
       const { slots } = await slotsFor(serviceId, date, staffId, db, exclude);
       return slots.map((s) => ({ time: s.time }));
     },
-    async book({ chatId, ...i }) {
-      const res = await createGuestBooking({ ...i, source: "TELEGRAM", telegramChatId: chatId });
+    async book({ chatId, linkChat, ...i }) {
+      const res = await createGuestBooking({ ...i, source: "TELEGRAM", telegramChatId: linkChat ? chatId : undefined });
       if (!res.ok || !res.payment) return res;
       return { ...res, deposit: { amount: res.payment.amount, payBy: res.payment.payBy, url: `${siteUrl()}${localePath(i.lang, `/oplata/${res.payment.id}`)}` } };
     },
@@ -134,6 +139,7 @@ export function botDeps(): BotDeps {
     },
     staffCode: getStaffCode,
     linkMaster: linkMasterChat,
+    tooManyCodeTries,
     formatWhen: (d, lang) => when(d, lang),
     async bonus(guestId, lang) {
       const b = await guestBonus(db, guestId, lang);
@@ -151,13 +157,14 @@ export function botDeps(): BotDeps {
           code: o.code,
         }));
     },
-    async waitlist({ chatId, guestId, ...i }) {
-      // She becomes a guest now, so the offer comes into this chat rather than WhatsApp
+    async waitlist({ chatId, guestId, linkChat, ...i }) {
+      // She becomes a guest now, so the offer comes into this chat rather than WhatsApp -
+      // unless she only typed the number, which may not be hers
       const guest =
         (guestId ? await db.guest.findUnique({ where: { id: guestId } }) : null) ??
         (await db.guest.findUnique({ where: { phone: i.phone } })) ??
         (await db.guest.create({ data: { name: i.name, phone: i.phone, tag: "NEW", lang: i.lang } }));
-      await db.telegramChat.update({ where: { id: chatId }, data: { guestId: guest.id } });
+      if (linkChat) await db.telegramChat.update({ where: { id: chatId }, data: { guestId: guest.id } });
       const res = await joinWaitlist(db, { ...i, name: guest.name, guestId: guest.id, source: "TELEGRAM" });
       return res.duplicate ? "already" : res.offered ? "offered" : "joined";
     },

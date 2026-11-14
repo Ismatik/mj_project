@@ -10,7 +10,7 @@ import { GIFT_MAX, GIFT_MIN, validGiftAmount } from "@/lib/money";
 import { normalizePhone } from "@/lib/phone";
 import { createGiftCard } from "@/server/gift-cards";
 import { getLang } from "@/server/lang";
-import { cancelPayment, markPaid } from "@/server/payments/core";
+import { cancelPayment, markPaid, onlinePaymentsOpen } from "@/server/payments/core";
 import { clientIp } from "@/server/client-ip";
 import { tooManyAttempts } from "@/server/rate-limit";
 
@@ -23,6 +23,7 @@ export async function buyGiftCard(input: BuyGiftInput): Promise<{ ok: true; url:
   const e = dict(lang).errors;
   const g = moneyDict(lang).gift;
   if (input.company) return { ok: false, error: e.generic }; // honeypot
+  if (!onlinePaymentsOpen()) return { ok: false, error: g.errOffline };
   if (tooManyAttempts(`gift:${await clientIp()}`, 10, 3600_000)) return { ok: false, error: e.tooMany };
   const amount = Math.round(Number(input.amount));
   if (!validGiftAmount(amount)) return { ok: false, field: "amount", error: g.errAmount(somoni(GIFT_MIN, lang), somoni(GIFT_MAX, lang)) };
@@ -37,8 +38,9 @@ export async function buyGiftCard(input: BuyGiftInput): Promise<{ ok: true; url:
   return { ok: true, url: localePath(lang, `/oplata/${payment.id}`) };
 }
 
-/** Test checkout only works while online payments are in mock mode. */
+/** Test checkout only works while online payments are in mock mode, and never on a real site (see onlinePaymentsOpen). */
 async function testCheckoutAllowed(paymentId: string) {
+  if (!onlinePaymentsOpen()) return false;
   const [p, integration] = await Promise.all([db.payment.findUnique({ where: { id: String(paymentId) } }), db.integration.findUnique({ where: { key: "payments" } })]);
   return !!p && p.provider === "test" && (integration?.mode ?? "MOCK") === "MOCK";
 }

@@ -94,12 +94,14 @@ export async function verifyLoginCode(phone: string, code: string, name: string 
   const e = dict(lang).errors;
   const row = await db.loginCode.findFirst({ where: { phone, usedAt: null }, orderBy: { createdAt: "desc" } });
   if (!row || row.expiresAt < new Date()) return { ok: false, error: e.codeExpired };
-  if (row.attempts >= CODE_MAX_ATTEMPTS) return { ok: false, error: e.codeAttempts };
+  // Count the try before looking at the code, in one statement. Read-then-increment let a burst of
+  // parallel guesses all see "0 attempts" and get past the limit together.
+  const counted = await db.loginCode.updateMany({ where: { id: row.id, usedAt: null, attempts: { lt: CODE_MAX_ATTEMPTS } }, data: { attempts: { increment: 1 } } });
+  if (!counted.count) return { ok: false, error: e.codeAttempts };
   const a = Buffer.from(row.codeHash);
   const b = Buffer.from(codeHash(phone, code));
   if (a.length !== b.length || !timingSafeEqual(a, b)) {
-    await db.loginCode.update({ where: { id: row.id }, data: { attempts: { increment: 1 } } });
-    const left = CODE_MAX_ATTEMPTS - row.attempts - 1;
+    const left = Math.max(0, CODE_MAX_ATTEMPTS - row.attempts - 1);
     return { ok: false, error: e.codeWrong(left) };
   }
   let guest = await db.guest.findUnique({ where: { phone } });
@@ -110,7 +112,9 @@ export async function verifyLoginCode(phone: string, code: string, name: string 
   } else if (guest.lang !== lang) {
     guest = await db.guest.update({ where: { id: guest.id }, data: { lang } });
   }
-  await db.loginCode.update({ where: { id: row.id }, data: { usedAt: new Date() } });
+  // A code signs in once, even if two requests carry it at the same moment
+  const used = await db.loginCode.updateMany({ where: { id: row.id, usedAt: null }, data: { usedAt: new Date() } });
+  if (!used.count) return { ok: false, error: e.codeExpired };
 
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 3600_000);

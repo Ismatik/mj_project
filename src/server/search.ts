@@ -1,5 +1,5 @@
 import "server-only";
-import { canOpen } from "@/lib/access";
+import { canBook, canOpen } from "@/lib/access";
 import { db } from "@/lib/db";
 import { clock, shortDate, somoni } from "@/lib/format";
 import { formatPhone, phoneDigits } from "@/lib/phone";
@@ -19,7 +19,7 @@ export async function searchCms(query: string, user: CurrentUser, only?: "guests
   const receipt = /^(?:№|#|чек\s*)?\s*(\d{1,7})$/i.exec(q);
   const text = { contains: q, mode: "insensitive" as const };
 
-  const wantGuests = canOpen(user.role, "guests") || (only === "guests" && canOpen(user.role, "calendar"));
+  const wantGuests = canOpen(user.role, "guests") || (only === "guests" && canBook(user.role));
   const wantAppts = !only && canOpen(user.role, "calendar");
   const wantSales = !only && canOpen(user.role, "pos");
 

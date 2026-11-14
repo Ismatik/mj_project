@@ -8,6 +8,7 @@ function makeDeps() {
   const guests: BotGuest[] = [{ id: "g-marta", name: "Марта Каримова", phone: "+992935012214" }];
   const booked: { id: string; guestId: string; serviceId: string; staffId: string | null; date: string; time: string; status: string }[] = [];
   const calls: string[] = [];
+  const tries = new Map<string, number>();
   const deps: BotDeps = {
     async getChat(id) {
       const c = chats.get(id) ?? { state: {}, isStaff: false };
@@ -37,7 +38,7 @@ function makeDeps() {
       if (booked.some((b) => b.date === i.date && b.time === i.time)) return { ok: false, error: "Это время только что заняли - выберите другое" };
       let g = guests.find((x) => x.phone === i.phone);
       if (!g) guests.push((g = { id: `g${guests.length}`, name: i.name, phone: i.phone }));
-      await deps.saveChat(i.chatId, { guestId: g.id });
+      if (i.linkChat) await deps.saveChat(i.chatId, { guestId: g.id });
       booked.push({ id: `a${booked.length}`, guestId: g.id, serviceId: i.serviceId, staffId: i.staffId, date: i.date, time: i.time, status: "PENDING" });
       return { ok: true, summary: { service: "Ламинирование ресниц", master: "Мира", when: `${i.date}, ${i.time}` } };
     },
@@ -66,6 +67,11 @@ function makeDeps() {
     },
     staffCode: async () => "MJ-4821",
     linkMaster: async (_chatId, code) => (code === "MJ-1111-2222" ? "Мира" : null),
+    tooManyCodeTries(chatId) {
+      const n = (tries.get(chatId) ?? 0) + 1;
+      tries.set(chatId, n);
+      return n > 5;
+    },
     formatWhen: (d) => d.toISOString(),
     bonus: async () => ({ balance: 120, tier: "Серебро", percent: 7, maxSpendPercent: 30 }),
     offers: async () => [{ title: "Осенний маникюр", description: "", label: "−20%", until: "31 октября 2026", code: null }],
@@ -74,7 +80,7 @@ function makeDeps() {
       // Like the real one: she becomes a guest linked to this chat
       let g = guests.find((x) => x.phone === i.phone);
       if (!g) guests.push((g = { id: `g${guests.length}`, name: i.name, phone: i.phone }));
-      await deps.saveChat(i.chatId, { guestId: g.id });
+      if (i.linkChat) await deps.saveChat(i.chatId, { guestId: g.id });
       return calls.filter((c) => c.startsWith(`wait ${i.serviceId} ${i.date}`)).length > 1 ? "already" : "joined";
     },
   };
@@ -196,6 +202,38 @@ describe("Telegram bot", () => {
     expect(texts(await send({ data: cancel.data }))).toContain("Точно отменить");
     expect(texts(await send({ data: cancel.data.replace("x:", "xx:") }))).toContain("Запись отменена");
     expect(texts(await send({ data: "my" }))).toContain("нет предстоящих записей");
+  });
+
+  it("does not open another guest's bookings to a typed number", async () => {
+    t.booked.push({ id: "m1", guestId: "g-marta", serviceId: "svc-lash", staffId: "mira", date: "2026-09-29", time: "10:00", status: "PENDING" });
+    await send({ data: "my" });
+    const typed = await send({ text: "935012214" });
+    expect(texts(typed)).toContain("только по номеру вашего Telegram");
+    expect(typed[0]!.askContact).toBe(true);
+    expect(texts(typed)).not.toContain("Марта");
+    expect(t.chats.get("c1")?.guestId).toBeUndefined();
+    // her own contact, shared with the button, does open them
+    expect(texts(await send({ contactPhone: "935012214" }))).toContain("Ламинирование ресниц");
+  });
+
+  it("books with a typed number without tying the chat to that guest", async () => {
+    await send({ data: "s:svc-lash" });
+    await send({ data: "m:any" });
+    await send({ data: "d:2026-09-29" });
+    await send({ data: "t:10:30" });
+    const confirm = await send({ text: "935012214" });
+    expect(texts(confirm)).toContain("Имя: Зарина"); // not "Марта Каримова": the number is only a claim
+    expect(texts(await send({ data: "ok" }))).toContain("Ламинирование ресниц");
+    expect(t.calls).toContain("book svc-lash 2026-09-29 10:30 Зарина +992935012214");
+    expect(t.chats.get("c1")?.guestId).toBeUndefined();
+    expect((await send({ data: "my" }))[0]!.askContact).toBe(true);
+  });
+
+  it("stops answering code guesses after five tries", async () => {
+    for (let i = 0; i < 5; i++) expect(texts(await send({ text: `/staff MJ-000${i}` }))).toContain("Код не подошёл");
+    expect(texts(await send({ text: "/staff MJ-4821" }))).toContain("Слишком много попыток");
+    expect(texts(await send({ text: "/master MJ-1111-2222" }))).toContain("Слишком много попыток");
+    expect(t.chats.get("c1")?.isStaff ?? false).toBe(false);
   });
 
   it("links a staff chat only with the right code", async () => {

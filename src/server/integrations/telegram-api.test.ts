@@ -12,6 +12,9 @@ describe("Telegram mapping", () => {
     expect(own?.update.contactPhone).toBe("+992931112233");
     const other = toBotUpdate({ message: { chat: { id: 7, type: "private" }, contact: { phone_number: "+992935012214", user_id: 99 } } });
     expect(other?.update.contactPhone).toBeUndefined();
+    // a card typed in by hand carries no user_id at all
+    const typed = toBotUpdate({ message: { chat: { id: 7, type: "private" }, contact: { phone_number: "+992935012214" } } });
+    expect(typed?.update.contactPhone).toBeUndefined();
   });
 
   it("ignores group chats", () => {

@@ -23,6 +23,7 @@ const ru = {
     homeCta: "Выбрать сертификат",
     errAmount: (min: string, max: string) => `Сумма от ${min} до ${max}`,
     errRecipient: "Кому дарим?",
+    errOffline: "Онлайн-оплата пока не подключена. Сертификат можно купить в салоне или по телефону.",
   },
   cert: {
     title: "Подарочный сертификат",
@@ -94,6 +95,7 @@ const tg: MoneyDict = {
     homeCta: "Интихоби сертификат",
     errAmount: (min, max) => `Маблағ аз ${min} то ${max}`,
     errRecipient: "Ба кӣ тӯҳфа мекунем?",
+    errOffline: "Пардохти онлайн ҳоло пайваст нашудааст. Сертификатро дар салон ё бо телефон харидан мумкин аст.",
   },
   cert: {
     title: "Сертификати тӯҳфагӣ",
@@ -163,6 +165,7 @@ const en: MoneyDict = {
     homeCta: "Choose a certificate",
     errAmount: (min, max) => `Amount from ${min} to ${max}`,
     errRecipient: "Who is it for?",
+    errOffline: "Online payment is not connected yet. You can buy a certificate at the salon or by phone.",
   },
   cert: {
     title: "Gift certificate",

@@ -10,6 +10,14 @@ import { appointmentVars, guestMessage, messageContext } from "../integrations/g
 import { cancelAlert, forEachMaster } from "../integrations/master-alerts";
 import { onBookingCancelled } from "../waitlist/core";
 
+/**
+ * Whether a guest can pay online at all. There is no bank driver yet, only the test checkout,
+ * and the test checkout marks a payment "paid" for free: on a real site that hands out valid
+ * certificates and confirmed prepayments to anyone. So it is open in development, and in
+ * production only when the owner asks for it with DEMO_PAYMENTS=1 (a demo or staging server).
+ */
+export const onlinePaymentsOpen = () => process.env.NODE_ENV !== "production" || process.env.DEMO_PAYMENTS === "1";
+
 type Db = PrismaClient;
 type Tx = Prisma.TransactionClient;
 

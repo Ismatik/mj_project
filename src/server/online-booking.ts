@@ -15,6 +15,7 @@ import { addDays, atSalonTime, todayYmd, type Ymd } from "@/lib/time";
 import { appointmentVars, guestMessage, messageContext } from "./integrations/guest-messages";
 import { cancelAlert, forEachMaster, newBookingAlert, rescheduleAlert } from "./integrations/master-alerts";
 import { promotionsBetween } from "./loyalty/core";
+import { onlinePaymentsOpen } from "./payments/core";
 import { onBookingCancelled } from "./waitlist/core";
 import { namerFor } from "./names";
 import { getSiteContent } from "./site";
@@ -169,8 +170,10 @@ export async function createGuestBooking(input: {
         : found
       : await tx.guest.create({ data: { name: input.name, phone: input.phone, tag: "NEW", lang } });
     const startsAt = atSalonTime(input.date, input.time);
-    // Services with a prepayment (weddings, long looks) hold the time until it is paid online
-    const deposit = depositFor(price, service.depositPercent);
+    // Services with a prepayment (weddings, long looks) hold the time until it is paid online.
+    // With nowhere to pay online the hold would just expire and drop her booking, so it goes in
+    // as an ordinary request and reception takes the prepayment when confirming.
+    const deposit = onlinePaymentsOpen() ? depositFor(price, service.depositPercent) : 0;
     const holdUntil = deposit ? new Date(Date.now() + DEPOSIT_HOLD_MIN * 60_000) : null;
     const appt = await tx.appointment.create({
       data: {

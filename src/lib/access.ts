@@ -80,7 +80,8 @@ export function navFor(role: Role) {
 
 /** Only same-site paths are allowed as a post-login target. */
 export function safeNext(next: string | null | undefined, role: Role): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) return homeFor(role);
+  // "/\\evil.com" and "/<tab>/evil.com" pass a plain "//" check, yet browsers read both as "//evil.com".
+  if (!next || !/^\/[A-Za-z0-9_-]/.test(next) || /[\\\u0000-\u001f]/.test(next)) return homeFor(role);
   if (next.startsWith("/cms")) {
     const page = [...CMS_PAGES].reverse().find((p) => next === p.path || next.startsWith(p.path + "/"));
     return page && page.roles.includes(role) ? next : homeFor(role);

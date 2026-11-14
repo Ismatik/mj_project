@@ -34,6 +34,8 @@ export type BotState = {
   after?: "confirm" | "my" | "wait";
   name?: string;
   phone?: string;
+  /** The phone came from her own Telegram contact, so this chat may be tied to that guest */
+  phoneOwn?: boolean;
 };
 
 export type BotGuest = { id: string; name: string; phone: string };
@@ -48,7 +50,8 @@ export interface BotDeps {
   menu(lang: Lang): Promise<BotCategory[]>;
   dates(): Ymd[];
   slots(serviceId: string, date: Ymd, staffId: string | null, excludeAppointmentId?: string): Promise<{ time: string }[]>;
-  book(input: { serviceId: string; staffId: string | null; date: Ymd; time: string; name: string; phone: string; guestId?: string; chatId: string; lang: Lang }): Promise<Result>;
+  /** linkChat: tie this chat to the guest. Only when the phone is proven to be hers. */
+  book(input: { serviceId: string; staffId: string | null; date: Ymd; time: string; name: string; phone: string; guestId?: string; chatId: string; linkChat: boolean; lang: Lang }): Promise<Result>;
   upcoming(guestId: string, lang: Lang): Promise<BotBooking[]>;
   cancel(appointmentId: string, guestId: string, lang: Lang): Promise<{ ok: boolean; error?: string }>;
   reschedule(appointmentId: string, guestId: string, date: Ymd, time: string, lang: Lang): Promise<Result>;
@@ -58,13 +61,15 @@ export interface BotDeps {
   staffCode(): Promise<string>;
   /** Links this chat to the master whose personal code it is (shown on /cms/staff). Her name back, or null. */
   linkMaster(chatId: string, code: string): Promise<string | null>;
+  /** True once this chat has guessed "/staff" or "/master" codes too many times in a row */
+  tooManyCodeTries(chatId: string): boolean;
   formatWhen(d: Date, lang: Lang): string;
   /** Her bonus points (null when the program is off) */
   bonus(guestId: string, lang: Lang): Promise<{ balance: number; tier: string; percent: number; maxSpendPercent: number } | null>;
   /** Current offers and public promo codes */
   offers(lang: Lang): Promise<{ title: string; description: string; label: string; until: string; code: string | null }[]>;
   /** Waitlist for a full day: "joined", "already" there, or a time was free and is "offered" right away */
-  waitlist(input: { serviceId: string; staffId: string | null; date: Ymd; name: string; phone: string; guestId?: string; chatId: string; lang: Lang }): Promise<"joined" | "already" | "offered">;
+  waitlist(input: { serviceId: string; staffId: string | null; date: Ymd; name: string; phone: string; guestId?: string; chatId: string; linkChat: boolean; lang: Lang }): Promise<"joined" | "already" | "offered">;
 }
 
 const rows = <T>(xs: T[], n: number): T[][] => Array.from({ length: Math.ceil(xs.length / n) }, (_, i) => xs.slice(i * n, i * n + n));
@@ -151,11 +156,11 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     });
   };
 
-  const joinWaitlist = async (phone: string, name: string) => {
+  const joinWaitlist = async (phone: string, name: string, own: boolean) => {
     if (!state.serviceId || !state.date) return menu(t.startOver);
     const date = state.date;
-    const res = await deps.waitlist({ serviceId: state.serviceId, staffId: state.staffId ?? null, date, name, phone, guestId: chat.guest?.id, chatId: u.chatId, lang });
-    await save({ step: "idle", phone, name });
+    const res = await deps.waitlist({ serviceId: state.serviceId, staffId: state.staffId ?? null, date, name, phone, guestId: chat.guest?.id, chatId: u.chatId, linkChat: own, lang });
+    await save({ step: "idle", phone, name, phoneOwn: own });
     out.push({ text: res === "offered" ? t.waitOffered : res === "already" ? t.waitAlready : t.waitJoined(dateLabel(date)), buttons: mainMenu() });
   };
 
@@ -191,12 +196,19 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
       out.push({ text: t.badPhone, askContact: true, contactLabel: t.sharePhone });
       return out;
     }
-    const guest = await deps.findGuestByPhone(phone);
+    // Telegram vouches for a shared contact. A typed number is only a claim: anyone can type
+    // someone else's, so it may book a visit but never opens that guest's bookings, name or codes.
+    const own = !!u.contactPhone;
+    if (state.after === "my" && !own) {
+      out.push({ text: t.needOwnPhone, askContact: true, contactLabel: t.sharePhone });
+      return out;
+    }
+    const guest = own ? await deps.findGuestByPhone(phone) : null;
     if (guest) await deps.saveChat(u.chatId, { guestId: guest.id, lang });
     out.push({ text: guest ? t.thanksKnown(guest.name.split(" ")[0]!) : t.thanks, removeKeyboard: true });
     if (state.after === "wait") {
-      await save({ ...state, phone });
-      await joinWaitlist(phone, guest?.name ?? state.name ?? u.firstName ?? "Гостья");
+      await save({ ...state, phone, phoneOwn: own });
+      await joinWaitlist(phone, guest?.name ?? state.name ?? u.firstName ?? "Гостья", own);
       return out;
     }
     if (state.after === "my") {
@@ -206,7 +218,7 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
       return out;
     }
     const name = guest?.name ?? state.name ?? u.firstName;
-    await save({ ...state, phone, name, step: name ? "idle" : "name" });
+    await save({ ...state, phone, phoneOwn: own, name, step: name ? "idle" : "name" });
     if (!name) {
       out.push({ text: t.askName });
       return out;
@@ -228,6 +240,10 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
   // Commands and free text
   const text = (u.text ?? "").trim();
   if (!u.data && text) {
+    if ((text.startsWith("/staff") || text.startsWith("/master")) && deps.tooManyCodeTries(u.chatId)) {
+      out.push({ text: t.codeTooMany });
+      return out;
+    }
     if (text.startsWith("/staff")) {
       const code = text.split(/\s+/)[1] ?? "";
       if (code && code === (await deps.staffCode())) {
@@ -320,8 +336,8 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     case "w":
       if (!state.serviceId) return bail();
       await save({ ...state, date: arg, time: undefined });
-      if (chat.guest) await joinWaitlist(chat.guest.phone, chat.guest.name);
-      else if (state.phone) await joinWaitlist(state.phone, state.name ?? u.firstName ?? "Гостья");
+      if (chat.guest) await joinWaitlist(chat.guest.phone, chat.guest.name, true);
+      else if (state.phone) await joinWaitlist(state.phone, state.name ?? u.firstName ?? "Гостья", state.phoneOwn === true);
       else await askPhone("wait");
       break;
 
@@ -334,7 +350,7 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
     case "t": {
       if (!state.serviceId || !state.date) return bail();
       const guest = chat.guest;
-      await save({ ...state, time: arg, ...(guest ? { phone: guest.phone, name: guest.name } : {}) });
+      await save({ ...state, time: arg, ...(guest ? { phone: guest.phone, name: guest.name, phoneOwn: true } : {}) });
       if (!guest && !state.phone) await askPhone("confirm");
       else await confirm();
       break;
@@ -351,6 +367,7 @@ export async function handleUpdate(u: BotUpdate, deps: BotDeps): Promise<BotRepl
         phone: state.phone,
         guestId: chat.guest?.id,
         chatId: u.chatId,
+        linkChat: !!chat.guest || state.phoneOwn === true,
         lang,
       });
       if (!res.ok) {

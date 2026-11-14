@@ -74,8 +74,9 @@ export function toBotUpdate(u: TgUpdate) {
   }
   const m = u.message;
   if (!m || m.chat.type !== "private") return null;
-  // Only accept the sender's own contact, not a forwarded one
-  const contact = m.contact && (!m.contact.user_id || String(m.contact.user_id) === String(m.chat.id)) ? m.contact.phone_number : undefined;
+  // Only the sender's own contact. Telegram sets user_id on a contact shared with the button;
+  // a card typed in by hand or forwarded has none, or someone else's, and proves nothing.
+  const contact = m.contact?.user_id && String(m.contact.user_id) === String(m.chat.id) ? m.contact.phone_number : undefined;
   return {
     callbackId: null,
     update: { chatId: String(m.chat.id), firstName: m.from?.first_name, username: m.from?.username, text: m.text, contactPhone: contact, languageCode: m.from?.language_code },
