@@ -48,3 +48,5 @@ next-env.d.ts
 /media/
 /e2e-output/
 /run-output/
+
+/videos
